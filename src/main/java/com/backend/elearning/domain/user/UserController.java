@@ -36,8 +36,10 @@ public class UserController {
 
     @PostMapping({"/admin/users"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = UserVm.class))),
-            @ApiResponse(responseCode = "409", description = "Duplicated email", content = @Content(schema = @Schema(implementation = ErrorVm.class))),
+            @ApiResponse(responseCode = "201", description = "Created", content =
+                @Content(schema = @Schema(implementation = UserVm.class))),
+            @ApiResponse(responseCode = "409", description = "Duplicated email", content =
+                @Content(schema = @Schema(implementation = ErrorVm.class))),
     })
     public ResponseEntity<UserVm> create (@RequestBody UserPostVm userPostVm) {
         UserVm savedUser = userService.create(userPostVm);
@@ -47,8 +49,10 @@ public class UserController {
     @PutMapping({"/admin/users/{id}"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No content"),
-            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorVm.class))),
-            @ApiResponse(responseCode = "409", description = "Duplicated email", content = @Content(schema = @Schema(implementation = ErrorVm.class)))
+            @ApiResponse(responseCode = "404", description = "Not found", content =
+                @Content(schema = @Schema(implementation = ErrorVm.class))),
+            @ApiResponse(responseCode = "409", description = "Duplicated email", content =
+                @Content(schema = @Schema(implementation = ErrorVm.class)))
     })
     public ResponseEntity<UserVm> update (@RequestBody UserPutVm userPostVm,
                                           @PathVariable("id") Long id

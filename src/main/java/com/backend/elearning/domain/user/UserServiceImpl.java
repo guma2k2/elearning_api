@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -69,8 +70,10 @@ public class UserServiceImpl implements UserService{
                 .lastName(userPostVm.lastName())
                 .active(userPostVm.active())
                 .password(passwordEncoder.encode(userPostVm.password()))
+                .dateOfBirth(LocalDate.of(userPostVm.year(), userPostVm.month(), userPostVm.day()))
+                .photoId(userPostVm.photoId())
                 .role(ERole.valueOf(userPostVm.role()))
-                .gender(EGender.valueOf(userPostVm.role()))
+                .gender(EGender.valueOf(userPostVm.gender()))
                 .build();
         User savedUser = userRepository.saveAndFlush(user);
         return UserVm.fromModel(savedUser);

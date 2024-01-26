@@ -24,7 +24,6 @@ public class User extends AbstractAuditEntity {
     @Column(unique = true, length = 50)
     private String email;
 
-    @Size(max = 20, min = 8)
     private String password;
 
     @Column(length = 20)
