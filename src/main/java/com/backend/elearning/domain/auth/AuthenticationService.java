@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.auth;
 
 
+import com.backend.elearning.domain.media.MediaService;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserVm;
@@ -20,10 +21,13 @@ public class AuthenticationService {
 
     private final JWTUtil jwtUtil;
 
-    public AuthenticationService(AuthenticationManager authenticationManager, UserRepository userRepository, JWTUtil jwtUtil) {
+    private final MediaService mediaService;
+
+    public AuthenticationService(AuthenticationManager authenticationManager, UserRepository userRepository, JWTUtil jwtUtil, MediaService mediaService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
+        this.mediaService = mediaService;
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
@@ -35,7 +39,8 @@ public class AuthenticationService {
         );
         AuthUserDetails principal = (AuthUserDetails) authentication.getPrincipal();
         User user = userRepository.findById(principal.getId()).orElseThrow();
-        UserVm userVm = UserVm.fromModel(user);
+        String urlPhoto = mediaService.getUrlById(user.getPhotoId());
+        UserVm userVm = UserVm.fromModel(user, urlPhoto);
         String token = jwtUtil.issueToken(request.username(), principal.getRole());
         return new AuthenticationVm(token, userVm);
     }

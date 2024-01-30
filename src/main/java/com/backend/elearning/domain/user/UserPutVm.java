@@ -9,6 +9,8 @@ public record UserPutVm(
     String gender,
     boolean active,
     String photoId,
-    String dateOfBirth,
+    int day,
+    int month,
+    int year,
     String role
 ) {}

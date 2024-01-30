@@ -9,18 +9,18 @@ public record UserVm (
          String lastName,
          String gender,
          boolean active,
-         String photoId,
+         String photoURL,
          String dateOfBirth,
          String role
 ) {
-    public static UserVm fromModel (User user) {
+    public static UserVm fromModel (User user, String photoUrl) {
         return new UserVm(user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getGender().name(),
                 user.isActive(),
-                user.getPhotoId(),
+                photoUrl,
                 user.getDateOfBirth().toString(),
                 user.getRole().name());
     }

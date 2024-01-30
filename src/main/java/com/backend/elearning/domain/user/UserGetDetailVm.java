@@ -7,7 +7,7 @@ public record UserGetDetailVm (Long id,
                                String lastName,
                                String gender,
                                boolean active,
-                               String photoId,
+                               String photoURL,
                                String dateOfBirth,
                                String role) {
 }

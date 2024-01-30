@@ -46,6 +46,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorVm> handleException(Exception ex, WebRequest request) {
         String message = ex.getMessage();
         ErrorVm errorVm = new ErrorVm(HttpStatus.INTERNAL_SERVER_ERROR.toString(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), message);
+        log.error(errorVm.toString());
         return ResponseEntity.badRequest().body(errorVm);
     }
 

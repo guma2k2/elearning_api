@@ -1,11 +1,13 @@
 package com.backend.elearning.domain.media;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/medias")
+@Slf4j
 public class MediaController {
 
     private final MediaService mediaService;
@@ -15,7 +17,8 @@ public class MediaController {
     }
 
     @PostMapping
-    public ResponseEntity<Media> save (@RequestParam("file") MultipartFile multipartFile) {
+    public ResponseEntity<Media> save (@RequestParam("photo") MultipartFile multipartFile) {
+        log.info(multipartFile.getName());
         Media media = mediaService.saveOrUpdateFile(multipartFile, "");
         return ResponseEntity.ok().body(media);
     }
