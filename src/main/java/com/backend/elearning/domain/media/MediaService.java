@@ -4,7 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MediaService {
     Media saveOrUpdateFile (MultipartFile multipartFile, String uuid);
-
     String getUrlById (String uuid);
     void deleteFile (String uuid);
 }

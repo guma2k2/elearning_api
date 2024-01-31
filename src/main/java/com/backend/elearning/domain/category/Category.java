@@ -31,8 +31,9 @@ public class Category extends AbstractAuditEntity {
 
     private String description;
 
+    private boolean publish;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "parent_id")
     private Category parent;
 

@@ -7,23 +7,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
 
-    @Query(value = """
-            select c
-            from Category c
-            join fetch c.parent p
-            """)
-    Page<Category> findAllWithParent(Pageable pageable);
 
     @Query(value = """
             select count(1)
             from Category c
-            join fetch c.parent p
             where c.name = :name and (c.id != :id or :id = null)
             """)
     Long countExistByName (@Param("name") String name,
@@ -33,8 +27,17 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query(value = """
             select c
             from Category c
-            join fetch c.parent p
             where c.id = :id
             """)
     Optional<Category> findByIdWithParent(@Param("id") Integer id);
+
+
+
+    @Query(value = """
+            select c
+            from Category c
+            left join fetch c.childrenList
+            where c.parent IS NULL
+            """)
+    List<Category> findAllParents();
 }

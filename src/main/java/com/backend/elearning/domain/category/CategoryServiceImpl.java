@@ -28,8 +28,7 @@ public class CategoryServiceImpl implements CategoryService{
         List<CategoryVM> categoryGetVms = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
-
-        Page<Category> categoryPage = categoryRepository.findAllWithParent(pageable);
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
         List<Category> categories = categoryPage.getContent();
         for (Category category : categories) {
             categoryGetVms.add(CategoryVM.fromModel(category));
@@ -45,24 +44,37 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void create(CategoryPostVM categoryPostVM) {
+    public CategoryVM create(CategoryPostVM categoryPostVM) {
         if (categoryRepository.countExistByName(categoryPostVM.name(), null) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND);
         }
         Category category = Category.builder()
                 .name(categoryPostVM.name())
                 .description(categoryPostVM.description())
+                .publish(categoryPostVM.isPublish())
                 .build();
         if (categoryPostVM.parentId() != null) {
-            Category parent = categoryRepository.findById(categoryPostVM.parentId()).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryPostVM.parentId()));
+            Category parent = categoryRepository.findById(categoryPostVM.parentId()).orElseThrow(() ->
+                    new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryPostVM.parentId()));
             category.setParent(parent);
         }
-
-        categoryRepository.saveAndFlush(category);
+        return CategoryVM.fromModel(categoryRepository.saveAndFlush(category));
     }
     @Override
-    public void getCategoryById(Integer categoryId) {
+    public CategoryVM getCategoryById(Integer categoryId) {
+        Category category = categoryRepository.findByIdWithParent(categoryId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryId));
+        CategoryVM categoryVM = CategoryVM.fromModel(category);
+        return categoryVM;
+    }
 
+    @Override
+    public List<CategoryListGetVM> getCategoryParents() {
+        List<Category> categoryParentList = categoryRepository.findAllParents();
+        List<CategoryListGetVM> categoryListGetVMs = categoryParentList.stream()
+                .map(CategoryListGetVM::fromModel)
+                .toList();
+        return categoryListGetVMs;
     }
 
     @Override
@@ -70,7 +82,8 @@ public class CategoryServiceImpl implements CategoryService{
         if (categoryRepository.countExistByName(categoryPutVM.name(), categoryId) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND);
         }
-        Category category = categoryRepository.findByIdWithParent(categoryId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND,categoryId));
+        Category category = categoryRepository.findByIdWithParent(categoryId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND,categoryId));
         category.setName(categoryPutVM.name());
         category.setDescription(categoryPutVM.description());
         if (categoryPutVM.parentId() == null) {
@@ -90,7 +103,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public void delete(Integer categoryId) {
-
+        // Todo: check isHaveChildren
     }
 
 
