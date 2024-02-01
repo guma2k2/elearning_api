@@ -46,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public CategoryVM create(CategoryPostVM categoryPostVM) {
         if (categoryRepository.countExistByName(categoryPostVM.name(), null) > 0l) {
-            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND);
+            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED);
         }
         Category category = Category.builder()
                 .name(categoryPostVM.name())
@@ -80,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public void update(CategoryPostVM categoryPutVM, Integer categoryId) {
         if (categoryRepository.countExistByName(categoryPutVM.name(), categoryId) > 0l) {
-            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND);
+            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED);
         }
         Category category = categoryRepository.findByIdWithParent(categoryId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND,categoryId));

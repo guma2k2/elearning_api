@@ -12,4 +12,5 @@ public interface CategoryService {
     List<CategoryListGetVM> getCategoryParents();
     void update(CategoryPostVM categoryPutVM, Integer categoryId);
     void delete(Integer categoryId);
+
 }

@@ -5,12 +5,8 @@ import com.backend.elearning.domain.common.CustomAuditingEntityListener;
 import com.backend.elearning.domain.topic.Topic;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "category")
@@ -26,7 +22,7 @@ public class Category extends AbstractAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 40)
+    @Column(length = 40,unique = true)
     private String name;
 
     private String description;
@@ -38,14 +34,27 @@ public class Category extends AbstractAuditEntity {
     private Category parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Category> childrenList = new ArrayList<>();
 
 
-    @ManyToMany
-    @JoinTable(
-            name = "category_topic",
-            joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @ManyToMany(mappedBy = "categories")
+    @Builder.Default
     private Set<Topic> topics = new HashSet<>();
+
+    public Category(String name) {
+        this.name = name;
+    }
+
+    public void addTopic(Topic topic) {
+        topics.add(topic);
+        topic.getCategories().add(this);
+    }
+
+    public void removeTopic(Topic topic) {
+        topics.remove(topic);
+        topic.getCategories().remove(this);
+    }
+
 
 }
