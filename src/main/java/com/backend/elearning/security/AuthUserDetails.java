@@ -16,6 +16,7 @@ import java.util.List;
 public class AuthUserDetails implements UserDetails {
 
     private Long id;
+
     private String email;
 
     private boolean active;

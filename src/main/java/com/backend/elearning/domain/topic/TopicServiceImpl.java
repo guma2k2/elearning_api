@@ -57,6 +57,7 @@ public class TopicServiceImpl implements TopicService{
         }
         Topic topic = Topic.builder()
                 .name(topicPostVM.name())
+                .description(topicPostVM.description())
                 .publish(topicPostVM.isPublish())
                 .build();
         topicRepository.saveAndFlush(topic);
@@ -90,6 +91,7 @@ public class TopicServiceImpl implements TopicService{
         Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.TOPIC_NOT_FOUND));
         topic.setName(topicPostVM.name());
         topic.setPublish(topicPostVM.isPublish());
+        topic.setDescription(topicPostVM.description());
         Set<Category> newCategories = new HashSet<>(categoryRepository.findAllByNameIn(topicPostVM.categories()));
         topic.setCategories(newCategories);
         log.info(String.valueOf(newCategories.size()));

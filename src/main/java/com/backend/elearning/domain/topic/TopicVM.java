@@ -8,7 +8,8 @@ import java.util.Set;
 public record TopicVM(
     Integer id,
     String name,
-    boolean publish,
+    String description,
+    boolean isPublish,
     List<String> categories,
     String createdAt,
     String updatedAt
@@ -17,6 +18,6 @@ public record TopicVM(
     public static TopicVM fromModel(Topic topic){
         Set<Category> categories = topic.getCategories();
         List<String> categoriesName = categories.stream().map(Category::getName).toList();
-        return new TopicVM(topic.getId(), topic.getName(), topic.isPublish(), categoriesName, topic.getCreatedAt().toString(), topic.getUpdatedAt().toString());
+        return new TopicVM(topic.getId(), topic.getName(),topic.getDescription() ,topic.isPublish(), categoriesName, topic.getCreatedAt().toString(), topic.getUpdatedAt().toString());
     }
 }

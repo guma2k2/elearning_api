@@ -25,6 +25,8 @@ public class Topic extends AbstractAuditEntity {
 
     private String name;
 
+    private String description;
+
     private boolean publish;
 
     @Builder.Default
