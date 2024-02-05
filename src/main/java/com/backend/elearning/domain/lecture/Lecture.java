@@ -21,7 +21,7 @@ public class Lecture extends AbstractAuditEntity {
     private Long id;
 
     @Column(nullable = false, length = 80)
-    private String name;
+    private String title;
 
     private int number;
 

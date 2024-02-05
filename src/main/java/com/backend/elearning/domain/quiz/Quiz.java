@@ -22,7 +22,7 @@ public class Quiz extends AbstractAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String title;
     private int number;
 
     @ManyToOne(fetch = FetchType.LAZY)
