@@ -24,6 +24,7 @@ public class Quiz extends AbstractAuditEntity {
     private Long id;
     private String title;
     private int number;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
