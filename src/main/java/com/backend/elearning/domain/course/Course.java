@@ -41,6 +41,9 @@ public class Course extends AbstractAuditEntity {
 
     private String imageId;
 
+    @Enumerated(EnumType.STRING)
+    private ELevel level;
+
     private boolean free;
 
     @ManyToOne

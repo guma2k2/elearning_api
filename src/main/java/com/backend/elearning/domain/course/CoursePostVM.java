@@ -14,9 +14,8 @@ public record CoursePostVM(
          String targetAudience,
 
          String description,
-
+         String level,
          String imageId,
-
          boolean free,
          Integer categoryId,
          Integer topicId
