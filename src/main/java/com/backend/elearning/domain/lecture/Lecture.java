@@ -23,7 +23,7 @@ public class Lecture extends AbstractAuditEntity {
     @Column(nullable = false, length = 80)
     private String title;
 
-    private int number;
+    private float number;
 
     private String videoId;
 

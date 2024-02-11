@@ -15,7 +15,7 @@ public class QuizServiceImpl implements QuizService{
     }
 
     @Override
-    public Quiz create(QuizPostVM quizPostVM) {
+    public void create(QuizPostVM quizPostVM) {
         Section section = sectionRepository.findById(quizPostVM.sectionId()).orElseThrow()  ;
         Quiz quiz = Quiz.builder()
                 .title(quizPostVM.title())
@@ -23,6 +23,6 @@ public class QuizServiceImpl implements QuizService{
                 .description(quizPostVM.description())
                 .section(section)
                 .build();
-        return quizRepository.save(quiz);
+        quizRepository.save(quiz);
     }
 }

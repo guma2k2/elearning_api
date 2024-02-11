@@ -4,6 +4,8 @@ import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class SectionServiceImpl implements SectionService{
     private final SectionRepository sectionRepository;
@@ -15,7 +17,7 @@ public class SectionServiceImpl implements SectionService{
     }
 
     @Override
-    public Section create(SectionPostVM sectionPostVM) {
+    public SectionVM create(SectionPostVM sectionPostVM) {
         Course course = courseRepository.findById(sectionPostVM.courseId()).orElseThrow();
         Section section = Section.builder()
                 .title(sectionPostVM.title())
@@ -23,6 +25,6 @@ public class SectionServiceImpl implements SectionService{
                 .objective(sectionPostVM.objective())
                 .course(course)
                 .build();
-        return sectionRepository.save(section);
+        return SectionVM.fromModel(sectionRepository.save(section), new ArrayList<>());
     }
 }

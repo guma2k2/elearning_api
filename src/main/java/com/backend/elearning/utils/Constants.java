@@ -15,6 +15,7 @@ public final class Constants {
         public static final String TOPIC_NOT_FOUND = "TOPIC_NOT_FOUND";
 
         public static final String TOPIC_NAME_DUPLICATED = "TOPIC_NAME_DUPLICATED";
+        public static final String COURSE_TITLE_DUPLICATED = "COURSE_TITLE_DUPLICATED";
         public static final String USER_EMAIL_DUPLICATED = "USER_EMAIL_DUPLICATED";
 
     }

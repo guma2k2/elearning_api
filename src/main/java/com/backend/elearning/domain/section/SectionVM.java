@@ -8,9 +8,11 @@ public record SectionVM(
         Long id,
         String title,
 
-        int number,
-
+        float number,
         String objective,
         List<Curriculum> curriculums
 ) {
+    public static SectionVM fromModel(Section section, List<Curriculum> curriculums) {
+        return new SectionVM(section.getId(), section.getTitle(), section.getNumber(), section.getObjective(), curriculums);
+    }
 }

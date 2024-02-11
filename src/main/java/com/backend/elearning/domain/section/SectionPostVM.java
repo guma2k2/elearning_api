@@ -3,7 +3,7 @@ package com.backend.elearning.domain.section;
 public record SectionPostVM(
         Long id,
         String title,
-        int number,
+        float number,
         String objective,
         Long courseId
 ) {

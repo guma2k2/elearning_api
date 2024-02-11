@@ -18,7 +18,7 @@ public class LectureServiceImpl implements LectureService {
 
 
     @Override
-    public Lecture create(LecturePostVM lecturePostVM) {
+    public void create(LecturePostVM lecturePostVM) {
         Section section = sectionRepository.findById(lecturePostVM.sectionId()).orElseThrow();
         Lecture lecture = Lecture.builder()
                 .title(lecturePostVM.title())
@@ -27,6 +27,6 @@ public class LectureServiceImpl implements LectureService {
                 .number(lecturePostVM.number())
                 .section(section)
                 .build();
-        return lectureRepository.save(lecture);
+        lectureRepository.save(lecture);
     }
 }

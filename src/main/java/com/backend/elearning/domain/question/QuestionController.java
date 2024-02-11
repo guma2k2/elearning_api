@@ -1,4 +1,4 @@
-package com.backend.elearning.domain.lecture;
+package com.backend.elearning.domain.question;
 
 import com.backend.elearning.domain.course.CourseVM;
 import com.backend.elearning.domain.section.SectionPostVM;
@@ -16,21 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1")
-public class LectureController {
-    private final LectureService lectureService;
+public class QuestionController {
+    private final QuestionService questionService;
 
-    public LectureController(LectureService lectureService) {
-        this.lectureService = lectureService;
+    public QuestionController(QuestionService questionService) {
+        this.questionService = questionService;
     }
-
-    @PostMapping("/admin/lectures")
+    @PostMapping("/admin/questions")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No content")
     })
-    public ResponseEntity<Void> createCourse (
-            @RequestBody LecturePostVM lecturePostVM
+    public ResponseEntity<Void> createQuestion (
+            @RequestBody QuestionPostVM questionPostVM
     ) {
-        lectureService.create(lecturePostVM);
+        questionService.create(questionPostVM);
         return ResponseEntity.noContent().build();
     }
 }

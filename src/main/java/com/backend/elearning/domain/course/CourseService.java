@@ -1,7 +1,7 @@
 package com.backend.elearning.domain.course;
 
 public interface CourseService {
-    Course save(CoursePostVM coursePostVM);
+    CourseVM create(CoursePostVM coursePostVM, Long userId);
 
     CourseVM getCourseById(Long id);
 }

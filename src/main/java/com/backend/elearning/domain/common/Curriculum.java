@@ -4,12 +4,12 @@ public class Curriculum {
     private Long id;
     private String title;
 
-    private int number;
+    private float number;
 
     public Curriculum() {
     }
 
-    public Curriculum(Long id, String title, int number) {
+    public Curriculum(Long id, String title, float number) {
         this.id = id;
         this.title = title;
         this.number = number;
@@ -31,11 +31,11 @@ public class Curriculum {
         this.title = title;
     }
 
-    public int getNumber() {
+    public float getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(float number) {
         this.number = number;
     }
 }

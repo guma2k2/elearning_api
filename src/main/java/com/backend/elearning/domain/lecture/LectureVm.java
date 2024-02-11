@@ -15,7 +15,7 @@ public class LectureVm extends Curriculum {
         this.duration = duration;
     }
 
-    public LectureVm(Long id, String title, int number, String videoId, String lectureDetails, int duration) {
+    public LectureVm(Long id, String title, float number, String videoId, String lectureDetails, int duration) {
         super(id, title, number);
         this.videoId = videoId;
         this.lectureDetails = lectureDetails;

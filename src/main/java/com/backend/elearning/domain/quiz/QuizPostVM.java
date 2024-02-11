@@ -3,7 +3,7 @@ package com.backend.elearning.domain.quiz;
 public record QuizPostVM (
         Long id,
         String title,
-        int number,
+        float number,
         String description,
         Long sectionId
 ) {

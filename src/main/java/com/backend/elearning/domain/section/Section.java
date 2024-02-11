@@ -27,7 +27,7 @@ public class Section extends AbstractAuditEntity {
 
     private String title;
 
-    private int number;
+    private float number;
 
     private String objective;
 

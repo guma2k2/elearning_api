@@ -20,6 +20,7 @@ public class Answer extends AuditingEntityListener {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String answerText;
+    private String reason;
     private boolean correct;
 
     @ManyToOne(fetch = FetchType.LAZY)

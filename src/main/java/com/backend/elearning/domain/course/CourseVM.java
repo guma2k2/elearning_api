@@ -26,4 +26,8 @@ public record CourseVM(
         Integer topicId,
         List<SectionVM> sections
 ) {
+    public static CourseVM fromModel (Course course, String imageURL, List<SectionVM> sections) {
+        return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getObjective(), course.getRequirement(),
+                course.getTargetAudience(), course.getDescription(), imageURL, course.isFree(),course.getCategory().getId(), course.getTopic().getId(), sections);
+    }
 }
