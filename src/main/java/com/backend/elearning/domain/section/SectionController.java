@@ -1,20 +1,13 @@
 package com.backend.elearning.domain.section;
 
-import com.backend.elearning.domain.course.CoursePostVM;
 import com.backend.elearning.domain.course.CourseVM;
-import com.backend.elearning.exception.ErrorVm;
-import com.backend.elearning.security.AuthUserDetails;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,5 +30,13 @@ public class SectionController {
     ) {
         SectionVM sectionVM = sectionService.create(sectionPostVM);
         return ResponseEntity.status(HttpStatus.CREATED).body(sectionVM);
+    }
+
+    @GetMapping("/admin/sections/{id}")
+    public ResponseEntity<SectionVM> getSectionById (
+            @PathVariable("id") Long sectionId
+    ) {
+        SectionVM sectionVM = sectionService.getById(sectionId);
+        return ResponseEntity.ok().body(sectionVM);
     }
 }

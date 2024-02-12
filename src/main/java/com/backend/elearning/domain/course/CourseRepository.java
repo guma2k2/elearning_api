@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
@@ -15,4 +17,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             """)
     Long countExistByTitle(@Param("title") String title,
                            @Param("id") Long id);
+
+    @Query(value = """
+            select c
+            from Course c
+            left join fetch c.sections s
+            where s.id = :id
+            """)
+    Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
 }

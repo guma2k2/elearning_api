@@ -6,4 +6,7 @@ public record AnswerVM(
          String reason,
          boolean correct
 ) {
+    public static AnswerVM fromModel(Answer answer) {
+        return new AnswerVM(answer.getId(), answer.getAnswerText(), answer.getReason(), answer.isCorrect());
+    }
 }

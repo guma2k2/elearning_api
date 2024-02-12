@@ -31,11 +31,11 @@ public class Course extends AbstractAuditEntity {
 
     private String headline;
 
-    private String objective;
+    private String[] objectives;
 
-    private String requirement;
+    private String[] requirements;
 
-    private String targetAudience;
+    private String[] targetAudiences;
 
     private String description;
 

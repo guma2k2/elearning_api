@@ -33,10 +33,31 @@ public class CourseController {
     public ResponseEntity<CourseVM> createCourse (
             @RequestBody CoursePostVM coursePostVM,
             @AuthenticationPrincipal AuthUserDetails authUserDetails
-            ) {
-        Long userId = authUserDetails.getId();
+    ) {
+//        Long userId = authUserDetails.getId();
+        Long userId = 1L;
         CourseVM courseVM = courseService.create(coursePostVM, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(courseVM);
+    }
+
+    @PutMapping("/admin/courses/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Accepted", content =
+            @Content(schema = @Schema(implementation = CourseVM.class))),
+            @ApiResponse(responseCode = "404", description = "Bad Request", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+            @ApiResponse(responseCode = "409", description = "Duplicated title", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+    })
+    public ResponseEntity<CourseVM> updateCourse (
+            @RequestBody CoursePostVM coursePostVM,
+            @PathVariable("id") Long courseId,
+            @AuthenticationPrincipal AuthUserDetails authUserDetails
+    ) {
+//        Long userId = authUserDetails.getId();
+        Long userId = 1L;
+        CourseVM courseVM = courseService.update(coursePostVM, userId, courseId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(courseVM);
     }
 
     @GetMapping("/courses/{id}")

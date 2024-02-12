@@ -22,6 +22,10 @@ public class LectureVm extends Curriculum {
         this.duration = duration;
     }
 
+    public LectureVm() {
+
+    }
+
     public String getVideoId() {
         return videoId;
     }

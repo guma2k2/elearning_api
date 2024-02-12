@@ -11,11 +11,11 @@ public record CourseVM(
 
         String headline,
 
-        String objective,
+        String[] objective,
 
-        String requirement,
+        String[] requirement,
 
-        String targetAudience,
+        String[] targetAudience,
 
         String description,
 
@@ -27,7 +27,7 @@ public record CourseVM(
         List<SectionVM> sections
 ) {
     public static CourseVM fromModel (Course course, String imageURL, List<SectionVM> sections) {
-        return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getObjective(), course.getRequirement(),
-                course.getTargetAudience(), course.getDescription(), imageURL, course.isFree(),course.getCategory().getId(), course.getTopic().getId(), sections);
+        return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getObjectives(), course.getRequirements(),
+                course.getTargetAudiences(), course.getDescription(), imageURL, course.isFree(),course.getCategory().getId(), course.getTopic().getId(), sections);
     }
 }

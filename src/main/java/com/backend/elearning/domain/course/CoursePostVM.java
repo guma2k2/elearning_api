@@ -7,11 +7,11 @@ public record CoursePostVM(
 
          String headline,
 
-         String objective,
+         String[] objectives,
 
-         String requirement,
+         String[] requirements,
 
-         String targetAudience,
+         String[] targetAudiences,
 
          String description,
          String level,

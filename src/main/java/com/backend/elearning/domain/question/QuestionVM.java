@@ -9,4 +9,7 @@ public record QuestionVM(
         String title,
         List<AnswerVM> answers
 ) {
+    public static QuestionVM fromModel (Question question, List<AnswerVM> answerVMS) {
+        return new QuestionVM(question.getId(), question.getTitle(), answerVMS);
+    }
 }

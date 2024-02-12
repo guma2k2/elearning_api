@@ -21,6 +21,10 @@ public class QuizVM extends Curriculum {
         this.questions = questions;
     }
 
+    public QuizVM() {
+
+    }
+
     public List<QuestionVM> getQuestions() {
         return questions;
     }
