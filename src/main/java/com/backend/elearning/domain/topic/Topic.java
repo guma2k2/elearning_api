@@ -29,12 +29,12 @@ public class Topic extends AbstractAuditEntity {
 
     private boolean publish;
 
+    //Don’t use CascadeType.REMOVE with @ManyToMany associations:
+    // https://vladmihalcea.com/orphanremoval-jpa-hibernate/
     @Builder.Default
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE
-            //Don’t use CascadeType.REMOVE with @ManyToMany associations:
-            // https://vladmihalcea.com/orphanremoval-jpa-hibernate/
     })
     @JoinTable(
             name = "category_topic",

@@ -32,6 +32,15 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Optional<Category> findByIdWithParent(@Param("id") Integer id);
 
 
+    @Query(value = """
+            select c
+            from Category c
+            left join fetch c.topics
+            where c.id = :id
+            """)
+    Optional<Category> findByIdTopics(@Param("id") Integer id);
+
+
 
     @Query(value = """
             select c

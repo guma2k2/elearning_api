@@ -8,7 +8,7 @@ public interface TopicService {
     PageableData<TopicVM> getPageableTopics(int pageNum, int pageSize);
     TopicVM create (TopicPostVM topicPostVM);
     TopicVM getTopicById (Integer topicId);
-    List<TopicVM> getTopics();
+    List<TopicVM> getTopicsByCategoryId(Integer categoryId);
     void update(TopicPostVM topicPostVM, Integer topicId);
     void delete(Integer topicId);
 }

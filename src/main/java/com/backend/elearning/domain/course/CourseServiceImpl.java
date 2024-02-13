@@ -2,7 +2,11 @@ package com.backend.elearning.domain.course;
 
 import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.category.CategoryRepository;
+import com.backend.elearning.domain.category.CategoryVM;
+import com.backend.elearning.domain.common.Curriculum;
+import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.media.MediaService;
+import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.section.SectionService;
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.topic.Topic;
@@ -12,20 +16,24 @@ import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Slf4j
 public class CourseServiceImpl implements CourseService{
 
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
-
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
-
     private final SectionService sectionService;
     private final MediaService mediaService;
 
@@ -38,6 +46,27 @@ public class CourseServiceImpl implements CourseService{
         this.mediaService = mediaService;
     }
 
+
+    @Override
+    public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize) {
+        List<CourseVM> courseVMS = new ArrayList<>();
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+
+        Page<Course> coursePage = courseRepository.findAll(pageable);
+        List<Course> courses = coursePage.getContent();
+        for (Course course : courses) {
+            // Todo: get url image of course by imageId
+            courseVMS.add(CourseVM.fromModel(course,"" ,new ArrayList<>()));
+        }
+
+        return new PageableData(
+                pageNum,
+                pageSize,
+                (int) coursePage.getTotalElements(),
+                coursePage.getTotalPages(),
+                courseVMS
+        );
+    }
 
     @Override
     public CourseVM create(CoursePostVM coursePostVM, Long userId) {
@@ -88,12 +117,17 @@ public class CourseServiceImpl implements CourseService{
         List<SectionVM> sections = oldCourse.getSections()
                 .stream().map(section -> sectionService.getById(section.getId())).toList();
 
-        // Todo : list all sections by course id
+        // Todo : list all sections by course id -> done
         return CourseVM.fromModel(courseRepository.save(oldCourse), imageURL, sections);
     }
 
     @Override
     public CourseVM getCourseById(Long id) {
-        return null;
+        Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
+        log.info(String.valueOf(course.getSections().size()));
+        List<SectionVM> sections = new ArrayList<>(course.getSections()
+                .stream().map(section -> sectionService.getById(section.getId())).toList());
+        sections.sort(Comparator.comparing(SectionVM::number));
+        return CourseVM.fromModel(course, "", sections);
     }
 }

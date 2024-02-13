@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.lecture;
 
 import com.backend.elearning.domain.common.Curriculum;
+import com.backend.elearning.domain.common.ECurriculumType;
 
 public class LectureVm extends Curriculum {
     private String videoId;
@@ -15,8 +16,8 @@ public class LectureVm extends Curriculum {
         this.duration = duration;
     }
 
-    public LectureVm(Long id, String title, float number, String videoId, String lectureDetails, int duration) {
-        super(id, title, number);
+    public LectureVm(Long id, String title, float number, ECurriculumType type, String videoId, String lectureDetails, int duration) {
+        super(id, title, number, type);
         this.videoId = videoId;
         this.lectureDetails = lectureDetails;
         this.duration = duration;

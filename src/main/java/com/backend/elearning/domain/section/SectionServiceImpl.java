@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.section;
 
 import com.backend.elearning.domain.common.Curriculum;
+import com.backend.elearning.domain.common.ECurriculumType;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.lecture.Lecture;
@@ -9,11 +10,13 @@ import com.backend.elearning.domain.question.QuestionService;
 import com.backend.elearning.domain.question.QuestionVM;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizVM;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@Slf4j
 public class SectionServiceImpl implements SectionService{
     private final SectionRepository sectionRepository;
     private final CourseRepository courseRepository;
@@ -51,6 +54,7 @@ public class SectionServiceImpl implements SectionService{
         for (Lecture lecture : lectures) {
             LectureVm lectureVm = new LectureVm();
             lectureVm.setId(lecture.getId());
+            lectureVm.setType(ECurriculumType.lecture);
             lectureVm.setTitle(lecture.getTitle());
             lectureVm.setVideoId(lecture.getVideoId());
             lectureVm.setLectureDetails(lecture.getLectureDetails());
@@ -65,7 +69,8 @@ public class SectionServiceImpl implements SectionService{
             quizVM.setId(quiz.getId());
             quizVM.setTitle(quiz.getTitle());
             quizVM.setNumber(quiz.getNumber());
-
+            quizVM.setDescription(quiz.getDescription());
+            quizVM.setType(ECurriculumType.quiz);
             // Todo get all question by quizId
             List<QuestionVM> questionVMS = questionService.getByQuizId(quiz.getId());
             quizVM.setQuestions(questionVMS);

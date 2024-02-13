@@ -22,7 +22,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             select c
             from Course c
             left join fetch c.sections s
-            where s.id = :id
+            where c.id = :id
             """)
     Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
 }

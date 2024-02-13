@@ -33,6 +33,13 @@ public class TopicController {
         TopicVM topicVM = topicService.getTopicById(topicId);
         return ResponseEntity.ok().body(topicVM);
     }
+    @GetMapping("/topics/category/{id}")
+    public ResponseEntity<List<TopicVM>> getTopicsByCategoryId (
+            @PathVariable("id") Integer categoryId
+    ) {
+        List<TopicVM> topics = topicService.getTopicsByCategoryId(categoryId);
+        return ResponseEntity.ok().body(topics);
+    }
 
     @GetMapping("/admin/topic/paging")
     public ResponseEntity<PageableData<TopicVM>> getPageableTopic (
@@ -73,6 +80,8 @@ public class TopicController {
         return ResponseEntity.noContent()
                 .build();
     }
+
+
 
     @DeleteMapping("/admin/topic/{id}")
     public ResponseEntity<Void> delete (

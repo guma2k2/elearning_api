@@ -1,9 +1,10 @@
 package com.backend.elearning.domain.course;
 
-import com.backend.elearning.domain.category.CategoryPostVM;
 import com.backend.elearning.domain.category.CategoryVM;
+import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.exception.ErrorVm;
 import com.backend.elearning.security.AuthUserDetails;
+import com.backend.elearning.utils.Constants;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,13 +15,23 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/v1")
 public class CourseController {
 
     private final CourseService courseService;
 
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
+    }
+
+
+    @GetMapping("/admin/courses/paging")
+    public ResponseEntity<PageableData<CourseVM>> getPageableCourse (
+            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+    ) {
+        PageableData<CourseVM> pageableCourses = courseService.getPageableCourses(pageNum, pageSize);
+        return ResponseEntity.ok().body(pageableCourses);
     }
 
     @PostMapping("/admin/courses")

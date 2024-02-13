@@ -1,10 +1,10 @@
 package com.backend.elearning.domain.answer;
 
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.common.CustomAuditingEntityListener;
 import com.backend.elearning.domain.question.Question;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "answer")
@@ -14,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @Builder
 @EntityListeners(value = CustomAuditingEntityListener.class)
-public class Answer extends AuditingEntityListener {
+public class Answer extends AbstractAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

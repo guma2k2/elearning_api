@@ -79,8 +79,10 @@ public class TopicServiceImpl implements TopicService{
     }
 
     @Override
-    public List<TopicVM> getTopics() {
-        return null;
+    public List<TopicVM> getTopicsByCategoryId(Integer categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        List<TopicVM> topics = category.getTopics().stream().map(TopicVM::fromModel).toList();
+        return topics;
     }
 
     @Override
