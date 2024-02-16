@@ -1,7 +1,10 @@
 package com.backend.elearning.domain.lecture;
 
+import com.backend.elearning.domain.common.Curriculum;
 import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.section.SectionRepository;
+import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,15 +21,31 @@ public class LectureServiceImpl implements LectureService {
 
 
     @Override
-    public void create(LecturePostVM lecturePostVM) {
+    public LectureVm create(LecturePostVM lecturePostVM) {
         Section section = sectionRepository.findById(lecturePostVM.sectionId()).orElseThrow();
         Lecture lecture = Lecture.builder()
                 .title(lecturePostVM.title())
-                .lectureDetails(lecturePostVM.lectureDetails())
-                .videoId(lecturePostVM.videoId())
                 .number(lecturePostVM.number())
                 .section(section)
                 .build();
-        lectureRepository.save(lecture);
+        Lecture savedLecture = lectureRepository.save(lecture);
+        LectureVm lectureVm = new LectureVm(savedLecture);
+        return lectureVm;
+    }
+
+    @Override
+    public LectureVm update(LecturePostVM lecturePutVM, Long lectureId) {
+        Lecture lecture = lectureRepository.findByIdSection(lectureId).orElseThrow();
+        if (lecture.getSection().getId() != lecturePutVM.sectionId()) {
+            throw new BadRequestException(Constants.ERROR_CODE.LECTURE_SECTION_NOT_SAME, lecturePutVM.sectionId());
+        }
+        lecture.setTitle(lecturePutVM.title());
+        lecture.setNumber(lecturePutVM.number());
+        lecture.setVideoId(lecturePutVM.videoId());
+        lecture.setLectureDetails(lecturePutVM.lectureDetails());
+        lecture.setDuration(lecturePutVM.duration());
+        Lecture savedLecture = lectureRepository.saveAndFlush(lecture);
+        LectureVm lectureVm = new LectureVm(savedLecture);
+        return lectureVm;
     }
 }

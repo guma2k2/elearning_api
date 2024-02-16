@@ -12,4 +12,6 @@ public class Media {
 
     private String url;
 
+    private String duration;
+
 }

@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.lecture;
 
 public interface LectureService {
-    void create(LecturePostVM lecturePostVM);
+    LectureVm create(LecturePostVM lecturePostVM);
+    LectureVm update(LecturePostVM lecturePutVM, Long lectureId);
 }

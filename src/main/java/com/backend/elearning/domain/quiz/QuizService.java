@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.quiz;
 
 public interface QuizService {
-    void create(QuizPostVM quizPostVM);
+    QuizVM create(QuizPostVM quizPostVM);
+    QuizVM update(QuizPostVM quizPutVM, Long quizId);
 }

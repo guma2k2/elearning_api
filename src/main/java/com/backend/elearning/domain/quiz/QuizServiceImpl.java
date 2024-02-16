@@ -2,6 +2,8 @@ package com.backend.elearning.domain.quiz;
 
 import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.section.SectionRepository;
+import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +17,7 @@ public class QuizServiceImpl implements QuizService{
     }
 
     @Override
-    public void create(QuizPostVM quizPostVM) {
+    public QuizVM create(QuizPostVM quizPostVM) {
         Section section = sectionRepository.findById(quizPostVM.sectionId()).orElseThrow()  ;
         Quiz quiz = Quiz.builder()
                 .title(quizPostVM.title())
@@ -23,6 +25,20 @@ public class QuizServiceImpl implements QuizService{
                 .description(quizPostVM.description())
                 .section(section)
                 .build();
-        quizRepository.save(quiz);
+        Quiz savedQuiz = quizRepository.save(quiz);
+        return new QuizVM(savedQuiz);
+    }
+
+    @Override
+    public QuizVM update(QuizPostVM quizPutVM, Long quizId) {
+        Quiz quiz = quizRepository.findByIdReturnSection(quizId).orElseThrow();
+        if (quiz.getSection().getId() != quizPutVM.sectionId()) {
+            throw new BadRequestException(Constants.ERROR_CODE.LECTURE_SECTION_NOT_SAME, quizPutVM.sectionId());
+        }
+        quiz.setTitle(quizPutVM.title());
+        quiz.setDescription(quizPutVM.description());
+        quiz.setNumber(quizPutVM.number());
+        Quiz savedQuiz = quizRepository.saveAndFlush(quiz);
+        return new QuizVM(savedQuiz);
     }
 }

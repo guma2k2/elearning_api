@@ -29,6 +29,11 @@ public class QuizVM extends Curriculum {
         this.description = description;
         this.questions = questions;
     }
+    public QuizVM(Quiz quiz) {
+        super(quiz.getId(), quiz.getTitle(), quiz.getNumber(), ECurriculumType.quiz);
+        this.description = quiz.getDescription();
+        this.questions = new ArrayList<>();
+    }
 
     public QuizVM(Long id, String title, float number, ECurriculumType type, List<QuestionVM> questions) {
         super(id, title, number, type);

@@ -17,16 +17,17 @@ public class MediaController {
     }
 
     @PostMapping
-    public ResponseEntity<Media> save (@RequestParam("photo") MultipartFile multipartFile) {
-        log.info(multipartFile.getName());
-        Media media = mediaService.saveOrUpdateFile(multipartFile, "");
+    public ResponseEntity<Media> save (@RequestParam("file") MultipartFile multipartFile,
+                                       @RequestParam("type") String type) {
+        Media media = mediaService.saveOrUpdateFile(multipartFile, "", type);
         return ResponseEntity.ok().body(media);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Media> update (@RequestParam("file")MultipartFile multipartFile,
-                                         @PathVariable("id") String id) {
-        Media media = mediaService.saveOrUpdateFile(multipartFile, id);
+                                         @PathVariable("id") String id,
+                                         @PathVariable("type") String type) {
+        Media media = mediaService.saveOrUpdateFile(multipartFile, id, type);
         return ResponseEntity.ok().body(media);
     }
 

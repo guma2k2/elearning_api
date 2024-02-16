@@ -8,20 +8,27 @@ public class LectureVm extends Curriculum {
 
     private String lectureDetails;
 
-    private int duration;
+    private float duration;
 
     public LectureVm(String videoId, String lectureDetails, int duration) {
         this.videoId = videoId;
         this.lectureDetails = lectureDetails;
         this.duration = duration;
     }
-
-    public LectureVm(Long id, String title, float number, ECurriculumType type, String videoId, String lectureDetails, int duration) {
+    public LectureVm(Long id, String title, float number, ECurriculumType type, String videoId, String lectureDetails, float duration) {
         super(id, title, number, type);
         this.videoId = videoId;
         this.lectureDetails = lectureDetails;
         this.duration = duration;
     }
+
+    public LectureVm(Lecture lecture) {
+        super(lecture.getId(), lecture.getTitle(), lecture.getNumber(), ECurriculumType.lecture);
+        this.videoId = "";
+        this.lectureDetails = "";
+        this.duration = 0;
+    }
+
 
     public LectureVm() {
 
@@ -43,11 +50,11 @@ public class LectureVm extends Curriculum {
         this.lectureDetails = lectureDetails;
     }
 
-    public int getDuration() {
+    public float getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(float duration) {
         this.duration = duration;
     }
 }

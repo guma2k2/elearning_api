@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -20,7 +21,7 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    public Media saveOrUpdateFile(MultipartFile multipartFile, String uuid) {
+    public Media saveOrUpdateFile(MultipartFile multipartFile, String uuid, String type) {
         try {
             HashMap<String, String> map = new HashMap<>();
             String fileId = "";
@@ -31,14 +32,20 @@ public class MediaServiceImpl implements MediaService {
             }
             map.put("public_id", fileId);
             map.put("resource_type", "auto");
-            String url = cloudinary.uploader()
-                    .upload(multipartFile.getBytes(), map)
+            Map uploadResult = cloudinary.uploader()
+                    .upload(multipartFile.getBytes(), map);
+            String url = uploadResult
                     .get("url")
                     .toString();
-            return Media.builder()
+            Media media =  Media.builder()
                     .id(fileId)
                     .url(url)
                     .build();
+            if (type.equals("video")) {
+                String duration = uploadResult.get("duration").toString();
+                media.setDuration(duration);
+            }
+            return media;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
