@@ -5,8 +5,10 @@ import com.backend.elearning.domain.answer.AnswerRepository;
 import com.backend.elearning.domain.answer.AnswerVM;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizRepository;
+import com.backend.elearning.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,13 +24,14 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
-    public void create(QuestionPostVM questionVM) {
+    public QuestionVM create(QuestionPostVM questionVM) {
         Quiz quiz = quizRepository.findById(questionVM.quizId()).orElseThrow();
         Question question = Question.builder()
                 .title(questionVM.title())
                 .quiz(quiz)
                 .build();
-        Question savedQuestion = questionRepository.save(question);
+        Question savedQuestion = questionRepository.saveAndFlush(question);
+        List<AnswerVM> answerVMS = new ArrayList<>();
         if (!questionVM.answers().isEmpty()) {
             questionVM.answers().forEach(answerVM -> {
                 Answer answer = Answer.builder()
@@ -36,9 +39,41 @@ public class QuestionServiceImpl implements QuestionService{
                         .reason(answerVM.reason())
                         .question(savedQuestion)
                         .build();
-                answerRepository.save(answer);
+                Answer savedAnswer = answerRepository.saveAndFlush(answer);
+                answerVMS.add(AnswerVM.fromModel(savedAnswer));
             });
         }
+        return QuestionVM.fromModel(savedQuestion, answerVMS);
+    }
+
+    @Override
+    public QuestionVM update(QuestionPostVM questionPostVM, Long questionId) {
+        Question question = questionRepository.findByIdReturnAnswers(questionId).orElseThrow();
+        question.setTitle(questionPostVM.title());
+        if (question.getQuiz().getId() != questionPostVM.quizId()) {
+            throw new BadRequestException("");
+        }
+        List<AnswerVM> answerVMS = new ArrayList<>();
+        if (!questionPostVM.answers().isEmpty()) {
+            questionPostVM.answers().forEach(answerVM -> {
+                Answer answer = new Answer();
+                if (answerVM.id() != null) {
+                    answer =  answerRepository.findById(answerVM.id()).orElseThrow();
+                    answer.setAnswerText(answerVM.answerText());
+                    answer.setCorrect(answerVM.correct());
+                    answer.setReason(answerVM.reason());
+                } else {
+                    answer = Answer.builder()
+                            .answerText(answerVM.answerText())
+                            .reason(answerVM.reason())
+                            .question(question)
+                            .build();
+                }
+                Answer savedAnswer = answerRepository.saveAndFlush(answer);
+                answerVMS.add(AnswerVM.fromModel(savedAnswer));
+            });
+        }
+        return QuestionVM.fromModel(question, answerVMS);
     }
 
     @Override
