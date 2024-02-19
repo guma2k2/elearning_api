@@ -8,4 +8,6 @@ public interface QuestionService {
 
     QuestionVM update (QuestionPostVM questionPostVM, Long questionId);
     List<QuestionVM> getByQuizId (Long quizId);
+
+    QuestionVM getById (Long questionId);
 }
