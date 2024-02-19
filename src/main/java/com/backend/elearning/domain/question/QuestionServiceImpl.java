@@ -6,6 +6,8 @@ import com.backend.elearning.domain.answer.AnswerVM;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizRepository;
 import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,7 +27,9 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     public QuestionVM create(QuestionPostVM questionVM) {
-        Quiz quiz = quizRepository.findById(questionVM.quizId()).orElseThrow();
+        Quiz quiz = quizRepository.findById(questionVM.quizId()).orElseThrow(
+                () -> new NotFoundException(Constants.ERROR_CODE.QUIZ_NOT_FOUND, questionVM.quizId())
+        );
         Question question = Question.builder()
                 .title(questionVM.title())
                 .quiz(quiz)
@@ -48,7 +52,9 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     public QuestionVM update(QuestionPostVM questionPostVM, Long questionId) {
-        Question question = questionRepository.findByIdReturnAnswers(questionId).orElseThrow();
+        Question question = questionRepository.findByIdReturnAnswers(questionId).orElseThrow(
+                () -> new NotFoundException(Constants.ERROR_CODE.QUESTION_NOT_FOUND, questionId)
+        );
         question.setTitle(questionPostVM.title());
         if (question.getQuiz().getId() != questionPostVM.quizId()) {
             throw new BadRequestException("");
@@ -58,6 +64,7 @@ public class QuestionServiceImpl implements QuestionService{
             questionPostVM.answers().forEach(answerVM -> {
                 Answer answer;
                 if (answerVM.id() != null) {
+                    // Todo: Error code of answer
                     answer =  answerRepository.findById(answerVM.id()).orElseThrow();
                     answer.setAnswerText(answerVM.answerText());
                     answer.setCorrect(answerVM.correct());
@@ -84,5 +91,14 @@ public class QuestionServiceImpl implements QuestionService{
             return QuestionVM.fromModel(question, answers);
         }).toList();
         return questionVMS;
+    }
+
+    @Override
+    public QuestionVM getById(Long questionId) {
+        Question question = questionRepository.findByIdReturnAnswers(questionId).orElseThrow(
+                () -> new NotFoundException(Constants.ERROR_CODE.QUESTION_NOT_FOUND, questionId)
+        );
+        List<AnswerVM> answerVMS=  question.getAnswers().stream().map(AnswerVM::fromModel).toList();
+        return QuestionVM.fromModel(question, answerVMS);
     }
 }
