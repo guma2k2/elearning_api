@@ -56,7 +56,7 @@ public class QuestionServiceImpl implements QuestionService{
         List<AnswerVM> answerVMS = new ArrayList<>();
         if (!questionPostVM.answers().isEmpty()) {
             questionPostVM.answers().forEach(answerVM -> {
-                Answer answer = new Answer();
+                Answer answer;
                 if (answerVM.id() != null) {
                     answer =  answerRepository.findById(answerVM.id()).orElseThrow();
                     answer.setAnswerText(answerVM.answerText());
