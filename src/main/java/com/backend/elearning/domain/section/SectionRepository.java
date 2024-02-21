@@ -25,4 +25,12 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
             where s = :section
             """)
     Optional<Section> findByIdQuizzes(@Param("section") Section section);
+
+    @Query("""
+            select s
+            from Section s
+            join fetch s.course c
+            where s.id = :id
+            """)
+    Optional<Section> findByIdReturnCourse(@Param("id") Long id);
 }

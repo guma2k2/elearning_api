@@ -4,8 +4,10 @@ import com.backend.elearning.domain.common.Curriculum;
 import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.section.SectionRepository;
 import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LectureServiceImpl implements LectureService {
@@ -22,7 +24,8 @@ public class LectureServiceImpl implements LectureService {
 
     @Override
     public LectureVm create(LecturePostVM lecturePostVM) {
-        Section section = sectionRepository.findById(lecturePostVM.sectionId()).orElseThrow();
+        Section section = sectionRepository.findById(lecturePostVM.sectionId()).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, lecturePostVM.sectionId()));
         Lecture lecture = Lecture.builder()
                 .title(lecturePostVM.title())
                 .number(lecturePostVM.number())
@@ -35,7 +38,8 @@ public class LectureServiceImpl implements LectureService {
 
     @Override
     public LectureVm update(LecturePostVM lecturePutVM, Long lectureId) {
-        Lecture lecture = lectureRepository.findByIdSection(lectureId).orElseThrow();
+        Lecture lecture = lectureRepository.findByIdSection(lectureId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.LECTURE_NOT_FOUND, lectureId));
         if (lecture.getSection().getId() != lecturePutVM.sectionId()) {
             throw new BadRequestException(Constants.ERROR_CODE.LECTURE_SECTION_NOT_SAME, lecturePutVM.sectionId());
         }
@@ -47,5 +51,11 @@ public class LectureServiceImpl implements LectureService {
         Lecture savedLecture = lectureRepository.saveAndFlush(lecture);
         LectureVm lectureVm = new LectureVm(savedLecture);
         return lectureVm;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long lectureId) {
+        lectureRepository.deleteById(lectureId);
     }
 }

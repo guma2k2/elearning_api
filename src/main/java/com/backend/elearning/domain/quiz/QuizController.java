@@ -1,7 +1,9 @@
 package com.backend.elearning.domain.quiz;
 
+import com.backend.elearning.domain.course.CourseVM;
 import com.backend.elearning.domain.lecture.LecturePostVM;
 import com.backend.elearning.domain.lecture.LectureVm;
+import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.exception.ErrorVm;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -44,6 +46,21 @@ public class QuizController {
     ) {
         QuizVM quizVM = quizService.update(quizPostVM, quizId);
         return ResponseEntity.ok().body(quizVM);
+    }
+
+    @DeleteMapping("/admin/quizzes/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Delete success"),
+            @ApiResponse(responseCode = "400", description = "Cannot delete quiz because it had quizzes", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+            @ApiResponse(responseCode = "404", description = "Quiz not found", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+    })
+    public ResponseEntity<Void> deleteQuizById (
+            @PathVariable("id") Long quizId
+    ) {
+        quizService.delete(quizId);
+        return ResponseEntity.noContent().build();
     }
 }
 

@@ -10,8 +10,12 @@ import com.backend.elearning.domain.question.QuestionService;
 import com.backend.elearning.domain.question.QuestionVM;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizVM;
+import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -30,7 +34,8 @@ public class SectionServiceImpl implements SectionService{
 
     @Override
     public SectionVM create(SectionPostVM sectionPostVM) {
-        Course course = courseRepository.findById(sectionPostVM.courseId()).orElseThrow();
+        Course course = courseRepository.findById(sectionPostVM.courseId()).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, sectionPostVM.courseId()));
         Section section = Section.builder()
                 .title(sectionPostVM.title())
                 .number(sectionPostVM.number())
@@ -45,8 +50,10 @@ public class SectionServiceImpl implements SectionService{
         // Hibernate throws MultipleBagFetchException - cannot simultaneously fetch multiple bags
         // Vlad Mihalcea in his answer!
         // https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl/51055523#51055523
-        Section section = sectionRepository.findByIdLecturesQuizzes(sectionId).orElseThrow();
-        section = sectionRepository.findByIdQuizzes(section).orElseThrow();
+        Section section = sectionRepository.findByIdLecturesQuizzes(sectionId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
+        section = sectionRepository.findByIdQuizzes(section).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
         List<Curriculum> curriculumList = new ArrayList<>();
 
 
@@ -71,12 +78,38 @@ public class SectionServiceImpl implements SectionService{
             quizVM.setNumber(quiz.getNumber());
             quizVM.setDescription(quiz.getDescription());
             quizVM.setType(ECurriculumType.quiz);
-            // Todo get all question by quizId
             List<QuestionVM> questionVMS = questionService.getByQuizId(quiz.getId());
             quizVM.setQuestions(questionVMS);
             curriculumList.add(quizVM);
         }
         curriculumList.sort(Comparator.comparing(Curriculum::getNumber));
         return SectionVM.fromModel(section, curriculumList);
+    }
+
+    @Override
+    public SectionVM update(SectionPostVM sectionPutVM, Long sectionId) {
+        Section section = sectionRepository.findByIdReturnCourse(sectionId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
+        if (sectionPutVM.courseId() != section.getCourse().getId()) {
+            throw new BadRequestException("");
+        }
+        section.setTitle(sectionPutVM.title());
+        section.setNumber(sectionPutVM.number());
+        section.setObjective(sectionPutVM.objective());
+        sectionRepository.saveAndFlush(section);
+        return SectionVM.fromModel(section, new ArrayList<>());
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long sectionId) {
+        Section section = sectionRepository.findByIdLecturesQuizzes(sectionId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
+        section = sectionRepository.findByIdQuizzes(section).orElseThrow();
+        boolean canDelete = section.getLectures().isEmpty() && section.getQuizzes().isEmpty();
+        if (!canDelete) {
+            throw new BadRequestException("");
+        }
+        sectionRepository.delete(section);
     }
 }
