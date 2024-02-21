@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.section;
 
 import com.backend.elearning.domain.course.CourseVM;
+import com.backend.elearning.exception.ErrorVm;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,5 +39,36 @@ public class SectionController {
     ) {
         SectionVM sectionVM = sectionService.getById(sectionId);
         return ResponseEntity.ok().body(sectionVM);
+    }
+
+    @PutMapping("/admin/sections/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Update success", content =
+            @Content(schema = @Schema(implementation = CourseVM.class))),
+            @ApiResponse(responseCode = "400", description = "Course of section is not valid", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+            @ApiResponse(responseCode = "404", description = "Section not found", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+    })
+    public ResponseEntity<SectionVM> updateCourse (
+            @RequestBody SectionPostVM sectionPostVM,
+            @PathVariable("id") Long id
+    ) {
+        SectionVM sectionVM = sectionService.update(sectionPostVM, id);
+        return ResponseEntity.ok().body(sectionVM);
+    }
+    @DeleteMapping("/admin/sections/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Delete success"),
+            @ApiResponse(responseCode = "400", description = "Cannot delete section because it had curriculums", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+            @ApiResponse(responseCode = "404", description = "Section not found", content =
+            @Content(schema = @Schema(implementation = ErrorVm.class))),
+    })
+    public ResponseEntity<Void> deleteSectionById (
+            @PathVariable("id") Long sectionId
+    ) {
+        sectionService.delete(sectionId);
+        return ResponseEntity.noContent().build();
     }
 }

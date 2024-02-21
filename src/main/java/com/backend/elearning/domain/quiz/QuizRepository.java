@@ -17,4 +17,12 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
             where q.id = :id
             """)
     Optional<Quiz> findByIdReturnSection(@Param("id") Long id);
+
+    @Query(value = """
+            select q
+            from Quiz q
+            left join fetch q.questions
+            where q.id = :id
+            """)
+    Optional<Quiz> findByIdReturnQuestions(@Param("id") Long id);
 }

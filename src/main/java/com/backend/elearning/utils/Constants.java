@@ -8,6 +8,9 @@ public final class Constants {
 
         public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
         public static final String QUESTION_NOT_FOUND = "QUESTION_NOT_FOUND";
+        public static final String COURSE_NOT_FOUND = "COURSE_NOT_FOUND";
+        public static final String LECTURE_NOT_FOUND = "LECTURE_NOT_FOUND";
+        public static final String SECTION_NOT_FOUND = "SECTION_NOT_FOUND";
         public static final String QUIZ_NOT_FOUND = "QUIZ_NOT_FOUND";
         public static final String PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND";
         public static final String PARENT_CATEGORY_CANNOT_BE_ITSELF = "PARENT_CATEGORY_CANNOT_BE_ITSELF";

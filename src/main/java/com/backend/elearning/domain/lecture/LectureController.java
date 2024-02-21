@@ -43,4 +43,15 @@ public class LectureController {
         LectureVm lectureVm = lectureService.update(lecturePutVM, lectureId);
         return ResponseEntity.ok().body(lectureVm);
     }
+
+    @DeleteMapping("/admin/lectures/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Delete success"),
+    })
+    public ResponseEntity<Void> deleteLectureById (
+            @PathVariable("id") Long lectureId
+    ) {
+        lectureService.delete(lectureId);
+        return ResponseEntity.noContent().build();
+    }
 }
