@@ -53,7 +53,7 @@ public class CourseController {
 
     @PutMapping("/admin/courses/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Accepted", content =
+            @ApiResponse(responseCode = "200", description = "Accepted", content =
             @Content(schema = @Schema(implementation = CourseVM.class))),
             @ApiResponse(responseCode = "404", description = "Bad Request", content =
             @Content(schema = @Schema(implementation = ErrorVm.class))),
@@ -68,7 +68,7 @@ public class CourseController {
 //        Long userId = authUserDetails.getId();
         Long userId = 1L;
         CourseVM courseVM = courseService.update(coursePostVM, userId, courseId);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(courseVM);
+        return ResponseEntity.status(HttpStatus.OK).body(courseVM);
     }
 
     @GetMapping("/courses/{id}")

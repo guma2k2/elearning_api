@@ -88,6 +88,7 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public CourseVM update(CoursePostVM coursePutVM, Long userId, Long courseId) {
         String imageURL = mediaService.getUrlById(coursePutVM.imageId());
+        log.info(imageURL);
         Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow();
         if (oldCourse.getUser().getId() != userId) {
             throw new BadRequestException("You don't have permission to edit this course");
@@ -111,23 +112,20 @@ public class CourseServiceImpl implements CourseService{
         oldCourse.setDescription(coursePutVM.description());
         oldCourse.setTargetAudiences(coursePutVM.targetAudiences());
         oldCourse.setFree(coursePutVM.free());
-        oldCourse.setImageId(coursePutVM.imageId());
+        if (coursePutVM.imageId() != "") {
+            oldCourse.setImageId(coursePutVM.imageId());
+        }
         oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
-
-        List<SectionVM> sections = oldCourse.getSections()
-                .stream().map(section -> sectionService.getById(section.getId())).toList();
-
-        // Todo : list all sections by course id -> done
-        return CourseVM.fromModel(courseRepository.save(oldCourse), imageURL, sections);
+        return CourseVM.fromModel(courseRepository.save(oldCourse), imageURL, new ArrayList<>());
     }
 
     @Override
     public CourseVM getCourseById(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
-        log.info(String.valueOf(course.getSections().size()));
+        String imageURL = mediaService.getUrlById(course.getImageId());
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
         sections.sort(Comparator.comparing(SectionVM::number));
-        return CourseVM.fromModel(course, "", sections);
+        return CourseVM.fromModel(course, imageURL, sections);
     }
 }

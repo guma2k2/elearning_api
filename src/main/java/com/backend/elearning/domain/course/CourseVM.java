@@ -31,6 +31,6 @@ public record CourseVM(
 ) {
     public static CourseVM fromModel (Course course, String imageURL, List<SectionVM> sections) {
         return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getObjectives(), course.getRequirements(),
-                course.getTargetAudiences(), course.getDescription(), imageURL, course.getCreatedAt().toString(), course.getUpdatedAt().toString(), course.getLevel().toString() ,course.isFree(), false, course.getCategory().getId(), course.getTopic().getId(), sections);
+                course.getTargetAudiences(), course.getDescription(), course.getLevel().toString(), imageURL, course.getCreatedAt().toString(), course.getUpdatedAt().toString() ,course.isFree(), false, course.getCategory().getId(), course.getTopic().getId(), sections);
     }
 }
