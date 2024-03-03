@@ -1,5 +1,7 @@
 package com.backend.elearning.domain.course;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +27,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             where c.id = :id
             """)
     Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
+
+
+    @Query(value = """
+            select c
+            from Course c
+            join fetch c.category cat
+            left join fetch cat.parent
+            join fetch c.topic t
+            join fetch c.user u
+            """)
+    Page<Course> findAllCustom(Pageable pageable);
 }

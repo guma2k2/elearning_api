@@ -52,11 +52,12 @@ public class CourseServiceImpl implements CourseService{
         List<CourseVM> courseVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
-        Page<Course> coursePage = courseRepository.findAll(pageable);
+        Page<Course> coursePage = courseRepository.findAllCustom(pageable);
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
             // Todo: get url image of course by imageId
-            courseVMS.add(CourseVM.fromModel(course,"" ,new ArrayList<>()));
+            String imageURL = mediaService.getUrlById(course.getImageId());
+            courseVMS.add(CourseVM.fromModel(course,imageURL ,new ArrayList<>()));
         }
 
         return new PageableData(
