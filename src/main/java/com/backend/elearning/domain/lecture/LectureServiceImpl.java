@@ -9,6 +9,8 @@ import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 public class LectureServiceImpl implements LectureService {
 
@@ -40,7 +42,7 @@ public class LectureServiceImpl implements LectureService {
     public LectureVm update(LecturePostVM lecturePutVM, Long lectureId) {
         Lecture lecture = lectureRepository.findByIdSection(lectureId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.LECTURE_NOT_FOUND, lectureId));
-        if (lecture.getSection().getId() != lecturePutVM.sectionId()) {
+        if (!Objects.equals(lecture.getSection().getId(), lecturePutVM.sectionId())) {
             throw new BadRequestException(Constants.ERROR_CODE.LECTURE_SECTION_NOT_SAME, lecturePutVM.sectionId());
         }
         lecture.setTitle(lecturePutVM.title());
