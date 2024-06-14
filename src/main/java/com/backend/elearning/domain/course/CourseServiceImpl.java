@@ -129,4 +129,10 @@ public class CourseServiceImpl implements CourseService{
         sections.sort(Comparator.comparing(SectionVM::number));
         return CourseVM.fromModel(course, imageURL, sections);
     }
+
+    @Override
+    public PageableData<CourseVM> getCoursesByMultiQuery(int pageNum, int pageSize, String name, int rating) {
+
+        return null;
+    }
 }

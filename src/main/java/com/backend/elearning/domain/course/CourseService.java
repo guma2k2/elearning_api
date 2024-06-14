@@ -9,4 +9,6 @@ public interface CourseService {
     CourseVM update(CoursePostVM coursePostVM, Long userId, Long courseId);
 
     CourseVM getCourseById(Long id);
+
+    PageableData<CourseVM> getCoursesByMultiQuery(int pageNum, int pageSize, String name, int rating);
 }

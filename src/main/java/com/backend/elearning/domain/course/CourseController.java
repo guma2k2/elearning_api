@@ -34,6 +34,18 @@ public class CourseController {
         return ResponseEntity.ok().body(pageableCourses);
     }
 
+
+    @GetMapping("/courses/search")
+    public ResponseEntity<PageableData<CourseVM>> getCoursesByMultiQuery (
+            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "ratingStar", required = false) int rating
+    ) {
+        PageableData<CourseVM> pageableCourses = courseService.getCoursesByMultiQuery(pageNum, pageSize, name, rating);
+        return ResponseEntity.ok().body(pageableCourses);
+    }
+
     @PostMapping("/admin/courses")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content =
