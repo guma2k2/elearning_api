@@ -5,7 +5,7 @@ import java.util.List;
 public  record PageableData<T>(
         int pageNum,
         int pageSize,
-        int totalElements,
+        long totalElements,
         int totalPages,
         List<T> content
 ) {
