@@ -16,8 +16,8 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             select c 
             from Cart c
             left join fetch c.user u
-            left join fetch c.course c
-            where u.email = :email and c.id = :courseId
+            left join fetch c.course co
+            where u.email = :email and co.id = :courseId
             """)
     Optional<Cart> findByEmailAndCourseId(@Param("courseId") Long courseId, @Param("email") String email);
 
@@ -26,7 +26,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             select c 
             from Cart c
             left join fetch c.user u
-            left join fetch c.course c
+            left join fetch c.course co
             where u.email = :email
             """)
     List<Cart> findByUserEmail(@Param("email") String email);

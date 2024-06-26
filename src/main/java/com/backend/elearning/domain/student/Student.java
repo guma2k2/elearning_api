@@ -1,8 +1,10 @@
-package com.backend.elearning.domain.user;
-import com.backend.elearning.domain.common.*;
+package com.backend.elearning.domain.student;
+
+import com.backend.elearning.domain.common.AbstractAuditEntity;
+import com.backend.elearning.domain.common.CustomAuditingEntityListener;
+import com.backend.elearning.domain.user.EGender;
+import com.backend.elearning.domain.user.ERole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,14 +15,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @Entity
-@Table(name = "`user`")
+@Table(name = "sudent")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
 @EntityListeners(value = CustomAuditingEntityListener.class)
-public class User extends AbstractAuditEntity implements UserDetails {
+public class Student extends AbstractAuditEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,17 +44,13 @@ public class User extends AbstractAuditEntity implements UserDetails {
 
     private boolean active;
 
-    private String photoId;
+    private String photo;
 
     private LocalDate dateOfBirth;
 
-    @Enumerated(EnumType.STRING)
-    private ERole role;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.asList(new SimpleGrantedAuthority(ERole.ROLE_INSTRUCTOR.name()),
-                new SimpleGrantedAuthority(ERole.ROLE_ADMIN.name()));
+        return Arrays.asList(new SimpleGrantedAuthority(ERole.ROLE_STUDENT.name()));
     }
 
     @Override

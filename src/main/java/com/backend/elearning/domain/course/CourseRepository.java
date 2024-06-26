@@ -46,7 +46,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             left join fetch cat.parent
             join fetch c.topic t
             join fetch c.user u
-            where c.title like %:name%
+            where c.title like %:title%
             """)
     Page<Course> findAllCustom(Pageable pageable, @Param("title") String title);
 }
