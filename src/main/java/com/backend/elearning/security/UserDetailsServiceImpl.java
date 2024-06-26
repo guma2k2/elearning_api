@@ -1,5 +1,7 @@
 package com.backend.elearning.security;
 
+import com.backend.elearning.domain.student.Student;
+import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.NotFoundException;
@@ -10,21 +12,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository ;
+
+    private final StudentRepository studentRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username).orElseThrow(() ->
-                new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, username));
-
-        return AuthUserDetails.builder()
-                .id(user.getId())
-                .active(user.isActive())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .role(user.getRole().name())
-                .build();
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isPresent()) {
+            return User.builder().build();
+        }
+        Optional<Student> student = studentRepository.findByEmail(username);
+        return student.orElseThrow(() -> new NotFoundException(""));
     }
 }

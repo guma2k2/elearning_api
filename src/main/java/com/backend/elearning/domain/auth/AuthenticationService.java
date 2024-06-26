@@ -2,6 +2,9 @@ package com.backend.elearning.domain.auth;
 
 
 import com.backend.elearning.domain.media.MediaService;
+import com.backend.elearning.domain.student.Student;
+import com.backend.elearning.domain.student.StudentRepository;
+import com.backend.elearning.domain.user.ERole;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserVm;
@@ -12,6 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthenticationService {
 
@@ -21,27 +26,25 @@ public class AuthenticationService {
 
     private final JWTUtil jwtUtil;
 
-    private final MediaService mediaService;
+    private final StudentRepository studentRepository;
 
-    public AuthenticationService(AuthenticationManager authenticationManager, UserRepository userRepository, JWTUtil jwtUtil, MediaService mediaService) {
+    public AuthenticationService(AuthenticationManager authenticationManager, UserRepository userRepository, JWTUtil jwtUtil, StudentRepository studentRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
-        this.mediaService = mediaService;
+        this.studentRepository = studentRepository;
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.username(),
-                        request.password()
-                )
-        );
-        AuthUserDetails principal = (AuthUserDetails) authentication.getPrincipal();
-        User user = userRepository.findById(principal.getId()).orElseThrow();
-        String urlPhoto = mediaService.getUrlById(user.getPhotoId());
-        UserVm userVm = UserVm.fromModel(user, urlPhoto);
-        String token = jwtUtil.issueToken(request.username(), principal.getRole());
+        Optional<User> user = userRepository.findByEmail(request.username());
+        if (user.isPresent()) {
+            String token = jwtUtil.issueToken(request.username(), user.get().getRole().name());
+            UserVm userVm = UserVm.fromModel(user.get(), "");
+            return new AuthenticationVm(token, userVm);
+        }
+        Optional<Student> student = studentRepository.findByEmail(request.username());
+        String token = jwtUtil.issueToken(request.username(), ERole.ROLE_STUDENT.name());
+        UserVm userVm = UserVm.fromModelStudent(student.get());
         return new AuthenticationVm(token, userVm);
     }
 }
