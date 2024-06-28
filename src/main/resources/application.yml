@@ -22,6 +22,6 @@ spring:
       max-file-size: 100MB
   outbound:
     identity:
-      client-id: "267032846386-hchqmc5j59qi1ti287asu2bgb9fafqk1.apps.googleusercontent.com"
-      client-secret: "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"
+      client-id: ""
+      client-secret: ""
       redirect-uri: "http://localhost:3000/authenticate"
