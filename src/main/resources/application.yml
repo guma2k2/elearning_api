@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    username: postgres
+    url: jdbc:postgresql://localhost:5433/elearning
+    password: '123456'
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+    show-sql: 'true'
+  cloudinary:
+    api:
+      secret: u3aoCSJzt31lcqOJBsgykwTq81o
+      key: '593637822396816'
+    name: di6h4mtfa
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+  outbound:
+    identity:
+      client-id: ""
+      client-secret: ""
+      redirect-uri: "http://localhost:3000/authenticate"
