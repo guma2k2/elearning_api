@@ -15,7 +15,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("""
             select c 
             from Cart c
-            left join fetch c.user u
+            left join fetch c.student u
             left join fetch c.course co
             where u.email = :email and co.id = :courseId
             """)
@@ -25,7 +25,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("""
             select c 
             from Cart c
-            left join fetch c.user u
+            left join fetch c.student u
             left join fetch c.course co
             where u.email = :email
             """)

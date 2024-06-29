@@ -10,18 +10,22 @@ import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserVm;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.security.JWTUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class AuthenticationService {
 
 
@@ -68,15 +72,24 @@ public class AuthenticationService {
         return new AuthenticationVm(token, userVm);
     }
 
-    public AuthenticationVm<StudentVm> outboundAuthenticate(String code) {
+    public AuthenticationVm outboundAuthenticate(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        ExchangeTokenRequest request = new ExchangeTokenRequest(code, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("code", code);
+        map.add("client_id", CLIENT_ID);
+        map.add("client_secret", CLIENT_SECRET);
+        map.add("redirect_uri", REDIRECT_URI);
+        map.add("grant_type", GRANT_TYPE);
 
-        HttpEntity<ExchangeTokenRequest> entity = new HttpEntity<>(request, headers);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
         ExchangeTokenResponse response = restTemplate.exchange(EXCHANGE_TOKEN_URL, HttpMethod.POST, entity, ExchangeTokenResponse.class).getBody();
+        if (response != null) {
+            log.info(response.toString());
+            log.info(response.toString());
+        }
 
 
         if (response != null) {
@@ -91,19 +104,33 @@ public class AuthenticationService {
                 Student student = studentRepository.findByEmail(userInfo.email()).orElseGet(
                         () -> studentRepository.saveAndFlush(Student.builder()
                                         .active(true)
-                                        .firstName(userInfo.givenName())
-                                        .lastName(userInfo.familyName())
+                                        .firstName(userInfo.familyName())
+                                        .lastName(userInfo.givenName())
                                         .email(userInfo.email())
+                                        .photo(userInfo.picture())
                                 .build()));
                 String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
-                AuthenticationVm authenticationVm = new AuthenticationVm(token, student);
+                UserVm userVm = UserVm.fromModelStudent(student);
+                AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
                 return authenticationVm ;
             }
-
-
-
         }
 
-        throw new BadRequestException("");
+        return null;
+    }
+
+    public AuthenticationVm register(RegistrationPostVm request) {
+        Student student = studentRepository.findByEmail(request.email()).orElseGet(
+                () -> studentRepository.saveAndFlush(Student.builder()
+                        .active(true)
+                        .firstName(request.firstName())
+                        .lastName(request.lastName())
+                        .email(request.email())
+                        .photo("")
+                        .build()));
+        String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
+        UserVm userVm = UserVm.fromModelStudent(student);
+        AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
+        return authenticationVm ;
     }
 }

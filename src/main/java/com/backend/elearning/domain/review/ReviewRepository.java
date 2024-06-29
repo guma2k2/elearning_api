@@ -13,13 +13,11 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 
-
-
     @Query("""
             select r
             from Review r
             left join fetch r.course c
-            left join fetch r.user u
+            left join fetch r.student u
             where c.id = :courseId and r.ratingStar = :ratingStar
             """)
     Page<Review> findByRatingStarAndCourseId(@Param("ratingStar") int ratingStar, @Param("courseId") Long courseId, Pageable pageable);
@@ -28,7 +26,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             select r
             from Review r
             left join fetch r.course c
-            left join fetch r.user u
+            left join fetch r.student u
             where c.id = :courseId
             """)
     Page<Review> findByCourseId(@Param("courseId") Long courseId, Pageable pageable);

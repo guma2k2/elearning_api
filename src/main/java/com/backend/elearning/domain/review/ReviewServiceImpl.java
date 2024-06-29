@@ -3,6 +3,8 @@ package com.backend.elearning.domain.review;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.student.Student;
+import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import org.springframework.data.domain.Page;
@@ -21,14 +23,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
     private final CourseRepository courseRepository;
 
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository, UserRepository userRepository, CourseRepository courseRepository) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.reviewRepository = reviewRepository;
-        this.userRepository = userRepository;
+        this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
     }
 
@@ -41,11 +43,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void createReviewForProduct(ReviewPostVM reviewPost) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        Student student = studentRepository.findByEmail(email).orElseThrow();
         Course course = courseRepository.findById(reviewPost.courseId()).orElseThrow();
         Review review = Review
                 .builder()
-                .user(user)
+                .student(student)
                 .course(course)
                 .content(reviewPost.content())
                 .ratingStar(reviewPost.ratingStar())

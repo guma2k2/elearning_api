@@ -3,6 +3,8 @@ package com.backend.elearning.domain.cart;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseListGetVM;
 import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.student.Student;
+import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,26 +17,26 @@ import java.util.List;
 public class CartServiceImpl implements CartService{
 
     private final CartRepository cartRepository;
-    private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
     private final CourseRepository courseRepository;
 
-    public CartServiceImpl(CartRepository cartRepository, UserRepository userRepository, CourseRepository courseRepository) {
+    public CartServiceImpl(CartRepository cartRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.cartRepository = cartRepository;
-        this.userRepository = userRepository;
+        this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
     }
 
     @Override
     public void addCourseToCart(Long courseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        Student student = studentRepository.findByEmail(email).orElseThrow();
         Course course = courseRepository.findById(courseId).orElseThrow();
 
         if (cartRepository.findByEmailAndCourseId(courseId, email).isEmpty()) {
             Cart cart = Cart.builder()
                     .course(course)
-                    .user(user)
+                    .student(student)
                     .build();
 
             cartRepository.saveAndFlush(cart);
@@ -54,9 +56,9 @@ public class CartServiceImpl implements CartService{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Cart> carts = cartRepository.findByUserEmail(email);
         List<CartListGetVM> cartListGetVMS = carts.stream().map(cart -> {
-            User user = cart.getUser();
+            Student student = cart.getStudent();
             Course course = cart.getCourse();
-            String fullName = user.getFirstName().concat(" ").concat(user.getLastName());
+            String fullName = student.getFirstName().concat(" ").concat(student.getLastName());
             CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1, 1, 5, 5);
             return new CartListGetVM(fullName, courseListGetVM);
         }).toList();
