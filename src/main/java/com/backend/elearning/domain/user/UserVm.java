@@ -28,14 +28,16 @@ public record UserVm (
     }
 
     public static UserVm fromModelStudent (Student student) {
+        String gender = student.getGender() != null ? student.getGender().name() : "";
+        String dateOfBirth = student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : "";
         return new UserVm(student.getId(),
                 student.getEmail(),
                 student.getFirstName(),
                 student.getLastName(),
-                student.getGender().name(),
+                gender,
                 student.isActive(),
                 student.getPhoto(),
-                student.getDateOfBirth().toString(),
+                dateOfBirth,
                 ERole.ROLE_STUDENT.name());
     }
 }

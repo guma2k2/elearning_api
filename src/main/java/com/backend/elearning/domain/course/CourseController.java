@@ -1,9 +1,7 @@
 package com.backend.elearning.domain.course;
 
-import com.backend.elearning.domain.category.CategoryVM;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.exception.ErrorVm;
-import com.backend.elearning.security.AuthUserDetails;
 import com.backend.elearning.utils.Constants;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -55,7 +54,7 @@ public class CourseController {
     })
     public ResponseEntity<CourseVM> createCourse (
             @RequestBody CoursePostVM coursePostVM,
-            @AuthenticationPrincipal AuthUserDetails authUserDetails
+            @AuthenticationPrincipal UserDetails authUserDetails
     ) {
 //        Long userId = authUserDetails.getId();
         Long userId = 1L;
@@ -75,7 +74,7 @@ public class CourseController {
     public ResponseEntity<CourseVM> updateCourse (
             @RequestBody CoursePostVM coursePostVM,
             @PathVariable("id") Long courseId,
-            @AuthenticationPrincipal AuthUserDetails authUserDetails
+            @AuthenticationPrincipal UserDetails authUserDetails
     ) {
 //        Long userId = authUserDetails.getId();
         Long userId = 1L;

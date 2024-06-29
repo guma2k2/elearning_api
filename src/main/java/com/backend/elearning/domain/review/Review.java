@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.review;
 
 import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,8 +32,8 @@ public class Review {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "student_id")
+    private Student student;
 
     @CreatedDate
     @Column(name = "created_at")

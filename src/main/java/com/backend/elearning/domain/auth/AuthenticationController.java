@@ -2,6 +2,7 @@ package com.backend.elearning.domain.auth;
 
 
 import com.backend.elearning.domain.student.StudentVm;
+import com.backend.elearning.domain.user.UserVm;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,19 +12,21 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-
-
-    @PostMapping("/outbound/authentication")
-    ResponseEntity<AuthenticationVm<StudentVm>> outboundAuthenticate(
-            @RequestParam("code") String code
-    ){
-        AuthenticationVm<StudentVm> result = authenticationService.outboundAuthenticate(code);
-        return ResponseEntity.ok().body(result);
-    }
-
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
+
+
+
+    @PostMapping("/outbound/authentication")
+    ResponseEntity<AuthenticationVm> outboundAuthenticate(
+            @RequestParam("code") String code
+    ){
+        AuthenticationVm result = authenticationService.outboundAuthenticate(code);
+        return ResponseEntity.ok().body(result);
+    }
+
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationVm> login (
@@ -31,7 +34,15 @@ public class AuthenticationController {
     ) {
         AuthenticationVm response = authenticationService.login(request);
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, response.token())
+                .body(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationVm> register (
+            @RequestBody RegistrationPostVm request
+    ) {
+        AuthenticationVm response = authenticationService.register(request);
+        return ResponseEntity.ok()
                 .body(response);
     }
 
