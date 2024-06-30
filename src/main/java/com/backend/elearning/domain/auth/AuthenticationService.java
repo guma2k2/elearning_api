@@ -63,7 +63,7 @@ public class AuthenticationService {
         Optional<User> user = userRepository.findByEmail(request.username());
         if (user.isPresent()) {
             String token = jwtUtil.issueToken(request.username(), user.get().getRole().name());
-            UserVm userVm = UserVm.fromModel(user.get(), "");
+            UserVm userVm = UserVm.fromModel(user.get());
             return new AuthenticationVm(token, userVm);
         }
         Optional<Student> student = studentRepository.findByEmail(request.username());

@@ -29,9 +29,9 @@ public record CourseVM(
         Integer topicId,
         List<SectionVM> sections
 ) {
-    public static CourseVM fromModel (Course course, String imageURL, List<SectionVM> sections) {
+    public static CourseVM fromModel (Course course, List<SectionVM> sections) {
         String level = course.getLevel() != null ? course.getLevel().toString() : "";
         return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getObjectives(), course.getRequirements(),
-                course.getTargetAudiences(), course.getDescription(),level, imageURL, course.getCreatedAt().toString(), course.getUpdatedAt().toString() ,course.isFree(), false, course.getCategory().getId(), course.getTopic().getId(), sections);
+                course.getTargetAudiences(), course.getDescription(),level, course.getImageId(), course.getCreatedAt().toString(), course.getUpdatedAt().toString() ,course.isFree(), course.isPublish(), course.getCategory().getId(), course.getTopic().getId(), sections);
     }
 }

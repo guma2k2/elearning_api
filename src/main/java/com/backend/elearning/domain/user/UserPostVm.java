@@ -7,7 +7,7 @@ public record UserPostVm(
         String password,
         String gender,
         boolean active,
-        String photoId,
+        String photo,
         int day,
         int month,
         int year,

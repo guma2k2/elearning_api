@@ -20,11 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -35,15 +37,13 @@ public class CourseServiceImpl implements CourseService{
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
     private final SectionService sectionService;
-    private final MediaService mediaService;
 
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, UserRepository userRepository, SectionService sectionService, MediaService mediaService) {
+    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, UserRepository userRepository, SectionService sectionService) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
         this.userRepository = userRepository;
         this.sectionService = sectionService;
-        this.mediaService = mediaService;
     }
 
 
@@ -55,9 +55,7 @@ public class CourseServiceImpl implements CourseService{
         Page<Course> coursePage = courseRepository.findAllCustom(pageable);
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
-            // Todo: get url image of course by imageId
-            String imageURL = mediaService.getUrlById(course.getImageId());
-            courseVMS.add(CourseVM.fromModel(course,imageURL ,new ArrayList<>()));
+            courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>()));
         }
 
         return new PageableData(
@@ -70,26 +68,26 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public CourseVM create(CoursePostVM coursePostVM, Long userId) {
+    public CourseVM create(CoursePostVM coursePostVM) {
+        /*String email = SecurityContextHolder.getContext().getAuthentication().getName();*/
+        String email = "thuanngo3072002@gmail.com";
         if (courseRepository.countExistByTitle(coursePostVM.title(), null) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
         Category category = categoryRepository.findById(coursePostVM.categoryId()).orElseThrow();
         Topic topic = topicRepository.findById(coursePostVM.topicId()).orElseThrow();
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow();
         Course course = Course.builder()
                 .title(coursePostVM.title())
                 .category(category)
                 .topic(topic)
                 .user(user)
                 .build();
-        return CourseVM.fromModel(courseRepository.save(course), null, new ArrayList<>());
+        return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>());
     }
 
     @Override
     public CourseVM update(CoursePostVM coursePutVM, Long userId, Long courseId) {
-        String imageURL = mediaService.getUrlById(coursePutVM.imageId());
-        log.info(imageURL);
         Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow();
         if (oldCourse.getUser().getId() != userId) {
             throw new BadRequestException("You don't have permission to edit this course");
@@ -97,7 +95,7 @@ public class CourseServiceImpl implements CourseService{
         if (courseRepository.countExistByTitle(coursePutVM.title(), courseId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
-        if (oldCourse.getCategory().getId() != coursePutVM.categoryId()) {
+        if (!Objects.equals(oldCourse.getCategory().getId(), coursePutVM.categoryId())) {
             Category category = categoryRepository.findById(coursePutVM.categoryId()).orElseThrow();
             oldCourse.setCategory(category);
         }
@@ -113,21 +111,20 @@ public class CourseServiceImpl implements CourseService{
         oldCourse.setDescription(coursePutVM.description());
         oldCourse.setTargetAudiences(coursePutVM.targetAudiences());
         oldCourse.setFree(coursePutVM.free());
-        if (coursePutVM.imageId() != "") {
-            oldCourse.setImageId(coursePutVM.imageId());
+        if (coursePutVM.image() != "") {
+            oldCourse.setImageId(coursePutVM.image());
         }
         oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
-        return CourseVM.fromModel(courseRepository.save(oldCourse), imageURL, new ArrayList<>());
+        return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>());
     }
 
     @Override
     public CourseVM getCourseById(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
-        String imageURL = mediaService.getUrlById(course.getImageId());
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
         sections.sort(Comparator.comparing(SectionVM::number));
-        return CourseVM.fromModel(course, imageURL, sections);
+        return CourseVM.fromModel(course, sections);
     }
 
     @Override

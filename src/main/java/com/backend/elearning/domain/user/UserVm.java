@@ -15,14 +15,14 @@ public record UserVm (
          String dateOfBirth,
          String role
 ) {
-    public static UserVm fromModel (User user, String photoUrl) {
+    public static UserVm fromModel (User user) {
         return new UserVm(user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getGender().name(),
                 user.isActive(),
-                photoUrl,
+                user.getPhoto(),
                 user.getDateOfBirth().toString(),
                 user.getRole().name());
     }

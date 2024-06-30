@@ -46,7 +46,7 @@ public class Course extends AbstractAuditEntity {
 
     private boolean free;
 
-//    private boolean publish;
+    private boolean publish;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

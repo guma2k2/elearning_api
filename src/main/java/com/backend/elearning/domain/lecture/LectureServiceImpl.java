@@ -47,7 +47,7 @@ public class LectureServiceImpl implements LectureService {
         }
         lecture.setTitle(lecturePutVM.title());
         lecture.setNumber(lecturePutVM.number());
-        lecture.setVideoId(lecturePutVM.videoId());
+        lecture.setVideoId(lecturePutVM.video());
         lecture.setLectureDetails(lecturePutVM.lectureDetails());
         lecture.setDuration(lecturePutVM.duration());
         Lecture savedLecture = lectureRepository.saveAndFlush(lecture);
