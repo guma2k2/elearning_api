@@ -15,7 +15,7 @@ public record CoursePostVM(
 
          String description,
          String level,
-         String imageId,
+         String image,
          boolean free,
          Integer categoryId,
          Integer topicId

@@ -42,7 +42,7 @@ public class User extends AbstractAuditEntity implements UserDetails {
 
     private boolean active;
 
-    private String photoId;
+    private String photo;
 
     private LocalDate dateOfBirth;
 

@@ -53,12 +53,10 @@ public class CourseController {
             @Content(schema = @Schema(implementation = ErrorVm.class))),
     })
     public ResponseEntity<CourseVM> createCourse (
-            @RequestBody CoursePostVM coursePostVM,
-            @AuthenticationPrincipal UserDetails authUserDetails
+            @RequestBody CoursePostVM coursePostVM
     ) {
 //        Long userId = authUserDetails.getId();
-        Long userId = 1L;
-        CourseVM courseVM = courseService.create(coursePostVM, userId);
+        CourseVM courseVM = courseService.create(coursePostVM);
         return ResponseEntity.status(HttpStatus.CREATED).body(courseVM);
     }
 

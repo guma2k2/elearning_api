@@ -20,13 +20,11 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
 
-    private final MediaService mediaService;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, MediaService mediaService, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.mediaService = mediaService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,10 +34,7 @@ public class UserServiceImpl implements UserService{
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<User> userPage = userRepository.findAll(pageable);
         List<User> users = userPage.getContent();
-        List<UserVm> userVms = users.stream().map(user -> {
-            String urlPhoto = mediaService.getUrlById(user.getPhotoId());
-            return UserVm.fromModel(user, urlPhoto);
-        }).toList();
+        List<UserVm> userVms = users.stream().map(UserVm::fromModel).toList();
         return new PageableData<>(
                 pageNum,
                 pageSize,
@@ -53,7 +48,6 @@ public class UserServiceImpl implements UserService{
     public UserGetDetailVm getUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userId));
-        String urlPhoto = mediaService.getUrlById(user.getPhotoId());
         return new UserGetDetailVm(
                 userId,
                 user.getEmail(),
@@ -61,7 +55,7 @@ public class UserServiceImpl implements UserService{
                 user.getLastName(),
                 user.getGender().name(),
                 user.isActive(),
-                urlPhoto,
+                user.getPhoto(),
                 user.getDateOfBirth().toString(),
                 user.getRole().name()
         );
@@ -80,13 +74,12 @@ public class UserServiceImpl implements UserService{
                 .active(userPostVm.active())
                 .password(passwordEncoder.encode(userPostVm.password()))
                 .dateOfBirth(LocalDate.of(userPostVm.year(), userPostVm.month(), userPostVm.day()))
-                .photoId(userPostVm.photoId())
+                .photo(userPostVm.photo())
                 .role(ERole.valueOf(userPostVm.role()))
                 .gender(EGender.valueOf(userPostVm.gender()))
                 .build();
         User savedUser = userRepository.saveAndFlush(user);
-        String urlPhoto = mediaService.getUrlById(savedUser.getPhotoId());
-        return UserVm.fromModel(user, urlPhoto);
+        return UserVm.fromModel(user);
     }
 
     @Override
@@ -103,7 +96,7 @@ public class UserServiceImpl implements UserService{
         user.setRole(ERole.valueOf(userPutVm.role()));
         user.setDateOfBirth(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()));
         if (!userPutVm.photoId().isEmpty() && !userPutVm.photoId().isBlank()) {
-            user.setPhotoId(userPutVm.photoId());
+            user.setPhoto(userPutVm.photoId());
         }
         if (!userPutVm.password().isEmpty() && !userPutVm.password().isBlank()) {
             user.setPassword(passwordEncoder.encode(userPutVm.password()));

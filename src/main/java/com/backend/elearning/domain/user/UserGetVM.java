@@ -9,7 +9,7 @@ public record UserGetVM(
         String avatar
 ) {
     public static UserGetVM fromModel(User user) {
-        return new UserGetVM(user.getId(), user.getFirstName(), user.getLastName(), user.getPhotoId());
+        return new UserGetVM(user.getId(), user.getFirstName(), user.getLastName(), user.getPhoto());
     }
 
     public static UserGetVM fromModelStudent(Student student) {

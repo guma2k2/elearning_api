@@ -6,7 +6,7 @@ public record LecturePostVM(
         float number,
         String lectureDetails,
         float duration,
-        String videoId,
+        String video,
         Long sectionId
 ) {
 }
