@@ -15,10 +15,8 @@ import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService{
-
     private final CartRepository cartRepository;
     private final StudentRepository studentRepository;
-
     private final CourseRepository courseRepository;
 
     public CartServiceImpl(CartRepository cartRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
@@ -37,6 +35,7 @@ public class CartServiceImpl implements CartService{
             Cart cart = Cart.builder()
                     .course(course)
                     .student(student)
+                    .buyLater(false)
                     .build();
 
             cartRepository.saveAndFlush(cart);
@@ -60,7 +59,7 @@ public class CartServiceImpl implements CartService{
             Course course = cart.getCourse();
             String fullName = student.getFirstName().concat(" ").concat(student.getLastName());
             CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1, 1, 5, 5);
-            return new CartListGetVM(fullName, courseListGetVM);
+            return new CartListGetVM(fullName, courseListGetVM, cart.isBuyLater());
         }).toList();
         return cartListGetVMS;
     }
