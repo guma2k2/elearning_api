@@ -16,6 +16,7 @@ public record UserVm (
          String role
 ) {
     public static UserVm fromModel (User user) {
+        String dateOfBirth = user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "";
         return new UserVm(user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
@@ -23,7 +24,7 @@ public record UserVm (
                 user.getGender().name(),
                 user.isActive(),
                 user.getPhoto(),
-                user.getDateOfBirth().toString(),
+                dateOfBirth,
                 user.getRole().name());
     }
 

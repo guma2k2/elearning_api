@@ -60,14 +60,14 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
-        Optional<User> user = userRepository.findByEmail(request.username());
+        Optional<User> user = userRepository.findByEmail(request.email());
         if (user.isPresent()) {
-            String token = jwtUtil.issueToken(request.username(), user.get().getRole().name());
+            String token = jwtUtil.issueToken(request.email(), user.get().getRole().name());
             UserVm userVm = UserVm.fromModel(user.get());
             return new AuthenticationVm(token, userVm);
         }
-        Optional<Student> student = studentRepository.findByEmail(request.username());
-        String token = jwtUtil.issueToken(request.username(), ERole.ROLE_STUDENT.name());
+        Optional<Student> student = studentRepository.findByEmail(request.email());
+        String token = jwtUtil.issueToken(request.email(), ERole.ROLE_STUDENT.name());
         UserVm userVm = UserVm.fromModelStudent(student.get());
         return new AuthenticationVm(token, userVm);
     }
