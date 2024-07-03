@@ -2,11 +2,11 @@ package com.backend.elearning.domain.course;
 
 import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.category.CategoryRepository;
-import com.backend.elearning.domain.category.CategoryVM;
-import com.backend.elearning.domain.common.Curriculum;
 import com.backend.elearning.domain.common.PageableData;
-import com.backend.elearning.domain.media.MediaService;
-import com.backend.elearning.domain.section.Section;
+import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
+import com.backend.elearning.domain.learning.learningLecture.LearningLectureRepository;
+import com.backend.elearning.domain.learning.learningQuiz.LearningQuiz;
+import com.backend.elearning.domain.learning.learningQuiz.LearningQuizRepository;
 import com.backend.elearning.domain.section.SectionService;
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.topic.Topic;
@@ -38,12 +38,17 @@ public class CourseServiceImpl implements CourseService{
     private final UserRepository userRepository;
     private final SectionService sectionService;
 
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, UserRepository userRepository, SectionService sectionService) {
+    private final LearningLectureRepository learningLectureRepository;
+    private final LearningQuizRepository learningQuizRepository;
+
+    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, UserRepository userRepository, SectionService sectionService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
         this.userRepository = userRepository;
         this.sectionService = sectionService;
+        this.learningLectureRepository = learningLectureRepository;
+        this.learningQuizRepository = learningQuizRepository;
     }
 
 
@@ -125,6 +130,25 @@ public class CourseServiceImpl implements CourseService{
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
         sections.sort(Comparator.comparing(SectionVM::number));
         return CourseVM.fromModel(course, sections);
+    }
+
+    @Override
+    public CourseLearningVm getCourseBySlug(String slug) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow();
+        List<SectionVM> sections = new ArrayList<>(course.getSections()
+                .stream().map(section -> sectionService.getById(section.getId())).toList());
+        sections.sort(Comparator.comparing(SectionVM::number));
+
+        CourseVM courseVM = CourseVM.fromModel(course, sections);
+
+        LearningLecture lecture = learningLectureRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug).orElseThrow();
+        LearningQuiz quiz = learningQuizRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug).orElseThrow();
+
+        if (lecture.getAccessTime().isAfter(quiz.getAccessTime())) {
+            return new CourseLearningVm(courseVM, lecture.getId(), lecture.getWatchingSecond());
+        }
+        return new CourseLearningVm(courseVM, quiz.getId(), null);
     }
 
     @Override
