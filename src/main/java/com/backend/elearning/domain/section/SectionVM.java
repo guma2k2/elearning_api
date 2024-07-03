@@ -7,7 +7,6 @@ import java.util.List;
 public record SectionVM(
         Long id,
         String title,
-
         float number,
         String objective,
         List<Curriculum> curriculums
