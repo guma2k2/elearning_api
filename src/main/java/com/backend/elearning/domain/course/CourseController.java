@@ -69,6 +69,7 @@ public class CourseController {
             @ApiResponse(responseCode = "409", description = "Duplicated title", content =
             @Content(schema = @Schema(implementation = ErrorVm.class))),
     })
+
     public ResponseEntity<CourseVM> updateCourse (
             @RequestBody CoursePostVM coursePostVM,
             @PathVariable("id") Long courseId,
@@ -86,5 +87,13 @@ public class CourseController {
     ) {
         CourseVM courseVM = courseService.getCourseById(courseId);
         return ResponseEntity.ok().body(courseVM);
+    }
+
+    @GetMapping("/courses/{slug}/learn")
+    public ResponseEntity<CourseLearningVm> getCourseBySlug (
+            @PathVariable("slug") String slug
+    ) {
+        CourseLearningVm course = courseService.getCourseBySlug(slug);
+        return ResponseEntity.ok().body(course);
     }
 }
