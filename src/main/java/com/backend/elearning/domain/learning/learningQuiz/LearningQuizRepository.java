@@ -13,14 +13,20 @@ public interface LearningQuizRepository extends JpaRepository<LearningQuiz, Long
 
 
     @Query("""
-            select ll
-            from LearningQuiz ll
-            left join fetch ll.student s
-             left join fetch ll.student s
-            left join fetch ll.lecture l
-            left join fetch l.course c
-            group by ll.student, ll.quiz
-            having ll.accessTime = max(ll.accessTime) and s.email = :email and c.slug = :slug
-            """)
+           select ll
+           from LearningQuiz ll
+           left join fetch ll.student s
+           left join fetch ll.quiz l
+           left join fetch l.section se
+           left join fetch se.course c
+           where ll.accessTime = (
+               select max(ll2.accessTime)
+               from LearningQuiz ll2
+               where ll2.student.id = s.id
+           )
+           and s.email = :email
+           and c.slug = :slug
+                                                                                               
+     """)
     Optional<LearningQuiz> findMaxAccessTimeByEmailAndCourseSlug(@Param("email") String email, @Param("slug") String slug);
 }

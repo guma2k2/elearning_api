@@ -9,7 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "learning_lecture")
+@Table(name = "learning_quiz")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -27,7 +27,7 @@ public class LearningQuiz {
     private Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lecture_id")
+    @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
     private LocalDateTime accessTime;

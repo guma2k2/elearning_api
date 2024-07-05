@@ -23,10 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -134,7 +131,8 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseLearningVm getCourseBySlug(String slug) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = "thuanngo3072002@gmail.com";
         Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow();
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
@@ -142,13 +140,23 @@ public class CourseServiceImpl implements CourseService{
 
         CourseVM courseVM = CourseVM.fromModel(course, sections);
 
-        LearningLecture lecture = learningLectureRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug).orElseThrow();
-        LearningQuiz quiz = learningQuizRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug).orElseThrow();
+        Optional<LearningLecture> maxAccessTimeByEmailAndCourseSlugLecture = learningLectureRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
+        Optional<LearningQuiz> maxAccessTimeByEmailAndCourseSlugQuiz = learningQuizRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
 
-        if (lecture.getAccessTime().isAfter(quiz.getAccessTime())) {
-            return new CourseLearningVm(courseVM, lecture.getId(), lecture.getWatchingSecond());
+        if (maxAccessTimeByEmailAndCourseSlugLecture.isPresent() && maxAccessTimeByEmailAndCourseSlugQuiz.isPresent()) {
+            var lecture = maxAccessTimeByEmailAndCourseSlugLecture.get();
+            var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
+            if (lecture.getAccessTime().isAfter(quiz.getAccessTime())) {
+                return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getId(), lecture.getWatchingSecond());
+            }
+        } else if (maxAccessTimeByEmailAndCourseSlugLecture.isPresent()) {
+            var lecture = maxAccessTimeByEmailAndCourseSlugLecture.get();
+            return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getLecture().getId(), lecture.getWatchingSecond());
+        } else if (maxAccessTimeByEmailAndCourseSlugQuiz.isPresent()) {
+            var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
+            return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null);
         }
-        return new CourseLearningVm(courseVM, quiz.getId(), null);
+        return new CourseLearningVm(courseVM, null ,null, null);
     }
 
     @Override

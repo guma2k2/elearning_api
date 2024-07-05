@@ -29,6 +29,8 @@ public class Course extends AbstractAuditEntity {
     @Column(nullable = false, unique = true, length = 60)
     private String title;
 
+    private String slug;
+
     private String headline;
 
     private String[] objectives;
