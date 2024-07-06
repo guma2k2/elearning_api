@@ -28,6 +28,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             """)
     Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
 
+    @Query(value = """
+            select c
+            from Course c
+            left join fetch c.sections s
+            where c.slug = :slug
+            """)
+    Optional<Course> findBySlugReturnSections(@Param("slug") String slug);
+
 
     @Query(value = """
             select c

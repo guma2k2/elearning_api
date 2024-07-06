@@ -1,8 +1,8 @@
 spring:
   datasource:
-    username: root
-    url: jdbc:postgresql://localhost:5432/elearning
-    password: 'password'
+    username: postgres
+    url: jdbc:postgresql://localhost:5433/elearning
+    password: '123456'
   jpa:
     properties:
       hibernate:
@@ -20,8 +20,8 @@ spring:
     multipart:
       max-request-size: 100MB
       max-file-size: 100MB
-outbound:
-  identity:
-    client-id: "adsf"
-    client-secret: "asdfa"
-    redirect-uri: "http://localhost:3000/authenticate"
+  outbound:
+    identity:
+      client-id: ""
+      client-secret: ""
+      redirect-uri: "http://localhost:3000/authenticate"
