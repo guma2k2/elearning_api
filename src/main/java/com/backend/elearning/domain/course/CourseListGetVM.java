@@ -8,12 +8,13 @@ public record CourseListGetVM(
         int lectureCount,
         float averageRating,
         int ratingCount,
-        String image
+        String image,
+        double price
 ) {
 
     public static CourseListGetVM fromModel(Course course, int totalHours, int lectureCount,
                                             float averageRating,
                                             int ratingCount) {
-        return new CourseListGetVM(course.getId(), course.getTitle(), course.getLevel().toString(), totalHours, lectureCount, averageRating, ratingCount, course.getImageId());
+        return new CourseListGetVM(course.getId(), course.getTitle(), course.getLevel().toString(), totalHours, lectureCount, averageRating, ratingCount, course.getImageId(), course.getPrice());
     }
 }

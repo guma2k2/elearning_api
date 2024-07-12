@@ -73,7 +73,7 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public CourseVM create(CoursePostVM coursePostVM) {
         /*String email = SecurityContextHolder.getContext().getAuthentication().getName();*/
-        String email = "thuanngo3072002@gmail.com";
+        String email = "thuanngo3072006@gmail.com";
         if (courseRepository.countExistByTitle(coursePostVM.title(), null) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
@@ -85,6 +85,7 @@ public class CourseServiceImpl implements CourseService{
         Course course = Course.builder()
                 .title(coursePostVM.title())
                 .category(category)
+
                 .topic(topic)
                 .user(user)
                 .slug(slug)

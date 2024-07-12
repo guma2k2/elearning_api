@@ -50,6 +50,8 @@ public class Course extends AbstractAuditEntity {
 
     private boolean publish;
 
+    private Double price;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -4,7 +4,7 @@ public class ConvertTitleToSlug {
 
 
     public static String convertTitleToSlug (String title) {
-        String[] splitTitles = title.split("");
+        String[] splitTitles = title.trim().split("\\s+");
         String slug = "";
         for (int start = 0; start < splitTitles.length; start++) {
             if (start == splitTitles.length - 1) {

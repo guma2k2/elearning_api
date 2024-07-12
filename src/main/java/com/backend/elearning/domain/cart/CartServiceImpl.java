@@ -7,6 +7,9 @@ import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
+import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class CartServiceImpl implements CartService{
     private final CartRepository cartRepository;
     private final StudentRepository studentRepository;
@@ -28,7 +32,13 @@ public class CartServiceImpl implements CartService{
     @Override
     public void addCourseToCart(Long courseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Student student = studentRepository.findByEmail(email).orElseThrow();
+        if (email != null) {
+            log.info(email);
+            log.info(SecurityContextHolder.getContext().getAuthentication().toString());
+        }else {
+            log.info("email is null");
+        }
+        Student student = studentRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND));
         Course course = courseRepository.findById(courseId).orElseThrow();
 
         if (cartRepository.findByEmailAndCourseId(courseId, email).isEmpty()) {
@@ -55,7 +65,6 @@ public class CartServiceImpl implements CartService{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Cart> carts = cartRepository.findByUserEmail(email);
         List<CartListGetVM> cartListGetVMS = carts.stream().map(cart -> {
-            Student student = cart.getStudent();
             Course course = cart.getCourse();
             CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1, 1, 5, 5);
             return new CartListGetVM(courseListGetVM, cart.isBuyLater());
