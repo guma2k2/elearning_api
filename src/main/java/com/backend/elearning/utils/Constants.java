@@ -14,7 +14,7 @@ public final class Constants {
         public static final String QUIZ_NOT_FOUND = "QUIZ_NOT_FOUND";
         public static final String PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND";
         public static final String PARENT_CATEGORY_CANNOT_BE_ITSELF = "PARENT_CATEGORY_CANNOT_BE_ITSELF";
-
+        public static final String STUDENT_NOT_FOUND = "STUDENT_NOT_FOUND";
         public static final String CATEGORY_NAME_DUPLICATED = "CATEGORY_NAME_DUPLICATED";
         public static final String TOPIC_NOT_FOUND = "TOPIC_NOT_FOUND";
         public static final String TOPIC_NAME_DUPLICATED = "TOPIC_NAME_DUPLICATED";

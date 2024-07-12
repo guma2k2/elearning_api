@@ -20,8 +20,8 @@ spring:
     multipart:
       max-request-size: 100MB
       max-file-size: 100MB
-outbound:
-  identity:
-    client-id: ""
-    client-secret: ""
-    redirect-uri: "http://localhost:5173/authenticate"
+  outbound:
+    identity:
+      client-id: ""
+      client-secret: ""
+      redirect-uri: "http://localhost:3000/authenticate"

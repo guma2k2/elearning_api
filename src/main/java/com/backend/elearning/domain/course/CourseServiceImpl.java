@@ -16,6 +16,7 @@ import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.utils.Constants;
+import com.backend.elearning.utils.ConvertTitleToSlug;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,18 +73,22 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public CourseVM create(CoursePostVM coursePostVM) {
         /*String email = SecurityContextHolder.getContext().getAuthentication().getName();*/
-        String email = "thuanngo3072002@gmail.com";
+        String email = "thuanngo3072006@gmail.com";
         if (courseRepository.countExistByTitle(coursePostVM.title(), null) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
         Category category = categoryRepository.findById(coursePostVM.categoryId()).orElseThrow();
         Topic topic = topicRepository.findById(coursePostVM.topicId()).orElseThrow();
         User user = userRepository.findByEmail(email).orElseThrow();
+
+        String slug = ConvertTitleToSlug.convertTitleToSlug(coursePostVM.title());
         Course course = Course.builder()
                 .title(coursePostVM.title())
                 .category(category)
+
                 .topic(topic)
                 .user(user)
+                .slug(slug)
                 .build();
         return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>());
     }

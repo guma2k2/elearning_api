@@ -5,10 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +34,16 @@ public class JWTUtil {
     public String issueToken(
             String subject,
             Map<String, Object> claims) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 15);
+        Date expirationDate = calendar.getTime();
         String token = Jwts
                 .builder()
                 .setClaims(claims)
                 .setSubject(subject.toString())
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(
-                        Date.from(
-                                Instant.now().plus(15, ChronoUnit.DAYS)
-                        )
+                        expirationDate
                 )
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
