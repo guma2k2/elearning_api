@@ -86,10 +86,10 @@ public class AuthenticationService {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
         ExchangeTokenResponse response = restTemplate.exchange(EXCHANGE_TOKEN_URL, HttpMethod.POST, entity, ExchangeTokenResponse.class).getBody();
-        if (response != null) {
-            log.info(response.toString());
-            log.info(response.toString());
-        }
+//        if (response != null) {
+//            log.info(response.toString());
+//            log.info(response.toString());
+//        }
 
 
         if (response != null) {

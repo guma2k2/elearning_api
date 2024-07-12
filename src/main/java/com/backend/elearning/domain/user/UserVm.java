@@ -6,7 +6,6 @@ import com.backend.elearning.domain.student.Student;
 public record UserVm (
          Long id,
          String email,
-
          String firstName,
          String lastName,
          String gender,

@@ -63,7 +63,7 @@ public class TopicServiceImpl implements TopicService{
         topicRepository.saveAndFlush(topic);
         if (!topicPostVM.categories().isEmpty()) {
             for (String catName: topicPostVM.categories()) {
-                Category category = categoryRepository.findByName(catName).orElseThrow();
+                Category category = categoryRepository.findByName(catName).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND));
                 topic.addCategory(category);
             }
             topicRepository.save(topic);

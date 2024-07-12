@@ -57,9 +57,8 @@ public class CartServiceImpl implements CartService{
         List<CartListGetVM> cartListGetVMS = carts.stream().map(cart -> {
             Student student = cart.getStudent();
             Course course = cart.getCourse();
-            String fullName = student.getFirstName().concat(" ").concat(student.getLastName());
             CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1, 1, 5, 5);
-            return new CartListGetVM(fullName, courseListGetVM, cart.isBuyLater());
+            return new CartListGetVM(courseListGetVM, cart.isBuyLater());
         }).toList();
         return cartListGetVMS;
     }
