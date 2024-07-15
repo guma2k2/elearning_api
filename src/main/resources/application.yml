@@ -1,8 +1,8 @@
 spring:
   datasource:
-    username: postgres
-    url: jdbc:postgresql://localhost:5433/elearning
-    password: '123456'
+    username: root
+    url: jdbc:postgresql://localhost:5432/elearning
+    password: 'password'
   jpa:
     properties:
       hibernate:
@@ -20,8 +20,18 @@ spring:
     multipart:
       max-request-size: 100MB
       max-file-size: 100MB
-  outbound:
-    identity:
-      client-id: ""
-      client-secret: ""
-      redirect-uri: "http://localhost:3000/authenticate"
+outbound:
+  identity:
+    client-id: "267032846386-hchqmc5j59qi1ti287asu2bgb9fafqk1.apps.googleusercontent.com"
+    client-secret: "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"
+    redirect-uri: "http://localhost:5173/authenticate"
+
+payment:
+  vnPay:
+    url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    tmnCode: "EDT2E52Y"
+    secretKey: "VGC6H4EJ834TXE5USIHM20W3FH4469VW"
+    returnUrl: "http://localhost:5173/vn-pay-callback"
+    version: "2.1.0"
+    command: "pay"
+    orderType: "other"
