@@ -32,12 +32,6 @@ public class CartServiceImpl implements CartService{
     @Override
     public void addCourseToCart(Long courseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (email != null) {
-            log.info(email);
-            log.info(SecurityContextHolder.getContext().getAuthentication().toString());
-        }else {
-            log.info("email is null");
-        }
         Student student = studentRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND));
         Course course = courseRepository.findById(courseId).orElseThrow();
 
@@ -61,13 +55,21 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
+    @Transactional
+    public void updateCartBuyLater(Long cartId) {
+        Cart cart = cartRepository.findById(cartId).orElseThrow();
+        boolean newStatus = !cart.isBuyLater();
+        cartRepository.updateCartBuyLater(newStatus, cartId);
+    }
+
+    @Override
     public List<CartListGetVM> listCartForUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Cart> carts = cartRepository.findByUserEmail(email);
         List<CartListGetVM> cartListGetVMS = carts.stream().map(cart -> {
             Course course = cart.getCourse();
             CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1, 1, 5, 5);
-            return new CartListGetVM(courseListGetVM, cart.isBuyLater());
+            return new CartListGetVM(cart.getId(), courseListGetVM, cart.isBuyLater());
         }).toList();
         return cartListGetVMS;
     }

@@ -29,9 +29,15 @@ public class CartController {
         return ResponseEntity.ok().body(cartListGetVMS);
     }
 
-    @PostMapping("/carts/{cartId}")
+    @DeleteMapping("/carts/{cartId}")
     public ResponseEntity<Void> deleteCart(@PathVariable("cartId") Long cartId) {
         cartService.deleteCourseInCart(cartId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/carts/{cartId}")
+    public ResponseEntity<Void> updateCartStatus(@PathVariable("cartId") Long cartId) {
+        cartService.updateCartBuyLater(cartId);
         return ResponseEntity.noContent().build();
     }
 }
