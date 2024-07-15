@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.cart;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,14 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             where u.email = :email
             """)
     List<Cart> findByUserEmail(@Param("email") String email);
+
+
+    @Modifying
+    @Query("""
+        update Cart c
+        set c.buyLater = :buyLater
+        where c.id = :cartId
+    """)
+    void updateCartBuyLater(@Param("buyLater") boolean buyLater,
+                            @Param("cartId") Long cartId);
 }
