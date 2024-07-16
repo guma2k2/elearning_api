@@ -3,15 +3,17 @@ package com.backend.elearning.domain.order.impl;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseGetVM;
 import com.backend.elearning.domain.course.CourseRepository;
-import com.backend.elearning.domain.course.CourseVM;
 import com.backend.elearning.domain.order.*;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -72,7 +74,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, String orderStatus) {
+        EOrderStatus status = EOrderStatus.valueOf(orderStatus);
+        orderRepository.updateOrderStatus(orderId, status);
+    }
+
+    @Override
     public List<OrderGetListDto> findAll()  {
         return null;
+    }
+
+    private final LocalDateTime convertStringToLocalDateTimeOfPayDay (String payday) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        LocalDateTime localDateTime = LocalDateTime.parse(payday, formatter);
+        return localDateTime;
     }
 }

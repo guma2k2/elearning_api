@@ -23,12 +23,20 @@ public class OrderController {
     }
 
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Long> createOrder(@RequestBody OrderPostDto orderPostDto) {
         Long orderId = orderService.createOrder(orderPostDto);
         return ResponseEntity.ok().body(orderId);
     }
 
+    @PutMapping("/{orderId}/status/{orderStatus}")
+    public ResponseEntity<Void> createOrder(
+            @PathVariable("orderId") Long orderId,
+            @PathVariable("orderStatus") String status
+    ) {
+        orderService.updateOrderStatus(orderId, status);
+        return ResponseEntity.noContent().build();
+    }
     @GetMapping("/user")
     public ResponseEntity<List<OrderDto>> findAllByUserId() {
         List<OrderDto> orderDtos = orderService.findAllByUserId();
