@@ -16,7 +16,7 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
             left join fetch s.lectures
             where s.id = :id
             """)
-    Optional<Section> findByIdLecturesQuizzes(@Param("id") Long id);
+    Optional<Section> findByIdLectures(@Param("id") Long id);
 
     @Query(value = """
             select distinct s

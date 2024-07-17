@@ -32,4 +32,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByCourseId(@Param("courseId") Long courseId, Pageable pageable);
 
 
+    @Query("""
+            select r
+            from Review r
+            left join fetch r.course c
+            left join fetch r.student u
+            where c.id = :courseId
+            """)
+    List<Review> findByCourseId(@Param("courseId") Long courseId);
+
+
+
 }

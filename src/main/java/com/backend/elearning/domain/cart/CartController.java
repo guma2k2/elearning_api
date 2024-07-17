@@ -11,11 +11,9 @@ public class CartController {
 
     private final CartService cartService;
 
-
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }
-
 
     @PostMapping("/carts/add-to-cart/course/{courseId}")
     public ResponseEntity<Void> addToCart(@PathVariable("courseId") Long courseId) {

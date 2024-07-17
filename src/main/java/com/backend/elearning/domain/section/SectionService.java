@@ -6,4 +6,5 @@ public interface SectionService {
 
     SectionVM update(SectionPostVM sectionPutVM, Long sectionId);
     void delete (Long sectionId);
+
 }

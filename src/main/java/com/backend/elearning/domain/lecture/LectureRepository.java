@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +18,13 @@ public interface LectureRepository extends JpaRepository<Lecture, Long> {
             where l.id = :id
             """)
     Optional<Lecture> findByIdSection(@Param("id") Long id);
+
+
+    @Query(value = """
+            select l
+            from Lecture l
+            left join fetch l.section s
+            where s.id = :sectionId
+            """)
+    List<Lecture> findBySectionId(@Param("sectionId") Long sectionId);
 }
