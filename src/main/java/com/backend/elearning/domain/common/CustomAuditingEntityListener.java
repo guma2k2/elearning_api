@@ -11,6 +11,11 @@ public class CustomAuditingEntityListener extends AuditingEntityListener {
     public CustomAuditingEntityListener(ObjectFactory<AuditingHandler> handler) {
         super.setAuditingHandler(handler);
     }
+
+    public CustomAuditingEntityListener() {
+
+    }
+
     @Override
     @PrePersist
     public void touchForCreate(Object target) {

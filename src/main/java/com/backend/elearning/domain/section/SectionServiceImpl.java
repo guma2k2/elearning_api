@@ -50,7 +50,7 @@ public class SectionServiceImpl implements SectionService{
         // Hibernate throws MultipleBagFetchException - cannot simultaneously fetch multiple bags
         // Vlad Mihalcea in his answer!
         // https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl/51055523#51055523
-        Section section = sectionRepository.findByIdLecturesQuizzes(sectionId).orElseThrow(() ->
+        Section section = sectionRepository.findByIdLectures(sectionId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
         section = sectionRepository.findByIdQuizzes(section).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
@@ -103,7 +103,7 @@ public class SectionServiceImpl implements SectionService{
     @Override
     @Transactional
     public void delete(Long sectionId) {
-        Section section = sectionRepository.findByIdLecturesQuizzes(sectionId).orElseThrow(() ->
+        Section section = sectionRepository.findByIdLectures(sectionId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
         section = sectionRepository.findByIdQuizzes(section).orElseThrow();
         boolean canDelete = section.getLectures().isEmpty() && section.getQuizzes().isEmpty();

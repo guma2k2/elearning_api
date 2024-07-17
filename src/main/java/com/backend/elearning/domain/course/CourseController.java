@@ -96,4 +96,7 @@ public class CourseController {
         CourseLearningVm course = courseService.getCourseBySlug(slug);
         return ResponseEntity.ok().body(course);
     }
+
+
+
 }

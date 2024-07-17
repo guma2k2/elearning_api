@@ -7,6 +7,10 @@ import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
 import com.backend.elearning.domain.learning.learningLecture.LearningLectureRepository;
 import com.backend.elearning.domain.learning.learningQuiz.LearningQuiz;
 import com.backend.elearning.domain.learning.learningQuiz.LearningQuizRepository;
+import com.backend.elearning.domain.lecture.Lecture;
+import com.backend.elearning.domain.lecture.LectureRepository;
+import com.backend.elearning.domain.review.Review;
+import com.backend.elearning.domain.review.ReviewRepository;
 import com.backend.elearning.domain.section.SectionService;
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.topic.Topic;
@@ -21,10 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -36,15 +41,19 @@ public class CourseServiceImpl implements CourseService{
     private final UserRepository userRepository;
     private final SectionService sectionService;
 
+    private final LectureRepository lectureRepository ;
+    private final ReviewRepository reviewRepository;
     private final LearningLectureRepository learningLectureRepository;
     private final LearningQuizRepository learningQuizRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, UserRepository userRepository, SectionService sectionService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, UserRepository userRepository, SectionService sectionService, LectureRepository lectureRepository, ReviewRepository reviewRepository, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
         this.userRepository = userRepository;
         this.sectionService = sectionService;
+        this.lectureRepository = lectureRepository;
+        this.reviewRepository = reviewRepository;
         this.learningLectureRepository = learningLectureRepository;
         this.learningQuizRepository = learningQuizRepository;
     }
@@ -58,7 +67,8 @@ public class CourseServiceImpl implements CourseService{
         Page<Course> coursePage = courseRepository.findAllCustom(pageable);
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
-            courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>()));
+            courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>(),0, 0.0,0,"" ));
+
         }
 
         return new PageableData(
@@ -90,7 +100,7 @@ public class CourseServiceImpl implements CourseService{
                 .user(user)
                 .slug(slug)
                 .build();
-        return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>());
+        return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>(),0, 0.0,0,"" );
     }
 
     @Override
@@ -122,16 +132,38 @@ public class CourseServiceImpl implements CourseService{
             oldCourse.setImageId(coursePutVM.image());
         }
         oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
-        return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>());
+        return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>(),0, 0.0,0,"" );
     }
 
     @Override
     public CourseVM getCourseById(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
+        Long courseId = course.getId();
+        List<Review> reviews = reviewRepository.findByCourseId(courseId);
+        int ratingCount = reviews.size();
+        Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
+
+        double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
+
+        AtomicInteger totalLectureCourse = new AtomicInteger();
+        AtomicInteger totalDurationCourse = new AtomicInteger();
+        course.getSections().forEach(section -> {
+            Long sectionId = section.getId();
+            List<Lecture> lectures = lectureRepository.findBySectionId(sectionId);
+            int totalLectures = lectures.size();
+            totalLectureCourse.addAndGet(totalLectures);
+            int totalSeconds = lectures.stream()
+                    .mapToInt(lecture -> lecture.getDuration())
+                    .sum();
+            totalDurationCourse.addAndGet(totalSeconds);
+
+        });
+        double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
+        String formattedHours = String.format("%.1f hours", roundedHours);
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
         sections.sort(Comparator.comparing(SectionVM::number));
-        return CourseVM.fromModel(course, sections);
+        return CourseVM.fromModel(course, sections,ratingCount, roundedAverageRating, totalLectureCourse.get(),formattedHours);
     }
 
     @Override
@@ -143,7 +175,7 @@ public class CourseServiceImpl implements CourseService{
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
         sections.sort(Comparator.comparing(SectionVM::number));
 
-        CourseVM courseVM = CourseVM.fromModel(course, sections);
+        CourseVM courseVM = CourseVM.fromModel(course, sections ,0, 0.0,0,"" );
 
         Optional<LearningLecture> maxAccessTimeByEmailAndCourseSlugLecture = learningLectureRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
         Optional<LearningQuiz> maxAccessTimeByEmailAndCourseSlugQuiz = learningQuizRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);

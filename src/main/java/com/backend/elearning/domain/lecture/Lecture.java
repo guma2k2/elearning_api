@@ -29,7 +29,7 @@ public class Lecture extends AbstractAuditEntity {
 
     private String lectureDetails;
 
-    private float duration;
+    private int duration;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
