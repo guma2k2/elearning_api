@@ -10,6 +10,8 @@ public interface CourseService {
 
     CourseVM getCourseById(Long id);
 
+    CourseListGetVM getCourseListGetVMById(Long id);
+
     CourseLearningVm getCourseBySlug(String slug);
 
     PageableData<CourseVM> getCoursesByMultiQuery(int pageNum, int pageSize, String name, int rating);

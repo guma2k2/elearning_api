@@ -27,4 +27,20 @@ public interface LearningLectureRepository extends JpaRepository<LearningLecture
            and c.slug = :slug
             """)
     Optional<LearningLecture> findMaxAccessTimeByEmailAndCourseSlug(@Param("email") String email, @Param("slug") String slug);
+
+
+
+    @Query("""
+        select count(ll)
+        from LearningLecture  ll 
+        join  ll.student st
+        join  ll.lecture l 
+        join  l.section s 
+        join  s.course c
+        where st.email = :email and c.id = :courseId
+    """)
+    Long countByCourseAndStudent(@Param("email") String email, @Param("courseId") Long courseId);
+
+
+
 }

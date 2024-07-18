@@ -1,12 +1,14 @@
 package com.backend.elearning.domain.course;
 
+import com.backend.elearning.domain.user.User;
+
 public record CourseListGetVM(
         Long id,
         String title,
         String level,
-        int totalHours,
+        String totalDurationCourse,
         int lectureCount,
-        float averageRating,
+        double averageRating,
         int ratingCount,
         String image,
         double price,
@@ -15,11 +17,13 @@ public record CourseListGetVM(
 
     public static CourseListGetVM fromModel(
             Course course,
-            int totalHours,
+            String totalDurationCourse,
             int lectureCount,
-            float averageRating,
+            double averageRating,
             int ratingCount
     ) {
-        return new CourseListGetVM(course.getId(), course.getTitle(), course.getLevel().toString(), totalHours, lectureCount, averageRating, ratingCount, course.getImageId(), course.getPrice(), course.getCreatedBy());
+        User user = course.getUser();
+        String fullName = user.getFirstName() + " " + user.getLastName();
+        return new CourseListGetVM(course.getId(), course.getTitle(), course.getLevel().toString(), totalDurationCourse, lectureCount, averageRating, ratingCount, course.getImageId(), course.getPrice(), fullName);
     }
 }

@@ -23,6 +23,13 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @PutMapping("/reviews/{id}")
+    public ResponseEntity<Void> updateReview(@Valid @RequestBody ReviewPostVM reviewPostVM, @PathVariable("id") Long reviewId){
+        reviewService.updateReview(reviewPostVM, reviewId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/reviews/search")
     public ResponseEntity<PageableData<ReviewVM>> getByBaseProductId(
             @PathVariable("courseId") Long courseId,

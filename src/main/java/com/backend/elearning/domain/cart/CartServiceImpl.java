@@ -68,7 +68,7 @@ public class CartServiceImpl implements CartService{
         List<Cart> carts = cartRepository.findByUserEmail(email);
         List<CartListGetVM> cartListGetVMS = carts.stream().map(cart -> {
             Course course = cart.getCourse();
-            CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1, 1, 5, 5);
+            CourseListGetVM courseListGetVM = CourseListGetVM.fromModel(course, 1+"", 1, 5, 5);
             return new CartListGetVM(cart.getId(), courseListGetVM, cart.isBuyLater());
         }).toList();
         return cartListGetVMS;

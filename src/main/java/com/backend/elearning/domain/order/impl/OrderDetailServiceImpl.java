@@ -39,7 +39,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             int lectureCount = 11;
             float averageRating = 12 ;
             int ratingCount = 5;
-            return CourseListGetVM.fromModel(course, totalHours, lectureCount, averageRating, ratingCount);
+            return CourseListGetVM.fromModel(course, totalHours + "", lectureCount, averageRating, ratingCount);
         }).toList();
         return courseListGetVMS;
     }
