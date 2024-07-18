@@ -77,4 +77,17 @@ public class ReviewServiceImpl implements ReviewService {
 
         return new PageableData<>(pageNum, pageSize, totalElements, totalPages, reviewDtos);
     }
+
+    @Override
+    public void updateReview(ReviewPostVM reviewPostVM, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow();
+        review.setRatingStar(reviewPostVM.ratingStar());
+        review.setContent(reviewPostVM.content());
+        reviewRepository.saveAndFlush(review);
+    }
+
+    @Override
+    public List<Review> findByCourseId(Long courseId) {
+        return reviewRepository.findByCourseId(courseId);
+    }
 }

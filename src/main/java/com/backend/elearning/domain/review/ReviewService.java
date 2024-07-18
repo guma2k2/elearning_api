@@ -10,4 +10,8 @@ public interface ReviewService {
     void createReviewForProduct(ReviewPostVM reviewPost);
 
     PageableData<ReviewVM> getByMultiQuery(Long courseId, Integer pageNum, int pageSize, Integer ratingStar, String sortDir);
+
+    void updateReview(ReviewPostVM reviewPostVM, Long reviewId);
+
+    List<Review> findByCourseId(Long courseId);
 }

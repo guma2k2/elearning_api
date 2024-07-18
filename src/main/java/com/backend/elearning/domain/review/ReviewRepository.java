@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -42,5 +43,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByCourseId(@Param("courseId") Long courseId);
 
 
+
+    @Query("""
+        select r 
+        from Review r 
+        left join fetch r.student s
+        left join fetch r.course c
+        where s.email = :email and c.id = :courseId
+""")
+    Optional<Review> findByStudentAndCourse(@Param("email") String email, @Param("courseId") Long courseId);
 
 }
