@@ -18,16 +18,16 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
     @PostMapping("/reviews")
-    public ResponseEntity<Void> createReview(@Valid @RequestBody ReviewPostVM reviewPostVM){
-        reviewService.createReviewForProduct(reviewPostVM);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ReviewVM> createReview(@Valid @RequestBody ReviewPostVM reviewPostVM){
+        ReviewVM review = reviewService.createReviewForProduct(reviewPostVM);
+        return ResponseEntity.ok().body(review);
     }
 
 
     @PutMapping("/reviews/{id}")
-    public ResponseEntity<Void> updateReview(@Valid @RequestBody ReviewPostVM reviewPostVM, @PathVariable("id") Long reviewId){
-        reviewService.updateReview(reviewPostVM, reviewId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ReviewVM> updateReview(@Valid @RequestBody ReviewPostVM reviewPostVM, @PathVariable("id") Long reviewId){
+        ReviewVM updatedReview = reviewService.updateReview(reviewPostVM, reviewId);
+        return ResponseEntity.ok().body(updatedReview);
     }
 
     @GetMapping("/reviews/search")

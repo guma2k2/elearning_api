@@ -41,7 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
-    public void createReviewForProduct(ReviewPostVM reviewPost) {
+    public ReviewVM createReviewForProduct(ReviewPostVM reviewPost) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Student student = studentRepository.findByEmail(email).orElseThrow();
         Course course = courseRepository.findById(reviewPost.courseId()).orElseThrow();
@@ -54,7 +54,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        reviewRepository.saveAndFlush(review);
+        Review savedReview = reviewRepository.save(review);
+        return ReviewVM.fromModel(savedReview);
     }
 
     @Override
@@ -79,11 +80,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void updateReview(ReviewPostVM reviewPostVM, Long reviewId) {
+    public ReviewVM updateReview(ReviewPostVM reviewPostVM, Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
         review.setRatingStar(reviewPostVM.ratingStar());
         review.setContent(reviewPostVM.content());
-        reviewRepository.saveAndFlush(review);
+        Review updatedReview = reviewRepository.save(review);
+        return ReviewVM.fromModel(updatedReview);
     }
 
     @Override
