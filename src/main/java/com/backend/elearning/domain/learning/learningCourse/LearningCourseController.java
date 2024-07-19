@@ -1,9 +1,12 @@
 package com.backend.elearning.domain.learning.learningCourse;
 
+import com.backend.elearning.domain.lecture.LectureVm;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +24,19 @@ public class LearningCourseController {
     public ResponseEntity<List<LearningCourseVM>> getLearningCoursesByStudent() {
         List<LearningCourseVM> learningCoursesByStudent = learningCourseService.getByStudent();
         return ResponseEntity.ok().body(learningCoursesByStudent);
+    }
+
+
+    @PostMapping("/learning-course")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created", content =
+            @Content(schema = @Schema(implementation = LectureVm.class)))
+    })
+    public ResponseEntity<Void> createCourse (
+            @RequestParam("courseId") Long courseId
+    ) {
+        learningCourseService.createLearningCourseForStudent(courseId);
+        return ResponseEntity.noContent().build();
     }
 
 }
