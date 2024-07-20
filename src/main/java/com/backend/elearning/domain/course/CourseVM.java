@@ -2,20 +2,16 @@ package com.backend.elearning.domain.course;
 
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.user.User;
+import com.backend.elearning.domain.user.UserProfileVM;
 
 import java.util.List;
 
 public record CourseVM(
         Long id,
-
         String title,
-
         String headline,
-
         String[] objectives,
-
         String[] requirements,
-
         String[] targetAudiences,
         String description,
         String level,
@@ -32,12 +28,16 @@ public record CourseVM(
         int totalLectureCourse,
         String totalDurationCourse,
         String createdBy,
-        List<SectionVM> sections
+        List<SectionVM> sections,
+        UserProfileVM user,
+        boolean learning
 ) {
     public static CourseVM fromModel (Course course, List<SectionVM> sections, int ratingCount,
                                       double averageRating,
                                       int totalLectureCourse,
-                                      String totalDurationCourse) {
+                                      String totalDurationCourse,
+                                      UserProfileVM userProfileVM,
+                                      boolean learning) {
         String level = course.getLevel() != null ? course.getLevel().toString() : "";
         User user = course.getUser();
         String createdBy = user.getFirstName() + " " + user.getLastName()   ;
@@ -57,6 +57,7 @@ public record CourseVM(
                 totalLectureCourse,
                 totalDurationCourse,
                 createdBy,
-                sections);
+                sections, userProfileVM,
+                learning);
     }
 }

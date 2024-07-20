@@ -8,4 +8,6 @@ public interface UserService {
     UserVm create (UserPostVm userPostVm);
     void update (UserPutVm userPutVm, Long userId);
     void delete (Long userId);
+    UserProfileVM getById(Long userId);
+    User getByEmail(String email);
 }
