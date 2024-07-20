@@ -30,13 +30,13 @@ public class ReviewController {
         return ResponseEntity.ok().body(updatedReview);
     }
 
-    @GetMapping("/reviews/search")
+    @GetMapping("/reviews/search/{courseId}")
     public ResponseEntity<PageableData<ReviewVM>> getByBaseProductId(
             @PathVariable("courseId") Long courseId,
 
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
 
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE_REVIEW, required = false) int pageSize,
 
             @RequestParam(value = "ratingStar", required = false) Integer ratingStar,
 

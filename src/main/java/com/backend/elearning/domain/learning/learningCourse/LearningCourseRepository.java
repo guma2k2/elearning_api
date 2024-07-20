@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LearningCourseRepository extends JpaRepository<LearningCourse, Long> {
@@ -20,4 +21,24 @@ public interface LearningCourseRepository extends JpaRepository<LearningCourse, 
         where s.email  = :email
     """)
     List<LearningCourse> findByStudentEmail(@Param("email") String email);
+
+
+    @Query("""
+        select count (lc.id)
+        from LearningCourse lc 
+        join lc.course c
+        join lc.student
+        where c.id = :courseId
+    """)
+    Long countStudentByCourseId (@Param("courseId") Long courseId);
+
+
+    @Query("""
+        select lc 
+        from LearningCourse lc
+        join lc.course c 
+        join lc.student s
+        where c.id = :courseId and s.email = :email
+    """)
+    Optional<LearningCourse> findByStudentAndCourse(@Param("email") String email, @Param("courseId") Long courseId);
 }

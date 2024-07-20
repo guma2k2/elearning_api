@@ -18,4 +18,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.email = :email AND (:id = null or u.id != :id)
             """)
     Long countByExistedEmail (@Param("email") String email, @Param("id") Long id) ;
+
+
+    @Query("""
+        select u 
+        from User u 
+        left join fetch u.courses
+        where u.id = :id
+    """)
+    Optional<User> findByIdCustom(@Param("id") Long id);
 }

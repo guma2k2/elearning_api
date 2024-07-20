@@ -5,4 +5,5 @@ import java.util.List;
 public interface LearningCourseService {
     List<LearningCourseVM> getByStudent();
     void createLearningCourseForStudent(Long courseId);
+
 }

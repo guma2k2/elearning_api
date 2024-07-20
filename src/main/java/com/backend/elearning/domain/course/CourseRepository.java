@@ -20,6 +20,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Long countExistByTitle(@Param("title") String title,
                            @Param("id") Long id);
 
+
+
+
     @Query(value = """
             select c
             from Course c

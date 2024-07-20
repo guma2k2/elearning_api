@@ -1,7 +1,11 @@
 package com.backend.elearning.domain.user;
 
 import com.backend.elearning.domain.common.PageableData;
-import com.backend.elearning.domain.media.MediaService;
+import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
+import com.backend.elearning.domain.learning.learningCourse.LearningCourseService;
+import com.backend.elearning.domain.review.Review;
+import com.backend.elearning.domain.review.ReviewService;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
@@ -14,18 +18,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
 
+    private final ReviewService reviewService;
 
     private final PasswordEncoder passwordEncoder;
+    private final LearningCourseRepository learningCourseRepository;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+
+    public UserServiceImpl(UserRepository userRepository, ReviewService reviewService, PasswordEncoder passwordEncoder, LearningCourseRepository learningCourseRepository) {
         this.userRepository = userRepository;
+        this.reviewService = reviewService;
         this.passwordEncoder = passwordEncoder;
+        this.learningCourseRepository = learningCourseRepository;
     }
 
 
@@ -109,6 +120,34 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public void delete(Long userId) {
 
+    }
+
+    @Override
+    public UserProfileVM getById(Long userId) {
+        User user = userRepository.findByIdCustom(userId).orElseThrow();
+        List<Course> coursesOfUser = user.getCourses();
+        int numberOfCourses = coursesOfUser.size();
+        AtomicInteger numberOfReviews = new AtomicInteger();
+        AtomicReference<Double> numberOfRatingOfCourses = new AtomicReference<>(0.0);
+        AtomicInteger numberOfStudent = new AtomicInteger();
+        coursesOfUser.forEach(course -> {
+            Long courseId = course.getId();
+            List<Review> reviews = reviewService.findByCourseId(courseId);
+            int ratingCount = reviews.size();
+            numberOfReviews.addAndGet(ratingCount);
+            Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
+            numberOfRatingOfCourses.updateAndGet(v -> v + averageRating);
+            Long numberOfStudentPerCourse = learningCourseRepository.countStudentByCourseId(courseId);
+            numberOfStudent.addAndGet(Math.toIntExact(numberOfStudentPerCourse));
+        });
+        Double averageRating = numberOfRatingOfCourses.get() / (numberOfCourses * 1.0);
+
+        return UserProfileVM.fromModel(user, averageRating, numberOfReviews.get(), numberOfStudent.get(), numberOfCourses);
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
     }
 
 }

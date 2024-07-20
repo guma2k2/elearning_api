@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.user;
 import com.backend.elearning.domain.common.*;
+import com.backend.elearning.domain.course.Course;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -9,8 +10,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "`user`")
@@ -48,6 +51,10 @@ public class User extends AbstractAuditEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private ERole role;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Course> courses = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
