@@ -41,7 +41,6 @@ public class Student extends AbstractAuditEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private EGender gender;
-
     private boolean active;
 
     private String photo;
