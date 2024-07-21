@@ -26,7 +26,7 @@ public class CouponServiceImpl implements CouponService{
                 .endTime(endTime)
                 .build();
         Coupon savedCoupon = couponRepository.saveAndFlush(newCoupon);
-        return CouponVM.fromModel(coupon);
+        return CouponVM.fromModel(savedCoupon);
     }
 
     @Override
