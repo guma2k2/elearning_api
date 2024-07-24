@@ -31,6 +31,9 @@ public class Review {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @Builder.Default
+    private boolean status = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;

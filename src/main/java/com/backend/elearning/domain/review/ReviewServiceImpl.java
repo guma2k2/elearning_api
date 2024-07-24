@@ -1,6 +1,8 @@
 package com.backend.elearning.domain.review;
 
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.coupon.Coupon;
+import com.backend.elearning.domain.coupon.CouponVM;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.student.Student;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -91,5 +94,24 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<Review> findByCourseId(Long courseId) {
         return reviewRepository.findByCourseId(courseId);
+    }
+
+    @Override
+    public PageableData<ReviewVM> getPageableReviews(int pageNum, int pageSize) {
+        List<ReviewVM> reviewVMS = new ArrayList<>();
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+
+        Page<Review> reviewPage = reviewRepository.findAllCustom(pageable);
+        List<Review> reviews = reviewPage.getContent();
+        for (Review review : reviews) {
+            reviewVMS.add(ReviewVM.fromModel(review));
+        }
+        return new PageableData(
+                pageNum,
+                pageSize,
+                (int) reviewPage.getTotalElements(),
+                reviewPage.getTotalPages(),
+                reviewVMS
+        );
     }
 }

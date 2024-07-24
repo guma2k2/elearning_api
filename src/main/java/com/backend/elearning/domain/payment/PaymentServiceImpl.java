@@ -3,6 +3,7 @@ package com.backend.elearning.domain.payment;
 import com.backend.elearning.configuration.VNPayConfig;
 import com.backend.elearning.domain.order.Order;
 import com.backend.elearning.domain.order.OrderRepository;
+import com.backend.elearning.utils.DateTimeUtils;
 import com.backend.elearning.utils.VNPayUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
         Order order = orderRepository.findById(request.orderId()).orElseThrow();
         Payment payment = Payment.builder()
                 .bankTranNo(request.bankTranNo())
-                .payDate(request.payDate())
+                .payDate(DateTimeUtils.convertStringToLocalDateTime(request.payDate(), DateTimeUtils.PAYMENT_TYPE))
                 .amount(request.amount())
                 .cartType(request.cartType())
                 .bankCode(request.bankCode())

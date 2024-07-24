@@ -1,6 +1,8 @@
 package com.backend.elearning.domain.order;
 
 import com.backend.elearning.domain.category.Category;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +24,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             where s.email =:email
         """)
     List<Order> findAllByStudent(@Param("email")String email);
+
+
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.orderDetails 
+        """)
+    Page<Order> findAllCustom(Pageable pageable);
 
     @Query("""
         update Order o

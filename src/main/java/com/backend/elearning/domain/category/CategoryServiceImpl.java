@@ -86,6 +86,7 @@ public class CategoryServiceImpl implements CategoryService{
                 new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND,categoryId));
         category.setName(categoryPutVM.name());
         category.setDescription(categoryPutVM.description());
+        category.setPublish(categoryPutVM.isPublish());
         if (categoryPutVM.parentId() == null) {
             category.setParent(null);
         } else {

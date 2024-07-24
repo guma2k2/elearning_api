@@ -1,11 +1,15 @@
 package com.backend.elearning.domain.order.impl;
 
+import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseGetVM;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.order.*;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -58,19 +61,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> findAllByUserId() {
+    public List<OrderVM> findAllByUserId() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Order> orders = orderRepository.findAllByStudent(email);
-        List<OrderDto> orderDtos = orders.stream().map(order -> {
-            List<OrderDetailDto> orderDetailDtos = order.getOrderDetails().stream().map(orderDetail -> {
+        List<OrderVM> orderVMS = orders.stream().map(order -> {
+            List<OrderDetailVM> orderDetailVMS = order.getOrderDetails().stream().map(orderDetail -> {
                 Long courseId = orderDetail.getId();
                 Course course = courseRepository.findById(courseId).orElseThrow();
                 CourseGetVM courseVM = CourseGetVM.fromModel(course);
-                return OrderDetailDto.fromModel(orderDetail, courseVM);
+                return OrderDetailVM.fromModel(orderDetail, courseVM);
             }).toList();
-            return OrderDto.fromModel(order, orderDetailDtos);
+            return OrderVM.fromModel(order, orderDetailVMS);
         }).toList();
-        return orderDtos;
+        return orderVMS;
     }
 
     @Override
@@ -85,9 +88,28 @@ public class OrderServiceImpl implements OrderService {
         return null;
     }
 
-    private final LocalDateTime convertStringToLocalDateTimeOfPayDay (String payday) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        LocalDateTime localDateTime = LocalDateTime.parse(payday, formatter);
-        return localDateTime;
+    @Override
+    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+
+        Page<Order> orderPage = orderRepository.findAllCustom(pageable);
+        List<Order> orders = orderPage.getContent();
+        List<OrderVM> orderVMS = orders.stream().map(order -> {
+            List<OrderDetailVM> orderDetailVMS = order.getOrderDetails().stream().map(orderDetail -> {
+                Long courseId = orderDetail.getId();
+                Course course = courseRepository.findById(courseId).orElseThrow();
+                CourseGetVM courseVM = CourseGetVM.fromModel(course);
+                return OrderDetailVM.fromModel(orderDetail, courseVM);
+            }).toList();
+            return OrderVM.fromModel(order, orderDetailVMS);
+        }).toList();
+        return new PageableData(
+                pageNum,
+                pageSize,
+                (int) orderPage.getTotalElements(),
+                orderPage.getTotalPages(),
+                orderVMS
+        );
     }
+
 }
