@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.review;
 
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.coupon.CouponVM;
 import com.backend.elearning.utils.Constants;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,10 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
+
     @PostMapping("/reviews")
     public ResponseEntity<ReviewVM> createReview(@Valid @RequestBody ReviewPostVM reviewPostVM){
         ReviewVM review = reviewService.createReviewForProduct(reviewPostVM);
@@ -28,6 +29,16 @@ public class ReviewController {
     public ResponseEntity<ReviewVM> updateReview(@Valid @RequestBody ReviewPostVM reviewPostVM, @PathVariable("id") Long reviewId){
         ReviewVM updatedReview = reviewService.updateReview(reviewPostVM, reviewId);
         return ResponseEntity.ok().body(updatedReview);
+    }
+
+
+    @GetMapping("/admin/reviews/paging")
+    public ResponseEntity<PageableData<ReviewVM>> getPageableCategory (
+            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+    ) {
+        PageableData<ReviewVM> pageableReviews = reviewService.getPageableReviews(pageNum, pageSize);
+        return ResponseEntity.ok().body(pageableReviews);
     }
 
     @GetMapping("/reviews/search/{courseId}")
