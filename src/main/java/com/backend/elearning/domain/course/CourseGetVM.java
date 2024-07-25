@@ -5,7 +5,7 @@ public record CourseGetVM(
         String headline,
         String description,
         String level,
-        String imageURL
+        String image
 ) {
 
     public static CourseGetVM fromModel(Course course) {

@@ -7,4 +7,8 @@ public interface CouponService {
     CouponVM getByCode(String code);
 
     PageableData<CouponVM> getPageableCoupons(int pageNum, int pageSize);
+
+    CouponVM updateCoupon(CouponPostVM couponPostVM, Long couponId);
+
+    void deleteById(Long couponId);
 }

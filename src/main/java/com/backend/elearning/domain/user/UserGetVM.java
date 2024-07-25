@@ -6,13 +6,14 @@ public record UserGetVM(
         Long id,
         String firstName,
         String lastName,
-        String avatar
+        String email,
+        String photo
 ) {
     public static UserGetVM fromModel(User user) {
-        return new UserGetVM(user.getId(), user.getFirstName(), user.getLastName(), user.getPhoto());
+        return new UserGetVM(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoto());
     }
 
     public static UserGetVM fromModelStudent(Student student) {
-        return new UserGetVM(student.getId(), student.getFirstName(), student.getLastName(), student.getPhoto());
+        return new UserGetVM(student.getId(), student.getFirstName(), student.getLastName(), student.getEmail(), student.getPhoto());
     }
 }

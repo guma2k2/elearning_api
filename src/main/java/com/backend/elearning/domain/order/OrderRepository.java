@@ -20,6 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             select o
             from Order o 
             left join fetch o.student s 
+            left join fetch o.coupon c
             left join fetch o.orderDetails 
             where s.email =:email
         """)
@@ -30,6 +31,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             select o
             from Order o 
             left join fetch o.student s 
+            left join fetch o.coupon 
             left join fetch o.orderDetails 
         """)
     Page<Order> findAllCustom(Pageable pageable);

@@ -3,6 +3,7 @@ package com.backend.elearning.domain.coupon;
 import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.category.CategoryVM;
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.utils.DateTimeUtils;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,7 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM createCoupon(CouponPostVM couponPostVM) {
-        if (couponRepository.findByCode(couponPostVM.code()).isPresent()) {
+        if (checkExistCoupon(null, couponPostVM.code())) {
             throw new DuplicateException("");
         }
         LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
@@ -64,5 +65,36 @@ public class CouponServiceImpl implements CouponService{
                 categoryPage.getTotalPages(),
                 couponVMS
         );
+    }
+
+
+    public boolean checkExistCoupon (Long id, String code) {
+        return couponRepository.findByCodeAndId(code, id) > 0l;
+    }
+
+    @Override
+    public CouponVM updateCoupon(CouponPostVM couponPostVM, Long couponId) {
+        if (checkExistCoupon(couponId, couponPostVM.code())) {
+            throw new DuplicateException("");
+        }
+        Coupon coupon = couponRepository.findByCode(couponPostVM.code()).orElseThrow();
+        coupon.setCode(coupon.getCode());
+        coupon.setDiscountPercent(couponPostVM.discountPercent());
+        LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
+        LocalDateTime endTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.endTime(), DateTimeUtils.NORMAL_TYPE);
+        coupon.setStartTime(startTime);
+        coupon.setEndTime(endTime);
+        Coupon updatedCoupon = couponRepository.save(coupon);
+
+        return CouponVM.fromModel(updatedCoupon);
+    }
+
+    @Override
+    public void deleteById(Long couponId) {
+        Coupon coupon = couponRepository.findByIdCustom(couponId).orElseThrow();
+        if (coupon.getOrders().size() > 0) {
+            throw new BadRequestException("");
+        }
+        couponRepository.delete(coupon);
     }
 }
