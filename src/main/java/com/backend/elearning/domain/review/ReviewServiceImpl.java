@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,14 +31,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final CourseRepository courseRepository;
 
-
+    private final static String sortField = "createdAt";
     public ReviewServiceImpl(ReviewRepository reviewRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.reviewRepository = reviewRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
     }
 
-    private final static String sortField = "createdAt";
+
 
 
 
@@ -97,14 +98,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageableData<ReviewVM> getPageableReviews(int pageNum, int pageSize) {
-        List<ReviewVM> reviewVMS = new ArrayList<>();
+    public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize) {
+        List<ReviewGetListVM> reviewVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
         Page<Review> reviewPage = reviewRepository.findAllCustom(pageable);
         List<Review> reviews = reviewPage.getContent();
         for (Review review : reviews) {
-            reviewVMS.add(ReviewVM.fromModel(review));
+            reviewVMS.add(ReviewGetListVM.fromModel(review));
         }
         return new PageableData(
                 pageNum,
@@ -113,5 +114,11 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewPage.getTotalPages(),
                 reviewVMS
         );
+    }
+
+    @Override
+    @Transactional
+    public void updateStatusReview(boolean status, Long reviewId) {
+        reviewRepository.updateStatusReview(status, reviewId);
     }
 }

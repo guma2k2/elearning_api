@@ -1,8 +1,11 @@
 package com.backend.elearning.domain.coupon;
+import com.backend.elearning.domain.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "coupon")
@@ -24,5 +27,10 @@ public class Coupon {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
+
+    @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Order> orders = new ArrayList<>();
 
 }

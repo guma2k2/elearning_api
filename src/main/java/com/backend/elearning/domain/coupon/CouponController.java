@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.coupon;
 
+import com.backend.elearning.domain.category.CategoryVM;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.CourseVM;
 import com.backend.elearning.exception.ErrorVm;
@@ -39,6 +40,17 @@ public class CouponController {
     }
 
 
+    @PutMapping("/admin/coupons/{couponId}")
+
+    public ResponseEntity<CouponVM> updateCoupon (
+            @RequestBody CouponPostVM couponPostVM,
+            @PathVariable("couponId") Long couponId
+    ) {
+        CouponVM coupon = couponService.updateCoupon(couponPostVM, couponId);
+        return ResponseEntity.ok().body(coupon);
+    }
+
+
     @GetMapping("/admin/coupons/paging")
     public ResponseEntity<PageableData<CouponVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
@@ -55,5 +67,13 @@ public class CouponController {
     ) {
         CouponVM couponVm = couponService.getByCode(code);
         return ResponseEntity.ok().body(couponVm);
+    }
+
+    @DeleteMapping("/admin/coupons/{id}")
+    public ResponseEntity<Void> delete (
+            @PathVariable("id") Long id
+    ) {
+        couponService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

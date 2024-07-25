@@ -3,6 +3,7 @@ package com.backend.elearning.domain.review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -61,5 +62,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         where s.email = :email and c.id = :courseId
 """)
     Optional<Review> findByStudentAndCourse(@Param("email") String email, @Param("courseId") Long courseId);
+
+    @Modifying
+    @Query("""
+        update 
+        Review s 
+        set s.status = :status
+        where s.id = :id
+    """)
+    void updateStatusReview(@Param("status") boolean status, @Param("id") Long reviewId);
 
 }

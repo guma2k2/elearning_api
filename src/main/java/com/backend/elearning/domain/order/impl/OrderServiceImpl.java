@@ -1,12 +1,14 @@
 package com.backend.elearning.domain.order.impl;
 
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.coupon.Coupon;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseGetVM;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.order.*;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
+import com.backend.elearning.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -26,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final StudentRepository studentRepository;
     private final CourseRepository  courseRepository;
+
 
     public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.orderRepository = orderRepository;
@@ -65,13 +68,22 @@ public class OrderServiceImpl implements OrderService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Order> orders = orderRepository.findAllByStudent(email);
         List<OrderVM> orderVMS = orders.stream().map(order -> {
-            List<OrderDetailVM> orderDetailVMS = order.getOrderDetails().stream().map(orderDetail -> {
-                Long courseId = orderDetail.getId();
+            Long orderId = order.getId();
+            Coupon coupon = order.getCoupon();
+            AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+            List<OrderDetailVM> orderDetailVMS = orderDetails.stream().map(orderDetail -> {
+                Long courseId = orderDetail.getCourse().getId();
                 Course course = courseRepository.findById(courseId).orElseThrow();
                 CourseGetVM courseVM = CourseGetVM.fromModel(course);
+                totalPrice.updateAndGet(v -> v + orderDetail.getPrice());
                 return OrderDetailVM.fromModel(orderDetail, courseVM);
             }).toList();
-            return OrderVM.fromModel(order, orderDetailVMS);
+            Double total = totalPrice.get();
+            if (coupon != null) {
+                total = total - coupon.getDiscountPercent() * total / 100;
+            }
+            return OrderVM.fromModel(order, orderDetailVMS, total);
         }).toList();
         return orderVMS;
     }
@@ -83,25 +95,30 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.updateOrderStatus(orderId, status);
     }
 
-    @Override
-    public List<OrderGetListDto> findAll()  {
-        return null;
-    }
+
 
     @Override
     public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-
         Page<Order> orderPage = orderRepository.findAllCustom(pageable);
         List<Order> orders = orderPage.getContent();
         List<OrderVM> orderVMS = orders.stream().map(order -> {
-            List<OrderDetailVM> orderDetailVMS = order.getOrderDetails().stream().map(orderDetail -> {
-                Long courseId = orderDetail.getId();
-                Course course = courseRepository.findById(courseId).orElseThrow();
+            Long orderId = order.getId();
+            Coupon coupon = order.getCoupon();
+            AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+            List<OrderDetailVM> orderDetailVMS = orderDetails.stream().map(orderDetail -> {
+                Long courseId = orderDetail.getCourse().getId();
+                Course course = courseRepository.findById(courseId).orElseThrow(() -> new  NotFoundException("course not found"));
                 CourseGetVM courseVM = CourseGetVM.fromModel(course);
+                totalPrice.updateAndGet(v -> v + orderDetail.getPrice());
                 return OrderDetailVM.fromModel(orderDetail, courseVM);
             }).toList();
-            return OrderVM.fromModel(order, orderDetailVMS);
+            Double total = totalPrice.get();
+            if (coupon != null) {
+                total = total - coupon.getDiscountPercent() * total / 100;
+            }
+            return OrderVM.fromModel(order, orderDetailVMS, total);
         }).toList();
         return new PageableData(
                 pageNum,

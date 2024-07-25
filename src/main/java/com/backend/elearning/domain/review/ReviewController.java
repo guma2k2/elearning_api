@@ -32,12 +32,19 @@ public class ReviewController {
     }
 
 
+    @PutMapping("/admin/reviews/{id}/status/{status}")
+    public ResponseEntity<Void> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long reviewId){
+        reviewService.updateStatusReview(status, reviewId);
+        return ResponseEntity.noContent().build();
+    }
+
+
     @GetMapping("/admin/reviews/paging")
-    public ResponseEntity<PageableData<ReviewVM>> getPageableCategory (
+    public ResponseEntity<PageableData<ReviewGetListVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
     ) {
-        PageableData<ReviewVM> pageableReviews = reviewService.getPageableReviews(pageNum, pageSize);
+        PageableData<ReviewGetListVM> pageableReviews = reviewService.getPageableReviews(pageNum, pageSize);
         return ResponseEntity.ok().body(pageableReviews);
     }
 
