@@ -40,10 +40,6 @@ public class ReviewServiceImpl implements ReviewService {
 
 
 
-
-
-
-
     @Override
     public ReviewVM createReviewForProduct(ReviewPostVM reviewPost) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

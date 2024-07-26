@@ -41,7 +41,6 @@ public class CouponController {
 
 
     @PutMapping("/admin/coupons/{couponId}")
-
     public ResponseEntity<CouponVM> updateCoupon (
             @RequestBody CouponPostVM couponPostVM,
             @PathVariable("couponId") Long couponId
@@ -61,7 +60,7 @@ public class CouponController {
     }
 
 
-    @GetMapping("/coupons/{code}")
+    @GetMapping("/coupons/code/{code}")
     public ResponseEntity<CouponVM> getCourseById (
             @PathVariable("code") String code
     ) {
