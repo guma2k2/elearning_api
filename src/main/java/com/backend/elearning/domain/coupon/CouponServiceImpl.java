@@ -5,6 +5,8 @@ import com.backend.elearning.domain.category.CategoryVM;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
+import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.DateTimeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +45,10 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM getByCode(String code) {
-        Coupon coupon = couponRepository.findByCode(code).orElseThrow();
+        Coupon coupon = couponRepository.findByCode(code).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, code));
+        if (LocalDateTime.now().isBefore(coupon.getStartTime()) || LocalDateTime.now().isAfter(coupon.getEndTime())) {
+            throw new BadRequestException(Constants.ERROR_CODE.COUPON_IS_EXPIRED, code);
+        }
         return CouponVM.fromModel(coupon);
     }
 
@@ -57,7 +62,6 @@ public class CouponServiceImpl implements CouponService{
         for (Coupon coupon : coupons) {
             couponVMS.add(CouponVM.fromModel(coupon));
         }
-
         return new PageableData(
                 pageNum,
                 pageSize,

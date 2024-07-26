@@ -22,6 +22,11 @@ public final class Constants {
         public static final String USER_EMAIL_DUPLICATED = "USER_EMAIL_DUPLICATED";
         public static final String LECTURE_SECTION_NOT_SAME = "LECTURE_SECTION_NOT_SAME";
 
+        public static final String COUPON_NOT_FOUND = "COUPON_NOT_FOUND";
+        public static final String COUPON_IS_EXPIRED = "COUPON_IS_EXPIRED";
+
+
+
     }
 
     public final class PageableConstant {
