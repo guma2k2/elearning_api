@@ -39,6 +39,7 @@ public class Course extends AbstractAuditEntity {
 
     private String[] targetAudiences;
 
+    @Column(length = 1000)
     private String description;
 
     private String imageId;

@@ -8,7 +8,7 @@ import com.backend.elearning.domain.user.UserGetVM;
 public record ReviewVM(
         Long id,
         String content,
-        int rating,
+        int ratingStar,
         UserGetVM student,
         String created_at,
         String updated_at,

@@ -51,6 +51,10 @@ public class CourseServiceImpl implements CourseService{
 
     private final LearningCourseRepository learningCourseRepository;
     private final UserService userService;
+
+    private final static String LECTURE_TYPE = "lecture";
+    private final static String QUIZ_TYPE = "quiz";
+
     public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, UserService userService) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
@@ -214,8 +218,8 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseLearningVm getCourseBySlug(String slug) {
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        String email = "thuanngo3072002@gmail.com";
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String email = "thuanngo3072002@gmail.com";
         Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow();
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId())).toList());
@@ -230,16 +234,16 @@ public class CourseServiceImpl implements CourseService{
             var lecture = maxAccessTimeByEmailAndCourseSlugLecture.get();
             var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
             if (lecture.getAccessTime().isAfter(quiz.getAccessTime())) {
-                return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getId(), lecture.getWatchingSecond());
+                return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getId(), lecture.getWatchingSecond(), LECTURE_TYPE);
             }
         } else if (maxAccessTimeByEmailAndCourseSlugLecture.isPresent()) {
             var lecture = maxAccessTimeByEmailAndCourseSlugLecture.get();
-            return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getLecture().getId(), lecture.getWatchingSecond());
+            return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getLecture().getId(), lecture.getWatchingSecond(), LECTURE_TYPE);
         } else if (maxAccessTimeByEmailAndCourseSlugQuiz.isPresent()) {
             var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
-            return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null);
+            return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null, QUIZ_TYPE);
         }
-        return new CourseLearningVm(courseVM, null ,null, null);
+        return new CourseLearningVm(courseVM, null ,null, null, null);
     }
 
     @Override

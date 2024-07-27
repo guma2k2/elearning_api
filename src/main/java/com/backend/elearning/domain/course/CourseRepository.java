@@ -21,12 +21,13 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                            @Param("id") Long id);
 
 
-
-
     @Query(value = """
             select c
             from Course c
             left join fetch c.sections s
+            join fetch c.category ca
+            join fetch ca.parent
+            join fetch c.topic
             where c.id = :id
             """)
     Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
@@ -35,6 +36,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             select c
             from Course c
             left join fetch c.sections s
+            join fetch c.category cat
+            left join fetch cat.parent
+            join fetch c.topic t
             where c.slug = :slug
             """)
     Optional<Course> findBySlugReturnSections(@Param("slug") String slug);

@@ -24,6 +24,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             """)
     Page<Review> findByRatingStarAndCourseId(@Param("ratingStar") int ratingStar, @Param("courseId") Long courseId, Pageable pageable);
 
+
+    @Query("""
+        select count(*)
+        from Review r
+        join r.course c 
+        where c.id = :courseId and r.ratingStar = :ratingStar
+    """)
+    Long countByRatingAndCourse(@Param("ratingStar") int ratingStar, @Param("courseId") Long courseId);
+
     @Query("""
             select r
             from Review r
