@@ -1,8 +1,6 @@
 package com.backend.elearning.domain.review;
 
 import com.backend.elearning.domain.common.PageableData;
-import com.backend.elearning.domain.coupon.Coupon;
-import com.backend.elearning.domain.coupon.CouponVM;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.student.Student;
@@ -30,6 +28,13 @@ public class ReviewServiceImpl implements ReviewService {
     private final StudentRepository studentRepository;
 
     private final CourseRepository courseRepository;
+
+    private final static int fiveStar = 5;
+    private final static int fourStar = 4;
+    private final static int threeStar = 3;
+    private final static int twoStar = 2;
+    private final static int oneStar = 1;
+
 
     private final static String sortField = "createdAt";
     public ReviewServiceImpl(ReviewRepository reviewRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
@@ -59,10 +64,25 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageableData<ReviewVM> getByMultiQuery(Long courseId, Integer pageNum, int pageSize, Integer ratingStar, String sortDir) {
+    public PageableDataReview<ReviewVM> getByMultiQuery(Long courseId, Integer pageNum, int pageSize, Integer ratingStar, String sortDir) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("desc") ? sort.descending() : sort.ascending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+        long ratingFiveStarCount = reviewRepository.countByRatingAndCourse(fiveStar, courseId);
+        long ratingFourStarCount = reviewRepository.countByRatingAndCourse(fourStar, courseId);
+        long ratingThreeStarCount = reviewRepository.countByRatingAndCourse(threeStar, courseId);
+        long ratingTwoStarCount = reviewRepository.countByRatingAndCourse(twoStar, courseId);
+        long ratingOneStarCount = reviewRepository.countByRatingAndCourse(oneStar, courseId);
+        long sum = ratingOneStarCount + ratingTwoStarCount + ratingThreeStarCount + ratingFourStarCount + ratingFiveStarCount;
+
+        int percentFiveStar = (int) (ratingFiveStarCount * 100 / sum);
+        int percentFourStar = (int) (ratingFourStarCount * 100 / sum);
+        int percentThreeStar = (int) (ratingThreeStarCount * 100 / sum);
+        int percentTwoStar = (int) (ratingTwoStarCount * 100 / sum);
+        int percentOneStar =  100 - percentFiveStar - percentFourStar - percentThreeStar - percentTwoStar;
+
+
         Page<Review> reviewPage = null;
         if (ratingStar != null) {
             reviewPage = reviewRepository.findByRatingStarAndCourseId(ratingStar, courseId, pageable);
@@ -74,9 +94,23 @@ public class ReviewServiceImpl implements ReviewService {
         int totalPages = reviewPage.getTotalPages();
         long totalElements = reviewPage.getTotalElements();
 
-        List<ReviewVM> reviewDtos = reviews.stream().map(ReviewVM::fromModel).toList();
+        List<ReviewVM> reviewFilterVMS = reviews.stream().map(review -> {
+            ReviewVM reviewFilterVM = ReviewVM.fromModel(review);
+            return reviewFilterVM;
+        }).toList();
 
-        return new PageableData<>(pageNum, pageSize, totalElements, totalPages, reviewDtos);
+        return new PageableDataReview<ReviewVM>(
+                pageNum,
+                pageSize,
+                (int) reviewPage.getTotalElements(),
+                reviewPage.getTotalPages(),
+                reviewFilterVMS,
+                percentFiveStar,
+                percentFourStar,
+                percentThreeStar,
+                percentTwoStar,
+                percentOneStar
+        );
     }
 
     @Override

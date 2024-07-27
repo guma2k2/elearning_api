@@ -10,6 +10,7 @@ public record CourseVM(
         Long id,
         String title,
         String headline,
+        String slug,
         String[] objectives,
         String[] requirements,
         String[] targetAudiences,
@@ -30,7 +31,8 @@ public record CourseVM(
         String createdBy,
         List<SectionVM> sections,
         UserProfileVM user,
-        boolean learning
+        boolean learning,
+        String breadcrumb
 ) {
     public static CourseVM fromModel (Course course, List<SectionVM> sections, int ratingCount,
                                       double averageRating,
@@ -39,9 +41,13 @@ public record CourseVM(
                                       UserProfileVM userProfileVM,
                                       boolean learning) {
         String level = course.getLevel() != null ? course.getLevel().toString() : "";
+        String topicName = course.getTopic().getName();
+        String categoryChildName = course.getCategory().getName();
+        String categoryParentName = course.getCategory().getParent() != null ? course.getCategory().getParent().getName() : "";
+        String breadcrumb = categoryParentName.concat("-").concat(categoryChildName).concat("-").concat(topicName);
         User user = course.getUser();
         String createdBy = user.getFirstName() + " " + user.getLastName()   ;
-        return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getObjectives(), course.getRequirements(),
+        return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getSlug(), course.getObjectives(), course.getRequirements(),
                 course.getTargetAudiences(),
                 course.getDescription(),level,
                 course.getImageId(),
@@ -58,6 +64,7 @@ public record CourseVM(
                 totalDurationCourse,
                 createdBy,
                 sections, userProfileVM,
-                learning);
+                learning,
+                breadcrumb);
     }
 }
