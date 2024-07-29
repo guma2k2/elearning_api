@@ -41,4 +41,14 @@ public interface LearningQuizRepository extends JpaRepository<LearningQuiz, Long
     """)
     Long countByCourseAndStudent(@Param("email") String email, @Param("courseId") Long courseId);
 
+
+    @Query("""
+        select ll 
+        from LearningQuiz ll 
+        left join fetch ll.student s 
+        left join fetch  ll.quiz l 
+        where s.email = :email and l.id = :quizId
+    """)
+    Optional<LearningQuiz> findByEmailAndQuizId(@Param("email") String email, @Param("quizId") Long quizId);
+
 }

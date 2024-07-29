@@ -4,6 +4,10 @@ import com.backend.elearning.domain.common.Curriculum;
 import com.backend.elearning.domain.common.ECurriculumType;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
+import com.backend.elearning.domain.learning.learningLecture.LearningLectureRepository;
+import com.backend.elearning.domain.learning.learningQuiz.LearningQuiz;
+import com.backend.elearning.domain.learning.learningQuiz.LearningQuizRepository;
 import com.backend.elearning.domain.lecture.Lecture;
 import com.backend.elearning.domain.lecture.LectureVm;
 import com.backend.elearning.domain.question.QuestionService;
@@ -26,10 +30,14 @@ public class SectionServiceImpl implements SectionService{
     private final CourseRepository courseRepository;
     private final QuestionService questionService;
 
-    public SectionServiceImpl(SectionRepository sectionRepository, CourseRepository courseRepository, QuestionService questionService) {
+    private final LearningLectureRepository learningLectureRepository;
+    private final LearningQuizRepository learningQuizRepository;
+    public SectionServiceImpl(SectionRepository sectionRepository, CourseRepository courseRepository, QuestionService questionService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository) {
         this.sectionRepository = sectionRepository;
         this.courseRepository = courseRepository;
         this.questionService = questionService;
+        this.learningLectureRepository = learningLectureRepository;
+        this.learningQuizRepository = learningQuizRepository;
     }
 
     @Override
@@ -46,7 +54,7 @@ public class SectionServiceImpl implements SectionService{
     }
 
     @Override
-    public SectionVM getById(Long sectionId) {
+    public SectionVM getById(Long sectionId, String email) {
         // Hibernate throws MultipleBagFetchException - cannot simultaneously fetch multiple bags
         // Vlad Mihalcea in his answer!
         // https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl/51055523#51055523
@@ -66,7 +74,20 @@ public class SectionServiceImpl implements SectionService{
             lectureVm.setVideoId(lecture.getVideoId());
             lectureVm.setLectureDetails(lecture.getLectureDetails());
             lectureVm.setNumber(lecture.getNumber());
+            String formattedDuration = convertSecondToFormattedDuration(lecture.getDuration());
+            if (email != null) {
+                Optional<LearningLecture> learningLectureOptional = learningLectureRepository.findByEmailAndLectureId(email, lecture.getId());
+                if (learningLectureOptional.isPresent())    {
+                    LearningLecture learningLecture = learningLectureOptional.get();
+                    lectureVm.setFinished(learningLecture.isFinished());
+                    lectureVm.setWatchingSecond(learningLecture.getWatchingSecond());
+                } else {
+                    lectureVm.setWatchingSecond(0);
+                    lectureVm.setFinished(false);
+                }
+            }
             lectureVm.setDuration(lecture.getDuration());
+            lectureVm.setFormattedDuration(formattedDuration);
             curriculumList.add(lectureVm);
         }
 
@@ -80,6 +101,16 @@ public class SectionServiceImpl implements SectionService{
             quizVM.setType(ECurriculumType.quiz);
             List<QuestionVM> questionVMS = questionService.getByQuizId(quiz.getId());
             quizVM.setQuestions(questionVMS);
+
+            if (email != null) {
+                Optional<LearningQuiz> learningQuizOptional = learningQuizRepository.findByEmailAndQuizId(email, quiz.getId());
+                if (learningQuizOptional.isPresent())    {
+                    LearningQuiz learningQuiz = learningQuizOptional.get();
+                    quizVM.setFinished(learningQuiz.isFinished());
+                } else {
+                    quizVM.setFinished(false);
+                }
+            }
             curriculumList.add(quizVM);
         }
         curriculumList.sort(Comparator.comparing(Curriculum::getNumber));
@@ -111,5 +142,11 @@ public class SectionServiceImpl implements SectionService{
             throw new BadRequestException("");
         }
         sectionRepository.delete(section);
+    }
+
+    private String convertSecondToFormattedDuration (int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 }

@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class LearningLecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

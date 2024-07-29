@@ -42,5 +42,14 @@ public interface LearningLectureRepository extends JpaRepository<LearningLecture
     Long countByCourseAndStudent(@Param("email") String email, @Param("courseId") Long courseId);
 
 
+    @Query("""
+        select ll 
+        from LearningLecture ll 
+        left join fetch ll.student s 
+        left join fetch  ll.lecture l 
+        where s.email = :email and l.id = :lectureId
+    """)
+    Optional<LearningLecture> findByEmailAndLectureId(@Param("email") String email, @Param("lectureId") Long lectureId);
+
 
 }
