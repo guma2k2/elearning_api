@@ -37,7 +37,7 @@ public class SectionController {
     public ResponseEntity<SectionVM> getSectionById (
             @PathVariable("id") Long sectionId
     ) {
-        SectionVM sectionVM = sectionService.getById(sectionId);
+        SectionVM sectionVM = sectionService.getById(sectionId, null);
         return ResponseEntity.ok().body(sectionVM);
     }
 

@@ -170,7 +170,7 @@ public class CourseServiceImpl implements CourseService{
         double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
         String formattedHours = String.format("%.1f hours", roundedHours);
         List<SectionVM> sections = new ArrayList<>(course.getSections()
-                .stream().map(section -> sectionService.getById(section.getId())).toList());
+                .stream().map(section -> sectionService.getById(section.getId(), null)).toList());
         sections.forEach(sectionVM -> {
             int countCurriculumPerSection = sectionVM.curriculums().size();
             totalCurriculumCourse.addAndGet(countCurriculumPerSection);
@@ -221,11 +221,18 @@ public class CourseServiceImpl implements CourseService{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 //        String email = "thuanngo3072002@gmail.com";
         Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow();
+
+        AtomicInteger totalCurriculumCourse = new AtomicInteger();
+
         List<SectionVM> sections = new ArrayList<>(course.getSections()
-                .stream().map(section -> sectionService.getById(section.getId())).toList());
+                .stream().map(section -> sectionService.getById(section.getId(), email)).toList());
+        sections.forEach(sectionVM -> {
+            int countCurriculumPerSection = sectionVM.curriculums().size();
+            totalCurriculumCourse.addAndGet(countCurriculumPerSection);
+        });
         sections.sort(Comparator.comparing(SectionVM::number));
 
-        CourseVM courseVM = CourseVM.fromModel(course, sections ,0, 0.0,0,"", null, true );
+        CourseVM courseVM = CourseVM.fromModel(course, sections ,0, 0.0, totalCurriculumCourse.get(),"", null, true );
 
         Optional<LearningLecture> maxAccessTimeByEmailAndCourseSlugLecture = learningLectureRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
         Optional<LearningQuiz> maxAccessTimeByEmailAndCourseSlugQuiz = learningQuizRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
@@ -234,7 +241,9 @@ public class CourseServiceImpl implements CourseService{
             var lecture = maxAccessTimeByEmailAndCourseSlugLecture.get();
             var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
             if (lecture.getAccessTime().isAfter(quiz.getAccessTime())) {
-                return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getId(), lecture.getWatchingSecond(), LECTURE_TYPE);
+                return new CourseLearningVm(courseVM, lecture.getLecture().getSection().getId(), lecture.getLecture().getId(), lecture.getWatchingSecond(), LECTURE_TYPE);
+            } else {
+                return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null, QUIZ_TYPE);
             }
         } else if (maxAccessTimeByEmailAndCourseSlugLecture.isPresent()) {
             var lecture = maxAccessTimeByEmailAndCourseSlugLecture.get();
@@ -243,7 +252,7 @@ public class CourseServiceImpl implements CourseService{
             var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
             return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null, QUIZ_TYPE);
         }
-        return new CourseLearningVm(courseVM, null ,null, null, null);
+        return new CourseLearningVm(courseVM, null ,null, 0, null);
     }
 
     @Override
