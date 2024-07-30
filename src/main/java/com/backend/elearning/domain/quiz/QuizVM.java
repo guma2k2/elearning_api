@@ -3,6 +3,7 @@ package com.backend.elearning.domain.quiz;
 import com.backend.elearning.domain.common.Curriculum;
 import com.backend.elearning.domain.common.ECurriculumType;
 import com.backend.elearning.domain.question.QuestionVM;
+import com.backend.elearning.utils.DateTimeUtils;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -26,12 +27,14 @@ public class QuizVM extends Curriculum {
     }
 
     public QuizVM(Quiz quiz) {
-        super(quiz.getId(), quiz.getTitle(), quiz.getNumber(), ECurriculumType.quiz);
+        super(quiz.getId(), quiz.getTitle(), quiz.getNumber(), ECurriculumType.quiz, quiz.getUpdatedAt() != null ?
+                DateTimeUtils.convertLocalDateTimeToMonthYearText(quiz.getUpdatedAt()) : "");
         this.description = quiz.getDescription();
         this.questions = new ArrayList<>();
     }
     public QuizVM(Quiz quiz, boolean finished) {
-        super(quiz.getId(), quiz.getTitle(), quiz.getNumber(), ECurriculumType.quiz);
+        super(quiz.getId(), quiz.getTitle(), quiz.getNumber(), ECurriculumType.quiz, quiz.getUpdatedAt() != null ?
+                DateTimeUtils.convertLocalDateTimeToMonthYearText(quiz.getUpdatedAt()) : "");
         this.description = quiz.getDescription();
         this.questions = new ArrayList<>();
         this.finished = finished;

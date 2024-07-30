@@ -17,6 +17,7 @@ import com.backend.elearning.domain.quiz.QuizVM;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
+import com.backend.elearning.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +75,8 @@ public class SectionServiceImpl implements SectionService{
             lectureVm.setVideoId(lecture.getVideoId());
             lectureVm.setLectureDetails(lecture.getLectureDetails());
             lectureVm.setNumber(lecture.getNumber());
+            String formatedUpdatedAt = lecture.getUpdatedAt() != null ? DateTimeUtils.convertLocalDateTimeToMonthYearText(lecture.getUpdatedAt()) : "";
+            lectureVm.setUpdatedAt(formatedUpdatedAt);
             String formattedDuration = convertSecondToFormattedDuration(lecture.getDuration());
             if (email != null) {
                 Optional<LearningLecture> learningLectureOptional = learningLectureRepository.findByEmailAndLectureId(email, lecture.getId());
@@ -101,7 +104,8 @@ public class SectionServiceImpl implements SectionService{
             quizVM.setType(ECurriculumType.quiz);
             List<QuestionVM> questionVMS = questionService.getByQuizId(quiz.getId());
             quizVM.setQuestions(questionVMS);
-
+            String formatedUpdatedAt = quiz.getUpdatedAt() != null ? DateTimeUtils.convertLocalDateTimeToMonthYearText(quiz.getUpdatedAt()) : "";
+            quizVM.setUpdatedAt(formatedUpdatedAt);
             if (email != null) {
                 Optional<LearningQuiz> learningQuizOptional = learningQuizRepository.findByEmailAndQuizId(email, quiz.getId());
                 if (learningQuizOptional.isPresent())    {
