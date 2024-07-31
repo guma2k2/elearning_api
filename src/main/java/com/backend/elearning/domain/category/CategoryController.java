@@ -32,6 +32,14 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryVM);
     }
 
+    @GetMapping("/category/name/{name}")
+    public ResponseEntity<CategoryGetVM> getCategoryByName (
+            @PathVariable("name") String name
+    ) {
+        CategoryGetVM categoryGetVM = categoryService.getByName(name);
+        return ResponseEntity.ok().body(categoryGetVM);
+    }
+
     @GetMapping("/category/parents")
     public ResponseEntity<List<CategoryListGetVM>> getCategoryParents (
     ) {

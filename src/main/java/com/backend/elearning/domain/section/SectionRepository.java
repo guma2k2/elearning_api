@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,4 +34,14 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
             where s.id = :id
             """)
     Optional<Section> findByIdReturnCourse(@Param("id") Long id);
+
+
+    @Query("""
+            select s
+            from Section s
+            join fetch s.course c
+            where c.id = :courseId
+            """)
+    List<Section> findSectionWithLecturesByCourseId(@Param("courseId") Long courseId);
+
 }

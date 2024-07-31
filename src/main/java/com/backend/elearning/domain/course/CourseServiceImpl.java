@@ -14,6 +14,7 @@ import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizRepository;
 import com.backend.elearning.domain.review.Review;
 import com.backend.elearning.domain.review.ReviewService;
+import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.section.SectionService;
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.topic.Topic;
@@ -169,13 +170,18 @@ public class CourseServiceImpl implements CourseService{
         });
         double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
         String formattedHours = String.format("%.1f hours", roundedHours);
+
+
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId(), null)).toList());
+
+
         sections.forEach(sectionVM -> {
             int countCurriculumPerSection = sectionVM.curriculums().size();
             totalCurriculumCourse.addAndGet(countCurriculumPerSection);
         });
         sections.sort(Comparator.comparing(SectionVM::number));
+
         Long userId = course.getUser().getId();
         UserProfileVM userProfileVM = userService.getById(userId);
 
@@ -193,12 +199,17 @@ public class CourseServiceImpl implements CourseService{
     public CourseListGetVM getCourseListGetVMById(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
         Long courseId = course.getId();
+        // get rating count, average rating
         List<Review> reviews = reviewService.findByCourseId(courseId);
         int ratingCount = reviews.size();
         Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
         double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
+
+        // get totalCur, total duration of course by section
         AtomicInteger totalCurriculumCourse = new AtomicInteger();
         AtomicInteger totalDurationCourse = new AtomicInteger();
+
+
         course.getSections().forEach(section -> {
             Long sectionId = section.getId();
             List<Lecture> lectures = lectureRepository.findBySectionId(sectionId);
@@ -256,8 +267,47 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public PageableData<CourseVM> getCoursesByMultiQuery(int pageNum, int pageSize, String name, int rating) {
-
-        return null;
+    public PageableData<CourseListGetVM> getCoursesByMultiQuery(int pageNum,
+                                                         int pageSize,
+                                                         String title,
+                                                         Float rating,
+                                                         String[] level,
+                                                         Boolean[] free,
+                                                         String categoryName, Integer topicId
+    ) {
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Page<Course> coursePage = courseRepository.findByMultiQuery(pageable, title, rating, level, free, categoryName, topicId);
+        List<Course> courses = coursePage.getContent();
+        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
+            List<Review> reviews = course.getReviews();
+            int ratingCount = reviews.size();
+            Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
+            double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
+            AtomicInteger totalCurriculumCourse = new AtomicInteger();
+            AtomicInteger totalDurationCourse = new AtomicInteger();
+            List<Section> sections = sectionService.findByCourseId(course.getId());
+            sections.forEach(section -> {
+                List<Lecture> lectures = section.getLectures();
+                List<Quiz> quizzes = section.getQuizzes();
+                totalCurriculumCourse.addAndGet(lectures.size());
+                totalCurriculumCourse.addAndGet(quizzes.size());
+                int totalSeconds = lectures.stream()
+                        .mapToInt(lecture -> lecture.getDuration())
+                        .sum();
+                totalDurationCourse.addAndGet(totalSeconds);
+            });
+            double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
+            String formattedHours = String.format("%.1f hours", roundedHours);
+            return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
+        }).toList();
+        return new PageableData(
+                pageNum,
+                pageSize,
+                (int) coursePage.getTotalElements(),
+                coursePage.getTotalPages(),
+                courseListGetVMS
+        );
     }
+
+
 }

@@ -64,4 +64,30 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             where c.title like %:title%
             """)
     Page<Course> findAllCustom(Pageable pageable, @Param("title") String title);
+
+
+    @Query(value = """
+            select c
+            from Course c
+            join fetch c.category cat
+            left join fetch cat.parent p
+            join fetch c.topic t
+            join fetch c.user u
+            left join fetch c.reviews r
+            where (:title IS NULL OR LOWER(c.title) LIKE %:title%)
+            and (:level is null or c.level in :level)
+            and (:free is null or c.free in :free)
+            and (:categoryName is null or cat.name = :categoryName or p.name = :categoryName)
+            and (:topicId is null or t.id = :topicId)
+            group by c.id, cat.id, p.id, t.id, u.id, r.id
+            HAVING COALESCE(AVG(r.ratingStar), 0) > :ratingStar 
+            """)
+    Page<Course> findByMultiQuery(Pageable pageable,
+                                  @Param("title") String title,
+                                  @Param("ratingStar") Float ratingStar,
+                                  @Param("level") String[] level,
+                                  @Param("free") Boolean[] free,
+                                  @Param("categoryName") String categoryName,
+                                  @Param("topicId") Integer topicId
+                                  );
 }

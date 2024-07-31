@@ -14,5 +14,13 @@ public interface CourseService {
 
     CourseLearningVm getCourseBySlug(String slug);
 
-    PageableData<CourseVM> getCoursesByMultiQuery(int pageNum, int pageSize, String name, int rating);
+    PageableData<CourseListGetVM> getCoursesByMultiQuery(int pageNum,
+                                                  int pageSize,
+                                                  String title,
+                                                  Float rating,
+                                                  String[] level,
+                                                  Boolean[] free,
+                                                  String categoryName,
+                                                  Integer topicId
+    );
 }

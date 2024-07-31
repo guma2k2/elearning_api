@@ -107,6 +107,21 @@ public class CategoryServiceImpl implements CategoryService{
         // Todo: check isHaveChildren
     }
 
+    @Override
+    public CategoryGetVM getByName(String name) {
+        Category category = categoryRepository.findByNameCustom(name).orElseThrow() ;
+        List<Category> childrenList = category.getChildrenList();
+        if (childrenList.size() > 0) {
+            List<CategoryGetVM> childVMs = childrenList
+                    .stream()
+                    .map(cat -> CategoryGetVM.fromModel(cat, new ArrayList<>()))
+                    .toList() ;
+            return CategoryGetVM.fromModel(category,childVMs);
+
+        }
+        return CategoryGetVM.fromModel(category, new ArrayList<>());
+    }
+
 
     private boolean checkParent (Integer id, Category category) {
         if (id.equals(category.getId())) {

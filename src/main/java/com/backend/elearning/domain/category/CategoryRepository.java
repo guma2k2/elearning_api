@@ -27,11 +27,25 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query(value = """
             select c
             from Category c
+            left join fetch c.parent
             where c.id = :id
             """)
     Optional<Category> findByIdWithParent(@Param("id") Integer id);
-
-
+    @Query(value = """
+            select c
+            from Category c
+            left join fetch c.parent
+            left join fetch c.childrenList
+            where c.name = :name
+            """)
+    Optional<Category> findByNameCustom(@Param("name") String name);
+//    @Query("""
+//        select c
+//        from Category c
+//        left join fetch c.parent p
+//        where p.id = :id
+//    """)
+//    List<Category> findByParentId(@Param("id") Integer id);
     @Query(value = """
             select c
             from Category c

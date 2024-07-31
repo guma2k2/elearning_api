@@ -13,4 +13,5 @@ public interface CategoryService {
     void update(CategoryPostVM categoryPutVM, Integer categoryId);
     void delete(Integer categoryId);
 
+    CategoryGetVM getByName(String name);
 }
