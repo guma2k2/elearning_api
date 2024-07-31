@@ -76,11 +76,11 @@ public class ReviewServiceImpl implements ReviewService {
         long ratingOneStarCount = reviewRepository.countByRatingAndCourse(oneStar, courseId);
         long sum = ratingOneStarCount + ratingTwoStarCount + ratingThreeStarCount + ratingFourStarCount + ratingFiveStarCount;
 
-        int percentFiveStar = (int) (ratingFiveStarCount * 100 / sum);
-        int percentFourStar = (int) (ratingFourStarCount * 100 / sum);
-        int percentThreeStar = (int) (ratingThreeStarCount * 100 / sum);
-        int percentTwoStar = (int) (ratingTwoStarCount * 100 / sum);
-        int percentOneStar =  100 - percentFiveStar - percentFourStar - percentThreeStar - percentTwoStar;
+        int percentFiveStar = (int) (sum != 0 ?  (ratingFiveStarCount * 100 / sum) : 0);
+        int percentFourStar = (int) (sum != 0 ?  ratingFourStarCount * 100 / sum : 0);
+        int percentThreeStar = (int) (sum != 0 ? ratingThreeStarCount * 100 / sum : 0);
+        int percentTwoStar = (int) (sum != 0 ? ratingTwoStarCount * 100 / sum : 0);
+        int percentOneStar = ratingOneStarCount != 0 ?  100 - percentFiveStar - percentFourStar - percentThreeStar - percentTwoStar : 0;
 
 
         Page<Review> reviewPage = null;
@@ -91,8 +91,6 @@ public class ReviewServiceImpl implements ReviewService {
         }
         List<Review> reviews = reviewPage.getContent();
 
-        int totalPages = reviewPage.getTotalPages();
-        long totalElements = reviewPage.getTotalElements();
 
         List<ReviewVM> reviewFilterVMS = reviews.stream().map(review -> {
             ReviewVM reviewFilterVM = ReviewVM.fromModel(review);

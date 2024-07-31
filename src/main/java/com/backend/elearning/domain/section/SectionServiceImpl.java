@@ -63,8 +63,53 @@ public class SectionServiceImpl implements SectionService{
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
         section = sectionRepository.findByIdQuizzes(section).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
-        List<Curriculum> curriculumList = new ArrayList<>();
+        List<Curriculum> curriculumList = getBySectionAndEmail(section, email);
+        return SectionVM.fromModel(section, curriculumList);
+    }
 
+    @Override
+    public SectionVM update(SectionPostVM sectionPutVM, Long sectionId) {
+        Section section = sectionRepository.findByIdReturnCourse(sectionId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
+        if (sectionPutVM.courseId() != section.getCourse().getId()) {
+            throw new BadRequestException("");
+        }
+        section.setTitle(sectionPutVM.title());
+        section.setNumber(sectionPutVM.number());
+        section.setObjective(sectionPutVM.objective());
+        sectionRepository.saveAndFlush(section);
+        return SectionVM.fromModel(section, new ArrayList<>());
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long sectionId) {
+        Section section = sectionRepository.findByIdLectures(sectionId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
+        section = sectionRepository.findByIdQuizzes(section).orElseThrow();
+        boolean canDelete = section.getLectures().isEmpty() && section.getQuizzes().isEmpty();
+        if (!canDelete) {
+            throw new BadRequestException("");
+        }
+        sectionRepository.delete(section);
+    }
+
+    @Override
+    public List<Section> findByCourseId(Long courseId) {
+        List<Section> sections = sectionRepository.findSectionWithLecturesByCourseId(courseId);
+        sections = sections.stream().map((section -> sectionRepository.findByIdQuizzes(section).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, section.getId())))).toList();
+        return sections;
+    }
+
+    private String convertSecondToFormattedDuration (int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
+    private List<Curriculum> getBySectionAndEmail(Section section, String email) {
+        List<Curriculum> curriculumList = new ArrayList<>();
 
         List<Lecture> lectures = section.getLectures();
         for (Lecture lecture : lectures) {
@@ -118,39 +163,6 @@ public class SectionServiceImpl implements SectionService{
             curriculumList.add(quizVM);
         }
         curriculumList.sort(Comparator.comparing(Curriculum::getNumber));
-        return SectionVM.fromModel(section, curriculumList);
-    }
-
-    @Override
-    public SectionVM update(SectionPostVM sectionPutVM, Long sectionId) {
-        Section section = sectionRepository.findByIdReturnCourse(sectionId).orElseThrow(() ->
-                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
-        if (sectionPutVM.courseId() != section.getCourse().getId()) {
-            throw new BadRequestException("");
-        }
-        section.setTitle(sectionPutVM.title());
-        section.setNumber(sectionPutVM.number());
-        section.setObjective(sectionPutVM.objective());
-        sectionRepository.saveAndFlush(section);
-        return SectionVM.fromModel(section, new ArrayList<>());
-    }
-
-    @Override
-    @Transactional
-    public void delete(Long sectionId) {
-        Section section = sectionRepository.findByIdLectures(sectionId).orElseThrow(() ->
-                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
-        section = sectionRepository.findByIdQuizzes(section).orElseThrow();
-        boolean canDelete = section.getLectures().isEmpty() && section.getQuizzes().isEmpty();
-        if (!canDelete) {
-            throw new BadRequestException("");
-        }
-        sectionRepository.delete(section);
-    }
-
-    private String convertSecondToFormattedDuration (int totalSeconds) {
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        return String.format("%02d:%02d", minutes, seconds);
+        return curriculumList;
     }
 }

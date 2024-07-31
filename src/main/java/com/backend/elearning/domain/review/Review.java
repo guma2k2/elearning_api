@@ -38,12 +38,10 @@ public class Review {
     @JoinColumn(name = "student_id")
     private Student student;
 
-    @CreatedDate
     @Column(name = "created_at")
     protected LocalDateTime createdAt;
 
 
-    @LastModifiedDate
     @Column(name = "updated_at")
     protected LocalDateTime updatedAt;
 }

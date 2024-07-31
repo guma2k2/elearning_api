@@ -35,13 +35,17 @@ public class CourseController {
 
 
     @GetMapping("/courses/search")
-    public ResponseEntity<PageableData<CourseVM>> getCoursesByMultiQuery (
+    public ResponseEntity<PageableData<CourseListGetVM>> getCoursesByMultiQuery (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "ratingStar", required = false) int rating
-    ) {
-        PageableData<CourseVM> pageableCourses = courseService.getCoursesByMultiQuery(pageNum, pageSize, name, rating);
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "ratingStar", required = false, defaultValue = "0") Float rating,
+            @RequestParam(value = "level", required = false) String[] level,
+            @RequestParam(value = "free", required = false) Boolean[] free,
+            @RequestParam(value = "categoryName", required = false) String categoryName,
+            @RequestParam(value = "topicId", required = false) Integer topicId
+            ) {
+        PageableData<CourseListGetVM> pageableCourses = courseService.getCoursesByMultiQuery(pageNum, pageSize, keyword, rating, level, free, categoryName, topicId);
         return ResponseEntity.ok().body(pageableCourses);
     }
 
@@ -55,7 +59,6 @@ public class CourseController {
     public ResponseEntity<CourseVM> createCourse (
             @RequestBody CoursePostVM coursePostVM
     ) {
-//        Long userId = authUserDetails.getId();
         CourseVM courseVM = courseService.create(coursePostVM);
         return ResponseEntity.status(HttpStatus.CREATED).body(courseVM);
     }

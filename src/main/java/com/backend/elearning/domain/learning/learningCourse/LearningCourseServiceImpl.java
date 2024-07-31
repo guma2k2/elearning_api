@@ -45,7 +45,7 @@ public class LearningCourseServiceImpl implements LearningCourseService {
             Long courseId = course.getId();
             Optional<Review> reviewOptional = reviewRepository.findByStudentAndCourse(email, courseId);
             CourseListGetVM courseListGetVM = courseService.getCourseListGetVMById(courseId);
-            int totalCurriculumCourse = courseListGetVM.lectureCount();
+            int totalCurriculumCourse = courseListGetVM.totalLectures();
             Long learningLecture = learningLectureRepository.countByCourseAndStudent(email, courseId);
             Long learningQuiz = learningQuizRepository.countByCourseAndStudent(email, courseId);
             int percentFinished = (int) (((double) (learningLecture + learningQuiz) / totalCurriculumCourse) * 100);
