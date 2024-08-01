@@ -43,4 +43,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     """)
     @Modifying
     void updateOrderStatus(@Param("orderId") Long orderId, @Param("status") EOrderStatus status);
+
+
+    @Query("""
+        select count(1)
+        from Order 
+    """)
+    long findTotalOrders();
+
+
+
 }

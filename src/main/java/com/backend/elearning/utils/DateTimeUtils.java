@@ -6,11 +6,11 @@ import java.util.Locale;
 
 public class DateTimeUtils {
 
-    private static final String PATTERN_PAYMENT = "yyyyMMddHHmmss";
+    public static final String PATTERN_PAYMENT = "yyyyMMddHHmmss";
 
-    private static final String PATTERN_NORMAL = "yyyy-MM-dd HH:mm:ss";
+    public static final String PATTERN_NORMAL = "yyyy-MM-dd HH:mm:ss";
 
-    private static final String MONTH_YEAR= "tháng %s năm %s";
+    public static final String MONTH_YEAR= "tháng %s năm %s";
 
     public static final String PAYMENT_TYPE = "PAYMENT";
     public static final String NORMAL_TYPE = "NORMAL";

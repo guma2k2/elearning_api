@@ -39,7 +39,7 @@ public class CourseController {
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "ratingStar", required = false, defaultValue = "0") Float rating,
+            @RequestParam(value = "ratingStar", required = false) Float rating,
             @RequestParam(value = "level", required = false) String[] level,
             @RequestParam(value = "free", required = false) Boolean[] free,
             @RequestParam(value = "categoryName", required = false) String categoryName,
