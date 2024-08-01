@@ -16,7 +16,9 @@ public class StatisticController {
     }
 
     @GetMapping("/statistic/time")
-    public ResponseEntity<List<StatisticTime>> getByYear(@RequestParam("year") int year, @RequestParam(value = "month", required = false) Integer month) {
+    public ResponseEntity<List<StatisticTime>> getByYear(@RequestParam("year") int year,
+                                                         @RequestParam(value = "month", required = false) Integer month
+    ) {
         if (month != null) {
             List<StatisticTime> statistics = statisticService.findByMonth(month, year);
             return ResponseEntity.ok().body(statistics);
@@ -25,5 +27,21 @@ public class StatisticController {
         return ResponseEntity.ok().body(statistics);
     }
 
+
+    @GetMapping("/statistic/dashboard")
+    public ResponseEntity<Dashboard> getDashboard() {
+        Dashboard dashboard = statisticService.getDashboard();
+        return ResponseEntity.ok().body(dashboard);
+    }
+
+    @GetMapping("/statistic/course")
+    public ResponseEntity<List<StatisticCourse>> getStatisticProductByTime(
+            @RequestParam("from") String from,
+            @RequestParam("to") String to
+    ) {
+
+        List<StatisticCourse> statisticCourses = statisticService.getByTime(from, to);
+        return ResponseEntity.ok().body(statisticCourses);
+    }
 
 }

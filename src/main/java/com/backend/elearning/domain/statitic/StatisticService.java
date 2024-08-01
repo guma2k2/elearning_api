@@ -1,14 +1,28 @@
 package com.backend.elearning.domain.statitic;
 
 
+import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
+import com.backend.elearning.domain.order.OrderDetailRepository;
+import com.backend.elearning.domain.order.OrderRepository;
 import com.backend.elearning.domain.payment.PaymentRepository;
+import com.backend.elearning.domain.review.ReviewRepository;
+import com.backend.elearning.domain.student.StudentRepository;
+import com.backend.elearning.domain.user.ERole;
+import com.backend.elearning.domain.user.User;
+import com.backend.elearning.domain.user.UserRepository;
+import com.backend.elearning.utils.DateTimeUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class StatisticService {
 
     private final PaymentRepository paymentRepository;
@@ -17,15 +31,65 @@ public class StatisticService {
 
     private static final String DAY_PATTERN = "Day %d";
 
-    public StatisticService(PaymentRepository paymentRepository) {
+    private final OrderRepository orderRepository;
+    private final ReviewRepository reviewRepository;
+    private final CourseRepository courseRepository;
+    private final StudentRepository studentRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final LearningCourseRepository learningCourseRepository;
+    private final UserRepository userRepository;
+    public StatisticService(PaymentRepository paymentRepository, OrderRepository orderRepository, ReviewRepository reviewRepository, CourseRepository courseRepository, StudentRepository studentRepository, OrderDetailRepository orderDetailRepository, LearningCourseRepository learningCourseRepository, UserRepository userRepository) {
         this.paymentRepository = paymentRepository;
+        this.orderRepository = orderRepository;
+        this.reviewRepository = reviewRepository;
+        this.courseRepository = courseRepository;
+        this.studentRepository = studentRepository;
+        this.orderDetailRepository = orderDetailRepository;
+        this.learningCourseRepository = learningCourseRepository;
+        this.userRepository = userRepository;
     }
 
 
+    public List<StatisticCourse> getByTime(String from, String to) {
+        LocalDateTime fromTime = DateTimeUtils.convertStringToLocalDateTime(from, DateTimeUtils.NORMAL_TYPE);
+        LocalDateTime toTime = DateTimeUtils.convertStringToLocalDateTime(to, DateTimeUtils.NORMAL_TYPE);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        if (user.getRole().equals(ERole.ROLE_ADMIN)){
+            return orderDetailRepository.getStatisticByTime(fromTime, toTime, null);
+        }
+        return orderDetailRepository.getStatisticByTime(fromTime, toTime, email);
+    }
+    public Dashboard getDashboard() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+
+        if (user.getRole().equals(ERole.ROLE_ADMIN)){
+            long totalReviews = reviewRepository.findTotalReviews(null);
+            long totalCourses = courseRepository.findTotalCourses(null);
+            long totalOrders = orderRepository.findTotalOrders();
+            long totalStudents = studentRepository.findTotalStudents();
+            return new Dashboard(totalOrders, totalReviews, totalCourses, totalStudents);
+        }
+        long totalReviews = reviewRepository.findTotalReviews(email);
+        long totalCourses = courseRepository.findTotalCourses(email);
+        long totalOrders = orderDetailRepository.countByInstructor(email);
+        long totalStudents = learningCourseRepository.countStudentByInstructorEmail(email);
+        return new Dashboard(totalOrders, totalReviews, totalCourses, totalStudents);
+    }
+
     public List<StatisticTime> findByYear(int year) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        if (user.getRole().equals(ERole.ROLE_ADMIN)) {
+            email = null ;
+        }
         int numberMonthOfYear = 12;
         List<StatisticTime> statisticTimes = new ArrayList<>();
-        List<Statistic> statistics = paymentRepository.findByYear(year);
+        List<Statistic> statistics = paymentRepository.findByYear(year, email);
+
         for (Statistic statistic: statistics) {
             String name = String.format(MONTH_PATTERN, statistic.getTime());
             Long total = statistic.getTotal();
@@ -39,15 +103,26 @@ public class StatisticService {
                 statisticTimes.add(new StatisticTime(name, 0L));
             }
         }
+        statisticTimes.sort((o1, o2) -> {
+            int number1 = extractNumber(o1.getName());
+            int number2 = extractNumber(o2.getName());
+            return Integer.compare(number1, number2);
+        });
         return statisticTimes;
     }
 
 
     public List<StatisticTime> findByMonth(int month, int year) {
-//        int numberMonthOfYear = 12;
-        int numberOfDayInMonth = getNumberOfDaysInMonth(month, year);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        if (user.getRole().equals(ERole.ROLE_ADMIN)) {
+            email = null ;
+        }
+        int numberOfDayInMonth = getNumberOfDaysInMonth(year, month);
+        log.info(numberOfDayInMonth+"");
         List<StatisticTime> statisticTimes = new ArrayList<>();
-        List<Statistic> statistics = paymentRepository.findByMonthAndYear(month, year);
+        List<Statistic> statistics = paymentRepository.findByMonthAndYear(month, year, email);
         for (Statistic statistic: statistics) {
             String name = String.format(DAY_PATTERN, statistic.getTime());
             Long total = statistic.getTotal();
@@ -55,12 +130,17 @@ public class StatisticService {
             statisticTimes.add(statisticTime);
         }
         for (int day = 1 ; day <= numberOfDayInMonth; day++) {
-            String name = String.format(DAY_PATTERN, month);
+            String name = String.format(DAY_PATTERN, day);
             StatisticTime statisticTime = new StatisticTime(name);
             if (!statisticTimes.contains(statisticTime)) {
                 statisticTimes.add(new StatisticTime(name, 0L));
             }
         }
+        statisticTimes.sort((o1, o2) -> {
+            int number1 = extractNumber(o1.getName());
+            int number2 = extractNumber(o2.getName());
+            return Integer.compare(number1, number2);
+        });
         return statisticTimes;
     }
 
@@ -70,5 +150,10 @@ public class StatisticService {
         }
         YearMonth yearMonth = YearMonth.of(year, month);
         return yearMonth.lengthOfMonth();
+    }
+
+    private int extractNumber(String name) {
+        String numberString = name.replaceAll("\\D+", ""); // Remove all non-digit characters
+        return Integer.parseInt(numberString); // Convert the remaining string to an integer
     }
 }

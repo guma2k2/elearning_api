@@ -1,6 +1,6 @@
 package com.backend.elearning.domain.order;
 
-import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.statitic.StatisticCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,12 +8,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 
 
+
+    @Query("""
+        select count(1) 
+        from OrderDetail  od 
+        join od.course c 
+        join c.user 
+        where c.user = :email
+    """)
+    long countByInstructor(@Param("email") String email);
     @Query("""
             select od.course.id
             from OrderDetail od
@@ -29,6 +39,23 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         join fetch od.order o 
         left join fetch od.course
         where o.id = :orderId
-""")
+    """)
     List<OrderDetail> findByOrderId (@Param("orderId") Long orderId);
+
+
+
+    @Query("""
+        select new com.backend.elearning.domain.statitic.StatisticCourse(od.course.title, count(*), sum(od.price))
+        from OrderDetail od
+        join od.order o
+        join od.course c
+        join c.user s
+        where (:email is null or s.email = :email)
+            and o.createdAt between :from and :to
+            and o.status = 'SUCCESS'
+        group by c.title
+    """)
+    List<StatisticCourse> getStatisticByTime (@Param("from")LocalDateTime from,
+                                              @Param("to")LocalDateTime to,
+                                              @Param("email") String email);
 }

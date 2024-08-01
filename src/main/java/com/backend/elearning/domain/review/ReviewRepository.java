@@ -16,6 +16,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 
     @Query("""
+        select count(1)
+        from Review r 
+        join r.course c 
+        join c.user u
+        where (:email is null or u.email = :email)
+    """)
+    long findTotalReviews(@Param("email")String email);
+    @Query("""
             select r
             from Review r
             left join fetch r.course c
