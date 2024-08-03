@@ -49,9 +49,10 @@ public class OrderController {
     @GetMapping("/admin/orders/paging")
     public ResponseEntity<PageableData<OrderVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "orderId", required = false) Long orderId
     ) {
-        PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize);
+        PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize, orderId);
         return ResponseEntity.ok().body(pageableData);
     }
 

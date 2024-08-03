@@ -10,4 +10,5 @@ public interface UserService {
     void delete (Long userId);
     UserProfileVM getById(Long userId);
     User getByEmail(String email);
+    UserGetDetailVm getUserProfile(Long id);
 }

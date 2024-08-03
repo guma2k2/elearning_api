@@ -56,8 +56,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             from Review r
             left join fetch r.course c
             left join fetch r.student u
+            where (:keyword IS NULL or LOWER(r.content) LIKE LOWER(CONCAT('%', :keyword, '%')))
             """)
-    Page<Review> findAllCustom(Pageable pageable);
+    Page<Review> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 
 
     @Query("""

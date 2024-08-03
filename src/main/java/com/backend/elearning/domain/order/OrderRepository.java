@@ -33,8 +33,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.student s 
             left join fetch o.coupon 
             left join fetch o.orderDetails 
+            where (:orderId IS NULL or o.id = :orderId)
         """)
-    Page<Order> findAllCustom(Pageable pageable);
+    Page<Order> findAllCustom(Pageable pageable, @Param("orderId") Long orderId);
+
 
     @Query("""
         update Order o

@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    username: root
+    url: jdbc:postgresql://elearning-postgres:5432/elearning
+    password: 'password'
+  mail:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: 'true'
+          auth: 'true'
+    host: smtp.gmail.com
+    username: 'thuanngo3072002@gmail.com'
+    password: 'vhro flua bbql umbp'
+    port: '587'
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+    show-sql: 'true'
+  cloudinary:
+    api:
+      secret: u3aoCSJzt31lcqOJBsgykwTq81o
+      key: '593637822396816'
+    name: di6h4mtfa
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+ui:
+  url: "http://localhost:5173"
+  forgot-password:
+    url: ${ui.url}/forgotpassword
+outbound:
+  identity:
+    client-id: "267032846386-hchqmc5j59qi1ti287asu2bgb9fafqk1.apps.googleusercontent.com"
+    client-secret: "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"
+    redirect-uri: "${ui.url}/authenticate"
+
+payment:
+  vnPay:
+    url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    tmnCode: "EDT2E52Y"
+    secretKey: "VGC6H4EJ834TXE5USIHM20W3FH4469VW"
+    returnUrl: "http://localhost:5173/vn-pay-callback"
+    version: "2.1.0"
+    command: "pay"
+    orderType: "bill"
+
+server:
+  port: 8082

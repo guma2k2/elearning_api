@@ -40,6 +40,9 @@ public class User extends AbstractAuditEntity implements UserDetails {
     @Column(length = 20)
     private String lastName;
 
+    @Column(length = 50)
+    private String headline;
+
     @Enumerated(EnumType.STRING)
     private EGender gender;
 

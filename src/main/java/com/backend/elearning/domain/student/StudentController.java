@@ -23,9 +23,10 @@ public class StudentController {
     @GetMapping("/admin/students/paging")
     public ResponseEntity<PageableData<StudentListGetVM>> getStudents (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword
     ) {
-        return ResponseEntity.ok().body(studentService.getStudents(pageNum, pageSize));
+        return ResponseEntity.ok().body(studentService.getStudents(pageNum, pageSize, keyword));
     }
     @PutMapping("/admin/students/{id}/status/{status}")
     public ResponseEntity<ReviewVM> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long studentId){

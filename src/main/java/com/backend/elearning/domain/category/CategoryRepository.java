@@ -1,6 +1,8 @@
 package com.backend.elearning.domain.category;
 
 import com.backend.elearning.domain.topic.Topic;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +17,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
 
 
+
     @Query(value = """
             select count(1)
             from Category c
@@ -23,6 +26,13 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Long countExistByName (@Param("name") String name,
                            @Param("id") Integer id);
 
+    @Query(value = """
+            select c
+            from Category c
+            left join fetch c.parent
+            where (:keyword IS NULL or LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            """)
+    Page<Category> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 
     @Query(value = """
             select c
@@ -49,6 +59,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query(value = """
             select c
             from Category c
+            left join fetch c.parent
             left join fetch c.topics
             where c.id = :id
             """)

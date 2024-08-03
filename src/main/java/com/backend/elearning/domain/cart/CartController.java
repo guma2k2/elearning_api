@@ -16,9 +16,9 @@ public class CartController {
     }
 
     @PostMapping("/carts/add-to-cart/course/{courseId}")
-    public ResponseEntity<Void> addToCart(@PathVariable("courseId") Long courseId) {
-        cartService.addCourseToCart(courseId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<CartListGetVM> addToCart(@PathVariable("courseId") Long courseId) {
+        CartListGetVM cartListGetVM = cartService.addCourseToCart(courseId);
+        return ResponseEntity.ok().body(cartListGetVM);
     }
 
     @GetMapping("/carts")

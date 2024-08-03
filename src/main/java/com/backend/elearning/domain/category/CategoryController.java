@@ -50,9 +50,11 @@ public class CategoryController {
     @GetMapping("/admin/category/paging")
     public ResponseEntity<PageableData<CategoryVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword
+
     ) {
-        PageableData<CategoryVM> pageableCategories = categoryService.getPageableCategories(pageNum, pageSize);
+        PageableData<CategoryVM> pageableCategories = categoryService.getPageableCategories(pageNum, pageSize, keyword);
         return ResponseEntity.ok().body(pageableCategories);
     }
 

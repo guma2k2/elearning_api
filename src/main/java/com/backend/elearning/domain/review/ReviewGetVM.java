@@ -4,7 +4,7 @@ package com.backend.elearning.domain.review;
 public record ReviewGetVM(
         Long id,
         String content,
-        int rating,
+        int ratingStar,
         String updated_at
 ) {
     public static ReviewGetVM fromModel(Review review) {

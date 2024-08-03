@@ -1,21 +1,24 @@
 package com.backend.elearning.domain.auth;
 
 
+import com.backend.elearning.domain.mail.MailService;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
-import com.backend.elearning.domain.student.StudentVm;
 import com.backend.elearning.domain.user.ERole;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserVm;
-import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.security.JWTUtil;
+import com.backend.elearning.utils.Constants;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -37,7 +40,9 @@ public class AuthenticationService {
 
     private final RestTemplate restTemplate;
 
+    private final PasswordEncoder passwordEncoder;
 
+    private final MailService mailService;
 
     private final String EXCHANGE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private final String EXCHANGE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
@@ -50,13 +55,18 @@ public class AuthenticationService {
     @Value("${outbound.identity.redirect-uri}")
     protected String REDIRECT_URI;
 
+    @Value("${ui.forgot-password.url}")
+    protected String FORGOTPASSWORD_LINK;
+
     private final String GRANT_TYPE = "authorization_code";
 
-    public AuthenticationService(UserRepository userRepository, JWTUtil jwtUtil, RestTemplate restTemplate, StudentRepository studentRepository) {
+    public AuthenticationService(UserRepository userRepository, JWTUtil jwtUtil, RestTemplate restTemplate, StudentRepository studentRepository, PasswordEncoder passwordEncoder, MailService mailService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.restTemplate = restTemplate;
         this.studentRepository = studentRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
@@ -132,5 +142,31 @@ public class AuthenticationService {
         UserVm userVm = UserVm.fromModelStudent(student);
         AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
         return authenticationVm ;
+    }
+
+    public void forgotPassword(String email) {
+        studentRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Email is not existed in system"));
+        String toAddress = email;
+        String url = FORGOTPASSWORD_LINK + "?email=" + email;
+        String subject = "Confirm and change password" ;
+        String content = "<p>Hi,</p>" +
+                "<p> You requested to change your password successful </p>" +
+                "Please click the link below to change your password:" +
+                "<p> <a href =\"" + url + "\">Change password</a> </p>" +
+                "<br>" +
+                "<p>Delete this email if you want, after you change your password successful</p>";
+        try {
+            mailService.sendEmail(toAddress, content, subject);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updatePassword(AuthenticationPostVm request) {
+        Student student = studentRepository
+                .findByEmail(request.email())
+                .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, request.email()));
+        student.setPassword(passwordEncoder.encode(request.password()));
+        studentRepository.save(student);
     }
 }

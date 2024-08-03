@@ -2,8 +2,9 @@ package com.backend.elearning.domain.user;
 
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.course.CourseListGetVM;
+import com.backend.elearning.domain.course.CourseService;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
-import com.backend.elearning.domain.learning.learningCourse.LearningCourseService;
 import com.backend.elearning.domain.review.Review;
 import com.backend.elearning.domain.review.ReviewService;
 import com.backend.elearning.exception.DuplicateException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,9 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
-
     private final ReviewService reviewService;
-
     private final PasswordEncoder passwordEncoder;
     private final LearningCourseRepository learningCourseRepository;
 
@@ -142,12 +142,32 @@ public class UserServiceImpl implements UserService{
         });
         Double averageRating = numberOfRatingOfCourses.get() / (numberOfCourses * 1.0);
 
-        return UserProfileVM.fromModel(user, averageRating, numberOfReviews.get(), numberOfStudent.get(), numberOfCourses);
+        return UserProfileVM.fromModel(user, averageRating, numberOfReviews.get(), numberOfStudent.get(), numberOfCourses, new ArrayList<>());
     }
 
     @Override
     public User getByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow();
+    }
+
+    @Override
+    public UserGetDetailVm getUserProfile(Long id) {
+        User user = userRepository.findByIdCustom(id).orElseThrow();
+        List<Course> coursesOfUser = user.getCourses();
+        AtomicInteger numberOfReviews = new AtomicInteger();
+        AtomicInteger numberOfStudent = new AtomicInteger();
+        coursesOfUser.forEach(course -> {
+            Long courseId = course.getId();
+            List<Review> reviews = reviewService.findByCourseId(courseId);
+            int ratingCount = reviews.size();
+            numberOfReviews.addAndGet(ratingCount);
+            Long numberOfStudentPerCourse = learningCourseRepository.countStudentByCourseId(courseId);
+            numberOfStudent.addAndGet(Math.toIntExact(numberOfStudentPerCourse));
+        });
+        UserGetDetailVm userGetDetailVm = new UserGetDetailVm(user);
+        userGetDetailVm.setNumberOfReview(numberOfReviews.get());
+        userGetDetailVm.setNumberOfStudent(numberOfStudent.get());
+        return userGetDetailVm;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.backend.elearning.domain.user;
 
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.course.CourseListGetVM;
+import com.backend.elearning.domain.course.CourseService;
 import com.backend.elearning.exception.ErrorVm;
 import com.backend.elearning.utils.Constants;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,19 +13,32 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final CourseService courseService;
+
+    public UserController(UserService userService, CourseService courseService) {
         this.userService = userService;
+        this.courseService = courseService;
     }
 
     @GetMapping("/admin/users/{id}")
     public ResponseEntity<UserGetDetailVm> getUser (@PathVariable("id") Long id) {
         return ResponseEntity.ok().body(userService.getUser(id));
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserGetDetailVm> getUserProfile (@PathVariable("id") Long id) {
+        UserGetDetailVm userProfile = userService.getUserProfile(id);
+        List<CourseListGetVM> courseListGetVMS = courseService.getByUserId(id);
+        userProfile.setCourses(courseListGetVMS);
+        return ResponseEntity.ok().body(userProfile);
     }
 
     @GetMapping("/admin/users/paging")

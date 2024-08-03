@@ -7,6 +7,7 @@ public record CourseListGetVM(
         String title,
         String headline,
         String level,
+        String slug,
         String totalDurationCourse,
         int totalLectures,
         double averageRating,
@@ -25,6 +26,6 @@ public record CourseListGetVM(
     ) {
         User user = course.getUser();
         String fullName = user.getFirstName() + " " + user.getLastName();
-        return new CourseListGetVM(course.getId(), course.getTitle(), course.getHeadline() ,course.getLevel().toString(), totalDurationCourse, totalLectures, averageRating, ratingCount, course.getImageId(), course.getPrice(), fullName);
+        return new CourseListGetVM(course.getId(), course.getTitle(), course.getHeadline() ,course.getLevel().toString(), course.getSlug(), totalDurationCourse, totalLectures, averageRating, ratingCount, course.getImageId(), course.getPrice(), fullName);
     }
 }

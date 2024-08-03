@@ -33,10 +33,10 @@ public class TopicServiceImpl implements TopicService{
 
 
     @Override
-    public PageableData<TopicVM> getPageableTopics(int pageNum, int pageSize) {
+    public PageableData<TopicVM> getPageableTopics(int pageNum, int pageSize, String keyword) {
         List<TopicVM> topicVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Topic> topicPage = topicRepository.findAll(pageable);
+        Page<Topic> topicPage = topicRepository.findAllCustom(pageable, keyword);
         List<Topic> topics = topicPage.getContent();
         for (Topic topic : topics) {
             topicVMS.add(TopicVM.fromModel(topic));

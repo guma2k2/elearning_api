@@ -42,9 +42,10 @@ public class ReviewController {
     @GetMapping("/admin/reviews/paging")
     public ResponseEntity<PageableData<ReviewGetListVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword
     ) {
-        PageableData<ReviewGetListVM> pageableReviews = reviewService.getPageableReviews(pageNum, pageSize);
+        PageableData<ReviewGetListVM> pageableReviews = reviewService.getPageableReviews(pageNum, pageSize, keyword);
         return ResponseEntity.ok().body(pageableReviews);
     }
 

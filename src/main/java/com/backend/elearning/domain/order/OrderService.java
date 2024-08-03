@@ -9,5 +9,5 @@ public interface OrderService {
     List<OrderVM> findAllByUserId();
     void updateOrderStatus(Long orderId, String orderStatus);
 
-    PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize);
+    PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long orderId);
 }
