@@ -1,5 +1,8 @@
 package com.backend.elearning.domain.topic;
 
+import com.backend.elearning.domain.category.Category;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +14,13 @@ import java.util.Optional;
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Integer> {
 
+
+    @Query(value = """
+            select c
+            from Topic c
+            where (:keyword IS NULL or LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            """)
+    Page<Topic> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 
     @Query(value = """
             select count(1)

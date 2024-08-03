@@ -44,9 +44,11 @@ public class TopicController {
     @GetMapping("/admin/topic/paging")
     public ResponseEntity<PageableData<TopicVM>> getPageableTopic (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword
+
     ) {
-        PageableData<TopicVM> pageableTopics = topicService.getPageableTopics(pageNum, pageSize);
+        PageableData<TopicVM> pageableTopics = topicService.getPageableTopics(pageNum, pageSize, keyword);
         return ResponseEntity.ok().body(pageableTopics);
     }
 

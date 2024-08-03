@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CategoryService {
 
-    PageableData<CategoryVM> getPageableCategories(int pageNum, int pageSize);
+    PageableData<CategoryVM> getPageableCategories(int pageNum, int pageSize, String keyword);
     CategoryVM create (CategoryPostVM categoryPostVM);
     CategoryVM getCategoryById (Integer categoryId);
     List<CategoryListGetVM> getCategoryParents();

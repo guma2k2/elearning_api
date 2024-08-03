@@ -24,11 +24,11 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public PageableData<CategoryVM> getPageableCategories(int pageNum, int pageSize) {
+    public PageableData<CategoryVM> getPageableCategories(int pageNum, int pageSize, String keyword) {
         List<CategoryVM> categoryGetVms = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
-        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+        Page<Category> categoryPage = categoryRepository.findAllCustom(pageable, keyword);
         List<Category> categories = categoryPage.getContent();
         for (Category category : categories) {
             categoryGetVms.add(CategoryVM.fromModel(category));

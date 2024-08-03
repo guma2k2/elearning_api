@@ -2,6 +2,7 @@ package com.backend.elearning.domain.course;
 
 import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.category.CategoryRepository;
+import com.backend.elearning.domain.common.ECurriculumType;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
 import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
@@ -19,11 +20,10 @@ import com.backend.elearning.domain.section.SectionService;
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.topic.Topic;
 import com.backend.elearning.domain.topic.TopicRepository;
-import com.backend.elearning.domain.user.User;
-import com.backend.elearning.domain.user.UserProfileVM;
-import com.backend.elearning.domain.user.UserService;
+import com.backend.elearning.domain.user.*;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
+import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.ConvertTitleToSlug;
 import lombok.extern.slf4j.Slf4j;
@@ -49,14 +49,14 @@ public class CourseServiceImpl implements CourseService{
     private final ReviewService reviewService;
     private final LearningLectureRepository learningLectureRepository;
     private final LearningQuizRepository learningQuizRepository;
-
     private final LearningCourseRepository learningCourseRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     private final static String LECTURE_TYPE = "lecture";
     private final static String QUIZ_TYPE = "quiz";
 
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, UserService userService) {
+    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, UserService userService, UserRepository userRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
@@ -68,21 +68,27 @@ public class CourseServiceImpl implements CourseService{
         this.learningQuizRepository = learningQuizRepository;
         this.learningCourseRepository = learningCourseRepository;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
 
     @Override
-    public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize) {
+    public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (email != null) {
+            User user = userRepository.findByEmail(email).orElseThrow();
+            if (user.getRole().equals(ERole.ROLE_ADMIN)) {
+                email = null;
+            }
+        }
         List<CourseVM> courseVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-
-        Page<Course> coursePage = courseRepository.findAllCustom(pageable);
+        Page<Course> coursePage = courseRepository.findAllCustomByRole(pageable, email, keyword);
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
             courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>(),0, 0.0,0,"" , null, false));
 
         }
-
         return new PageableData(
                 pageNum,
                 pageSize,
@@ -94,8 +100,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM create(CoursePostVM coursePostVM) {
-        /*String email = SecurityContextHolder.getContext().getAuthentication().getName();*/
-        String email = "thuanngo3072006@gmail.com";
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         if (courseRepository.countExistByTitle(coursePostVM.title(), null) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
@@ -197,9 +202,8 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseListGetVM getCourseListGetVMById(Long id) {
-        Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
+        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException("course not found"));
         Long courseId = course.getId();
-        // get rating count, average rating
         List<Review> reviews = reviewService.findByCourseId(courseId);
         int ratingCount = reviews.size();
         Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
@@ -263,7 +267,22 @@ public class CourseServiceImpl implements CourseService{
             var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
             return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null, QUIZ_TYPE);
         }
-        return new CourseLearningVm(courseVM, null ,null, 0, null);
+        if (sections.size() == 0) {
+            throw new BadRequestException("course dont have lecture");
+        }
+        Long sectionId = sections.get(0).id();
+        Long curriculumId = sections.get(0).curriculums().get(0).getId();
+        if (sections.get(0).curriculums().get(0).getType().equals(ECurriculumType.lecture)){
+            return new CourseLearningVm(courseVM, sectionId ,curriculumId, 0, LECTURE_TYPE);
+        }
+        return new CourseLearningVm(courseVM, sectionId ,curriculumId, 0, QUIZ_TYPE);
+    }
+
+    @Override
+    public List<CourseListGetVM> getByUserId(Long userId) {
+        List<Course> courses = courseRepository.findByUserIdReturnSections(userId);
+        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
+        return courseListGetVMS;
     }
 
     @Override
@@ -307,6 +326,13 @@ public class CourseServiceImpl implements CourseService{
                 coursePage.getTotalPages(),
                 courseListGetVMS
         );
+    }
+
+    @Override
+    public List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId) {
+        List<Course> courses = courseRepository.findByCategoryId(categoryId);
+        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
+        return courseListGetVMS;
     }
 
 

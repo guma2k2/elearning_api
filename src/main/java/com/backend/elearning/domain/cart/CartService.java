@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface CartService {
 
-    void addCourseToCart(Long courseId);
+    CartListGetVM addCourseToCart(Long courseId);
     void deleteCourseInCart(Long cartId);
 
     void updateCartBuyLater(Long cartId);

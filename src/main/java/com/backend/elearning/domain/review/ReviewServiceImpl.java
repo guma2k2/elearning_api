@@ -57,6 +57,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .content(reviewPost.content())
                 .ratingStar(reviewPost.ratingStar())
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         Review savedReview = reviewRepository.save(review);
@@ -116,6 +117,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
         review.setRatingStar(reviewPostVM.ratingStar());
         review.setContent(reviewPostVM.content());
+        review.setUpdatedAt(LocalDateTime.now());
         Review updatedReview = reviewRepository.save(review);
         return ReviewVM.fromModel(updatedReview);
     }
@@ -126,11 +128,10 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize) {
+    public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword) {
         List<ReviewGetListVM> reviewVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-
-        Page<Review> reviewPage = reviewRepository.findAllCustom(pageable);
+        Page<Review> reviewPage = reviewRepository.findAllCustom(pageable, keyword);
         List<Review> reviews = reviewPage.getContent();
         for (Review review : reviews) {
             reviewVMS.add(ReviewGetListVM.fromModel(review));

@@ -15,7 +15,7 @@ public interface ReviewService {
 
     List<Review> findByCourseId(Long courseId);
 
-    PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize);
+    PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword);
 
     void updateStatusReview(boolean status, Long reviewId);
 }

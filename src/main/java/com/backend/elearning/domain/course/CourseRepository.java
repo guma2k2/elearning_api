@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,7 +34,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             from Course c
             left join fetch c.sections s
             join fetch c.category ca
-            join fetch ca.parent
+            left join fetch ca.parent
             join fetch c.topic
             where c.id = :id
             """)
@@ -43,6 +44,28 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             select c
             from Course c
             left join fetch c.sections s
+            join fetch c.category ca
+            left join fetch ca.parent
+            join fetch c.topic
+            where ca.id = :id
+            """)
+    List<Course> findByCategoryId(@Param("id") Integer categoryId);
+
+    @Query(value = """
+            select c
+            from Course c
+            join c.user u
+            left join fetch c.sections s
+            join fetch c.category ca
+            left join fetch ca.parent
+            join fetch c.topic
+            where u.id = :userId
+            """)
+    List<Course> findByUserIdReturnSections(@Param("userId") Long userId);
+
+    @Query(value = """
+            select c
+            from Course c
             join fetch c.category cat
             left join fetch cat.parent
             join fetch c.topic t
@@ -58,8 +81,10 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             left join fetch cat.parent
             join fetch c.topic t
             join fetch c.user u
+            where (:email is null or u.email = :email)
+            AND (:keyword IS NULL or LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
             """)
-    Page<Course> findAllCustom(Pageable pageable);
+    Page<Course> findAllCustomByRole(Pageable pageable, @Param("email") String email, @Param("keyword")String keyword);
 
     @Query(value = """
             select c

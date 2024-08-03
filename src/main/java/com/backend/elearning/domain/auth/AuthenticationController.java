@@ -3,6 +3,7 @@ package com.backend.elearning.domain.auth;
 
 import com.backend.elearning.domain.student.StudentVm;
 import com.backend.elearning.domain.user.UserVm;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,21 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    @PostMapping("/forgotpassword")
+    public ResponseEntity<Void> forgotPassword (
+            @Param("email") String email
+    ) {
+        authenticationService.forgotPassword(email);
+        return ResponseEntity.noContent().build();
+    }
 
+    @PutMapping("/password")
+    public ResponseEntity<Void> forgotPassword (
+            @RequestBody AuthenticationPostVm request
+    ) {
+        authenticationService.updatePassword(request);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/outbound/authentication")
     ResponseEntity<AuthenticationVm> outboundAuthenticate(

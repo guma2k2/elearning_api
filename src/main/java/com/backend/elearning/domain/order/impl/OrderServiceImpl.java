@@ -8,6 +8,9 @@ import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.order.*;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
+import com.backend.elearning.domain.user.ERole;
+import com.backend.elearning.domain.user.User;
+import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,12 +32,15 @@ public class OrderServiceImpl implements OrderService {
     private final StudentRepository studentRepository;
     private final CourseRepository  courseRepository;
 
+    private final UserRepository userRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
+
+    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -98,9 +104,9 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize) {
+    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Order> orderPage = orderRepository.findAllCustom(pageable);
+        Page<Order> orderPage = orderRepository.findAllCustom(pageable, keyword);
         List<Order> orders = orderPage.getContent();
         List<OrderVM> orderVMS = orders.stream().map(order -> {
             Long orderId = order.getId();

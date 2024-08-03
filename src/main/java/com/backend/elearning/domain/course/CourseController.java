@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 public class CourseController {
@@ -27,10 +29,19 @@ public class CourseController {
     @GetMapping("/admin/courses/paging")
     public ResponseEntity<PageableData<CourseVM>> getPageableCourse (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword
     ) {
-        PageableData<CourseVM> pageableCourses = courseService.getPageableCourses(pageNum, pageSize);
+        PageableData<CourseVM> pageableCourses = courseService.getPageableCourses(pageNum, pageSize, keyword);
         return ResponseEntity.ok().body(pageableCourses);
+    }
+
+    @GetMapping("/courses/category/{categoryId}")
+    public ResponseEntity<List<CourseListGetVM>> getPageableCourse (
+            @PathVariable("categoryId") Integer categoryId
+    ) {
+        List<CourseListGetVM> courseListGetVMS = courseService.getCoursesByCategoryId(categoryId);
+        return ResponseEntity.ok().body(courseListGetVMS);
     }
 
 
