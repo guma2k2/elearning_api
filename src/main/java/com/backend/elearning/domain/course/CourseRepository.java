@@ -82,7 +82,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             join fetch c.topic t
             join fetch c.user u
             where (:email is null or u.email = :email)
-            AND (:keyword IS NULL or LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            and COALESCE(:keyword, '') = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
             """)
     Page<Course> findAllCustomByRole(Pageable pageable, @Param("email") String email, @Param("keyword")String keyword);
 

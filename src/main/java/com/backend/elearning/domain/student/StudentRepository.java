@@ -32,7 +32,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query(value = """
             select c
             from Student c
-            where (:keyword IS NULL or LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            where COALESCE(:keyword, '') = '' OR LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
             """)
     Page<Student> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 }

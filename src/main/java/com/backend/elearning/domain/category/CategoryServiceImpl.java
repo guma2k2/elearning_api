@@ -28,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService{
         List<CategoryVM> categoryGetVms = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
+
         Page<Category> categoryPage = categoryRepository.findAllCustom(pageable, keyword);
         List<Category> categories = categoryPage.getContent();
         for (Category category : categories) {
