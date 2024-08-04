@@ -18,7 +18,7 @@ public interface TopicRepository extends JpaRepository<Topic, Integer> {
     @Query(value = """
             select c
             from Topic c
-            where (:keyword IS NULL or LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            where COALESCE(:keyword, '') = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
             """)
     Page<Topic> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 

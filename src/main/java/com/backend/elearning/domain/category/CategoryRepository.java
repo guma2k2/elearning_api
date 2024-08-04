@@ -30,7 +30,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             select c
             from Category c
             left join fetch c.parent
-            where (:keyword IS NULL or LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            where COALESCE(:keyword, '') = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
             """)
     Page<Category> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 
