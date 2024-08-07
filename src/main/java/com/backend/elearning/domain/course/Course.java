@@ -3,6 +3,7 @@ package com.backend.elearning.domain.course;
 import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.common.CustomAuditingEntityListener;
+import com.backend.elearning.domain.learning.learningCourse.LearningCourse;
 import com.backend.elearning.domain.review.Review;
 import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.topic.Topic;
@@ -74,4 +75,8 @@ public class Course extends AbstractAuditEntity {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<LearningCourse> learningCourses = new ArrayList<>();
 }

@@ -2,6 +2,7 @@ package com.backend.elearning.domain.category;
 
 import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.common.CustomAuditingEntityListener;
+import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.topic.Topic;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,6 +38,10 @@ public class Category extends AbstractAuditEntity {
     @Builder.Default
     private List<Category> childrenList = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Course> courses = new ArrayList<>();
 
     @ManyToMany(mappedBy = "categories")
     @Builder.Default

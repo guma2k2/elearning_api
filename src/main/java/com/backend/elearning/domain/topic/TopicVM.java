@@ -18,6 +18,8 @@ public record TopicVM(
     public static TopicVM fromModel(Topic topic){
         Set<Category> categories = topic.getCategories();
         List<String> categoriesName = categories.stream().map(Category::getName).toList();
-        return new TopicVM(topic.getId(), topic.getName(),topic.getDescription() ,topic.isPublish(), categoriesName, topic.getCreatedAt().toString(), topic.getUpdatedAt().toString());
+        String createdAt = topic.getCreatedAt() != null ? topic.getCreatedAt().toString() : "";
+        String updatedAt = topic.getUpdatedAt() != null ? topic.getUpdatedAt().toString() : "";
+        return new TopicVM(topic.getId(), topic.getName(),topic.getDescription() ,topic.isPublish(), categoriesName,createdAt, updatedAt);
     }
 }

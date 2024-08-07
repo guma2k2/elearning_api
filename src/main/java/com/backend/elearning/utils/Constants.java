@@ -20,6 +20,11 @@ public final class Constants {
         public static final String TOPIC_NAME_DUPLICATED = "TOPIC_NAME_DUPLICATED";
         public static final String COURSE_TITLE_DUPLICATED = "COURSE_TITLE_DUPLICATED";
         public static final String USER_EMAIL_DUPLICATED = "USER_EMAIL_DUPLICATED";
+
+        public static final String STUDENT_EMAIL_DUPLICATED = "STUDENT_EMAIL_DUPLICATED";
+
+        public static final String COUPON_CODE_DUPLICATED = "COUPON_CODE_DUPLICATED";
+
         public static final String LECTURE_SECTION_NOT_SAME = "LECTURE_SECTION_NOT_SAME";
 
         public static final String COUPON_NOT_FOUND = "COUPON_NOT_FOUND";

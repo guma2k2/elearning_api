@@ -33,4 +33,11 @@ public class StudentController {
         studentService.updateStatusStudent(status, studentId);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/students/profile")
+    public ResponseEntity<UserVm> updateProfile(@RequestBody StudentPutVM studentPutVM) {
+        UserVm userVm = studentService.updateProfileStudent(studentPutVM);
+        return ResponseEntity.ok().body(userVm);
+    }
+
 }

@@ -7,9 +7,11 @@ import com.backend.elearning.domain.course.CourseService;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
 import com.backend.elearning.domain.review.Review;
 import com.backend.elearning.domain.review.ReviewService;
+import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
@@ -75,7 +80,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public UserVm create(UserPostVm userPostVm) {
-        if (userRepository.countByExistedEmail(userPostVm.email(), null) > 0) {
+        if (userRepository.countByExistedEmail(userPostVm.email(), null) > 0L) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userPostVm.email());
         }
         User user = User.builder()
@@ -89,13 +94,15 @@ public class UserServiceImpl implements UserService{
                 .role(ERole.valueOf(userPostVm.role()))
                 .gender(EGender.valueOf(userPostVm.gender()))
                 .build();
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         User savedUser = userRepository.saveAndFlush(user);
-        return UserVm.fromModel(user);
+        return UserVm.fromModel(savedUser);
     }
 
     @Override
     @Transactional
-    public void update(UserPutVm userPutVm, Long userId) {
+    public UserVm update(UserPutVm userPutVm, Long userId) {
         if (userRepository.countByExistedEmail(userPutVm.email(), userId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userPutVm.email());
         }
@@ -106,25 +113,31 @@ public class UserServiceImpl implements UserService{
         user.setActive(userPutVm.active());
         user.setRole(ERole.valueOf(userPutVm.role()));
         user.setDateOfBirth(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()));
-        if (!userPutVm.photoId().isEmpty() && !userPutVm.photoId().isBlank()) {
-            user.setPhoto(userPutVm.photoId());
-        }
-        if (!userPutVm.password().isEmpty() && !userPutVm.password().isBlank()) {
-            user.setPassword(passwordEncoder.encode(userPutVm.password()));
-        }
-        // update
+        user.setUpdatedAt(LocalDateTime.now());
+        Optional.ofNullable(userPutVm.photo())
+                .filter(photo -> !photo.isEmpty() && !photo.isBlank())
+                .ifPresent(user::setPhoto);
+
+        Optional.ofNullable(userPutVm.password())
+                .filter(pass -> !pass.isEmpty() && !pass.isBlank())
+                .ifPresent(pass -> user.setPassword(passwordEncoder.encode(pass)));
         userRepository.save(user);
+        return UserVm.fromModel(user);
     }
 
     @Override
     @Transactional
     public void delete(Long userId) {
-
+        User user = userRepository.findByIdCustom(userId).orElseThrow( () -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, userId));
+        if (user.getCourses().size() > 0) {
+            throw new BadRequestException("User had course");
+        }
+        userRepository.delete(user);
     }
 
     @Override
     public UserProfileVM getById(Long userId) {
-        User user = userRepository.findByIdCustom(userId).orElseThrow();
+        User user = userRepository.findByIdCustom(userId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, userId));
         List<Course> coursesOfUser = user.getCourses();
         int numberOfCourses = coursesOfUser.size();
         AtomicInteger numberOfReviews = new AtomicInteger();

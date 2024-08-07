@@ -90,11 +90,10 @@ public class CategoryController {
     }
 
     @DeleteMapping("/admin/category/{id}")
-    public ResponseEntity<CategoryVM> delete (
+    public ResponseEntity<Void> delete (
             @PathVariable("id") Integer id
     ) {
-        return null;
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
-
-
 }

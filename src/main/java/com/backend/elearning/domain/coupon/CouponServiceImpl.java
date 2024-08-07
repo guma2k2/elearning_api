@@ -29,7 +29,7 @@ public class CouponServiceImpl implements CouponService{
     @Override
     public CouponVM createCoupon(CouponPostVM couponPostVM) {
         if (checkExistCoupon(null, couponPostVM.code())) {
-            throw new DuplicateException("");
+            throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
         LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
         LocalDateTime endTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.endTime(), DateTimeUtils.NORMAL_TYPE);
@@ -45,7 +45,8 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM getByCode(String code) {
-        Coupon coupon = couponRepository.findByCode(code).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, code));
+        Coupon coupon = couponRepository.findByCode(code).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, code));
         if (LocalDateTime.now().isBefore(coupon.getStartTime()) || LocalDateTime.now().isAfter(coupon.getEndTime())) {
             throw new BadRequestException(Constants.ERROR_CODE.COUPON_IS_EXPIRED, code);
         }
@@ -79,7 +80,7 @@ public class CouponServiceImpl implements CouponService{
     @Override
     public CouponVM updateCoupon(CouponPostVM couponPostVM, Long couponId) {
         if (checkExistCoupon(couponId, couponPostVM.code())) {
-            throw new DuplicateException("");
+            throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
         Coupon coupon = couponRepository.findByCode(couponPostVM.code()).orElseThrow();
         coupon.setCode(coupon.getCode());
@@ -95,9 +96,10 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public void deleteById(Long couponId) {
-        Coupon coupon = couponRepository.findByIdCustom(couponId).orElseThrow();
+        Coupon coupon = couponRepository.findByIdCustom(couponId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, couponId));
         if (coupon.getOrders().size() > 0) {
-            throw new BadRequestException("");
+            throw new BadRequestException("Coupon had order");
         }
         couponRepository.delete(coupon);
     }

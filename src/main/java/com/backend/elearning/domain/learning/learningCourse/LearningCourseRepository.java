@@ -53,4 +53,12 @@ public interface LearningCourseRepository extends JpaRepository<LearningCourse, 
         where u.email = :email
     """)
     long countStudentByInstructorEmail(@Param("email") String email);
+
+    @Query("""
+        select lc 
+        from LearningCourse lc 
+        join lc.course c
+        where c.id = :courseId
+    """)
+    List<LearningCourse> findByCourseId(@Param("courseId") Long courseId);
 }

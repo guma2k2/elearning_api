@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = """
             SELECT COUNT(1)
             FROM User u
-            WHERE u.email = :email AND (:id = null or u.id != :id)
+            WHERE u.email = :email AND (:id is null or u.id != :id)
             """)
     Long countByExistedEmail (@Param("email") String email, @Param("id") Long id) ;
 

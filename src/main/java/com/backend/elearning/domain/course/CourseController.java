@@ -86,10 +86,8 @@ public class CourseController {
 
     public ResponseEntity<CourseVM> updateCourse (
             @RequestBody CoursePostVM coursePostVM,
-            @PathVariable("id") Long courseId,
-            @AuthenticationPrincipal UserDetails authUserDetails
+            @PathVariable("id") Long courseId
     ) {
-//        Long userId = authUserDetails.getId();
         Long userId = 1L;
         CourseVM courseVM = courseService.update(coursePostVM, userId, courseId);
         return ResponseEntity.status(HttpStatus.OK).body(courseVM);
@@ -110,7 +108,13 @@ public class CourseController {
         CourseLearningVm course = courseService.getCourseBySlug(slug);
         return ResponseEntity.ok().body(course);
     }
-
+    @DeleteMapping("/admin/courses/{id}")
+    public ResponseEntity<Void> delete (
+            @PathVariable("id") Long id
+    ) {
+        courseService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }
