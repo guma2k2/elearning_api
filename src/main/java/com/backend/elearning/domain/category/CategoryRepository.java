@@ -21,7 +21,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query(value = """
             select count(1)
             from Category c
-            where c.name = :name and (c.id != :id or :id = null)
+            where c.name = :name and (c.id != :id or :id is null)
             """)
     Long countExistByName (@Param("name") String name,
                            @Param("id") Integer id);
@@ -38,6 +38,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             select c
             from Category c
             left join fetch c.parent
+            left join c.childrenList
             where c.id = :id
             """)
     Optional<Category> findByIdWithParent(@Param("id") Integer id);
@@ -49,13 +50,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             where c.name = :name
             """)
     Optional<Category> findByNameCustom(@Param("name") String name);
-//    @Query("""
-//        select c
-//        from Category c
-//        left join fetch c.parent p
-//        where p.id = :id
-//    """)
-//    List<Category> findByParentId(@Param("id") Integer id);
     @Query(value = """
             select c
             from Category c
@@ -64,8 +58,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             where c.id = :id
             """)
     Optional<Category> findByIdTopics(@Param("id") Integer id);
-
-
 
     @Query(value = """
             select c

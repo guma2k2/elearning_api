@@ -41,4 +41,14 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     """)
     void updateCartBuyLater(@Param("buyLater") boolean buyLater,
                             @Param("cartId") Long cartId);
+
+
+    @Query("""
+        select c 
+        from Cart c 
+        join c.course co
+        where co.id = :courseId
+""")
+    List<Cart> findByCourseId(@Param("courseId") Long courseId);
+
 }

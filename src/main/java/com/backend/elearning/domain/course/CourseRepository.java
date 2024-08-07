@@ -54,6 +54,18 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query(value = """
             select c
             from Course c
+            left join fetch c.sections s
+            join fetch c.category ca
+            join fetch c.topic t
+            left join fetch ca.parent
+            join fetch c.topic
+            where t.id = :id
+            """)
+    List<Course> findByTopicId(@Param("id") Integer topicId);
+
+    @Query(value = """
+            select c
+            from Course c
             join c.user u
             left join fetch c.sections s
             join fetch c.category ca

@@ -19,7 +19,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query("""
         select count(1)
         from Coupon c 
-        where c.code = :code and ( c.id != :id or :id = null )
+        where c.code = :code and ( :id is null or c.id != :id )
     """)
     long findByCodeAndId(@Param("code") String code, @Param("id") Long couponId);
 

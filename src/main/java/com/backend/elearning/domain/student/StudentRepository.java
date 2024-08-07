@@ -35,4 +35,11 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             where COALESCE(:keyword, '') = '' OR LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
             """)
     Page<Student> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
+
+    @Query(value = """
+            SELECT COUNT(1)
+            FROM Student u
+            WHERE u.email = :email AND (:id is null or u.id != :id)
+            """)
+    Long countByExistedEmail(String email, Long id);
 }

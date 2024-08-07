@@ -1,9 +1,12 @@
 package com.backend.elearning.domain.course;
 
+import com.backend.elearning.domain.cart.Cart;
+import com.backend.elearning.domain.cart.CartRepository;
 import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.category.CategoryRepository;
 import com.backend.elearning.domain.common.ECurriculumType;
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.learning.learningCourse.LearningCourse;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
 import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
 import com.backend.elearning.domain.learning.learningLecture.LearningLectureRepository;
@@ -11,6 +14,8 @@ import com.backend.elearning.domain.learning.learningQuiz.LearningQuiz;
 import com.backend.elearning.domain.learning.learningQuiz.LearningQuizRepository;
 import com.backend.elearning.domain.lecture.Lecture;
 import com.backend.elearning.domain.lecture.LectureRepository;
+import com.backend.elearning.domain.order.OrderDetail;
+import com.backend.elearning.domain.order.OrderDetailRepository;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizRepository;
 import com.backend.elearning.domain.review.Review;
@@ -50,13 +55,16 @@ public class CourseServiceImpl implements CourseService{
     private final LearningLectureRepository learningLectureRepository;
     private final LearningQuizRepository learningQuizRepository;
     private final LearningCourseRepository learningCourseRepository;
+
+    private final OrderDetailRepository orderDetailRepository;
+    private final CartRepository cartRepository;
     private final UserService userService;
     private final UserRepository userRepository;
 
     private final static String LECTURE_TYPE = "lecture";
     private final static String QUIZ_TYPE = "quiz";
 
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, UserService userService, UserRepository userRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
@@ -67,6 +75,8 @@ public class CourseServiceImpl implements CourseService{
         this.learningLectureRepository = learningLectureRepository;
         this.learningQuizRepository = learningQuizRepository;
         this.learningCourseRepository = learningCourseRepository;
+        this.orderDetailRepository = orderDetailRepository;
+        this.cartRepository = cartRepository;
         this.userService = userService;
         this.userRepository = userRepository;
     }
@@ -76,7 +86,7 @@ public class CourseServiceImpl implements CourseService{
     public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         if (email != null) {
-            User user = userRepository.findByEmail(email).orElseThrow();
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND));
             if (user.getRole().equals(ERole.ROLE_ADMIN)) {
                 email = null;
             }
@@ -333,6 +343,32 @@ public class CourseServiceImpl implements CourseService{
         List<Course> courses = courseRepository.findByCategoryId(categoryId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
         return courseListGetVMS;
+    }
+
+    @Override
+    public void delete(Long id) {
+        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
+        if (course.getSections().size() > 0 ) {
+            throw new BadRequestException("Course had section");
+        }
+
+        List<LearningCourse> learningCourses = learningCourseRepository.findByCourseId(id);
+
+
+        if (learningCourses.size() > 0) {
+            throw new BadRequestException("Course had person who is learning");
+        }
+
+        List<Cart> carts = cartRepository.findByCourseId(id);
+        if (carts.size() > 0) {
+            throw new BadRequestException("Course had cart");
+        }
+
+        List<OrderDetail> orderDetails = orderDetailRepository.findByCourseId(id);
+        if (orderDetails.size() > 0) {
+            throw new BadRequestException("Course had bought");
+        }
+        courseRepository.delete(course);
     }
 
 

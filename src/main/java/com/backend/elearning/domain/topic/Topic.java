@@ -22,7 +22,7 @@ public class Topic extends AbstractAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @Column(length = 40,unique = true)
     private String name;
 
     private String description;

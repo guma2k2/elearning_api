@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.order;
 
+import com.backend.elearning.domain.cart.Cart;
 import com.backend.elearning.domain.statitic.StatisticCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,4 +59,12 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     List<StatisticCourse> getStatisticByTime (@Param("from")LocalDateTime from,
                                               @Param("to")LocalDateTime to,
                                               @Param("email") String email);
+
+    @Query("""
+        select c 
+        from OrderDetail c 
+        join c.course co
+        where co.id = :courseId
+    """)
+    List<OrderDetail> findByCourseId(@Param("courseId") Long courseId);
 }

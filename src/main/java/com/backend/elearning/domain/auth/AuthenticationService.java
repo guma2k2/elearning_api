@@ -8,6 +8,8 @@ import com.backend.elearning.domain.user.ERole;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserVm;
+import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.utils.Constants;
@@ -71,12 +73,15 @@ public class AuthenticationService {
 
     public AuthenticationVm login(AuthenticationPostVm request) {
         Optional<User> user = userRepository.findByEmail(request.email());
+        Optional<Student> student = studentRepository.findByEmail(request.email());
+        if (!user.isPresent() && !student.isPresent()) {
+            throw new BadRequestException("Email or password is not corrected");
+        }
         if (user.isPresent()) {
             String token = jwtUtil.issueToken(request.email(), user.get().getRole().name());
             UserVm userVm = UserVm.fromModel(user.get());
             return new AuthenticationVm(token, userVm);
         }
-        Optional<Student> student = studentRepository.findByEmail(request.email());
         String token = jwtUtil.issueToken(request.email(), ERole.ROLE_STUDENT.name());
         UserVm userVm = UserVm.fromModelStudent(student.get());
         return new AuthenticationVm(token, userVm);
@@ -96,11 +101,6 @@ public class AuthenticationService {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
         ExchangeTokenResponse response = restTemplate.exchange(EXCHANGE_TOKEN_URL, HttpMethod.POST, entity, ExchangeTokenResponse.class).getBody();
-//        if (response != null) {
-//            log.info(response.toString());
-//            log.info(response.toString());
-//        }
-
 
         if (response != null) {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(EXCHANGE_USER_INFO_URL)
@@ -130,14 +130,17 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm register(RegistrationPostVm request) {
-        Student student = studentRepository.findByEmail(request.email()).orElseGet(
-                () -> studentRepository.saveAndFlush(Student.builder()
-                        .active(true)
-                        .firstName(request.firstName())
-                        .lastName(request.lastName())
-                        .email(request.email())
-                        .photo("")
-                        .build()));
+        Long checkExisted = studentRepository.countByExistedEmail(request.email(), null);
+        if (checkExisted > 0) {
+            throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, request.email());
+        }
+        Student student = studentRepository.saveAndFlush(Student.builder()
+                .active(true)
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .email(request.email())
+                .photo("")
+                .build());
         String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
         UserVm userVm = UserVm.fromModelStudent(student);
         AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
@@ -158,7 +161,7 @@ public class AuthenticationService {
         try {
             mailService.sendEmail(toAddress, content, subject);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 

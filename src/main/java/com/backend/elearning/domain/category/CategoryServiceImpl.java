@@ -1,6 +1,9 @@
 package com.backend.elearning.domain.category;
 
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.topic.TopicRepository;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
@@ -10,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +23,12 @@ public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    private final TopicRepository topicRepository;
+    private final CourseRepository courseRepository;
+    public CategoryServiceImpl(CategoryRepository categoryRepository, TopicRepository topicRepository, CourseRepository courseRepository) {
         this.categoryRepository = categoryRepository;
+        this.topicRepository = topicRepository;
+        this.courseRepository = courseRepository;
     }
 
     @Override
@@ -46,20 +54,24 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public CategoryVM create(CategoryPostVM categoryPostVM) {
-        if (categoryRepository.countExistByName(categoryPostVM.name(), null) > 0l) {
+        if (categoryRepository.countExistByName(categoryPostVM.name(), null) > 0L) {
             throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED);
         }
+
         Category category = Category.builder()
                 .name(categoryPostVM.name())
                 .description(categoryPostVM.description())
                 .publish(categoryPostVM.isPublish())
                 .build();
+        category.setCreatedAt(LocalDateTime.now());
+        category.setUpdatedAt(LocalDateTime.now());
         if (categoryPostVM.parentId() != null) {
             Category parent = categoryRepository.findById(categoryPostVM.parentId()).orElseThrow(() ->
                     new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryPostVM.parentId()));
             category.setParent(parent);
         }
-        return CategoryVM.fromModel(categoryRepository.saveAndFlush(category));
+        categoryRepository.saveAndFlush(category);
+        return CategoryVM.fromModel(category);
     }
     @Override
     public CategoryVM getCategoryById(Integer categoryId) {
@@ -88,6 +100,7 @@ public class CategoryServiceImpl implements CategoryService{
         category.setName(categoryPutVM.name());
         category.setDescription(categoryPutVM.description());
         category.setPublish(categoryPutVM.isPublish());
+        category.setUpdatedAt(LocalDateTime.now());
         if (categoryPutVM.parentId() == null) {
             category.setParent(null);
         } else {
@@ -105,12 +118,24 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public void delete(Integer categoryId) {
-        // Todo: check isHaveChildren
+        Category category = categoryRepository.findByIdWithParent(categoryId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryId));
+        if (category.getChildrenList().size() > 0) {
+            throw new BadRequestException("Category had children");
+        }
+        List<Course> courses = courseRepository.findByCategoryId(categoryId);
+        if (courses.size() > 0) {
+            throw new BadRequestException("Category had course");
+        }
+        Category categoryWithTopic = categoryRepository.findByIdTopics(categoryId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryId));
+        if (categoryWithTopic.getTopics().size() > 0) {
+            throw new BadRequestException("Category had topic");
+        }
+        categoryRepository.delete(category);
     }
 
     @Override
     public CategoryGetVM getByName(String name) {
-        Category category = categoryRepository.findByNameCustom(name).orElseThrow() ;
+        Category category = categoryRepository.findByNameCustom(name).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, name)); ;
         List<Category> childrenList = category.getChildrenList();
         if (childrenList.size() > 0) {
             List<CategoryGetVM> childVMs = childrenList

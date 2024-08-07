@@ -89,6 +89,7 @@ public class TopicController {
     public ResponseEntity<Void> delete (
             @PathVariable("id") Integer id
     ) {
+        topicService.delete(id);
         return null;
     }
 }

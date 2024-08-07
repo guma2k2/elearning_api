@@ -72,7 +72,15 @@ public class UserController {
     public ResponseEntity<UserVm> update (@RequestBody UserPutVm userPostVm,
                                           @PathVariable("id") Long id
     ) {
-        userService.update(userPostVm, id);
+        UserVm userVm = userService.update(userPostVm, id);
+        return ResponseEntity.ok().body(userVm);
+    }
+
+    @DeleteMapping("/admin/users/{id}")
+    public ResponseEntity<Void> delete (
+            @PathVariable("id") Long id
+    ) {
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
