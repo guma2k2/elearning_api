@@ -29,12 +29,13 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     """)
     void updateStatusStudent(@Param("status") boolean status, @Param("id") Long studentId);
 
+
     @Query(value = """
             select c
             from Student c
-            where COALESCE(:keyword, '') = '' OR LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            where LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
             """)
-    Page<Student> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
+    Page<Student> findAllWithKeyword(Pageable pageable, @Param("keyword") String keyword);
 
     @Query(value = """
             SELECT COUNT(1)

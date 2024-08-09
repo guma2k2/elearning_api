@@ -44,9 +44,10 @@ public class UserController {
     @GetMapping("/admin/users/paging")
     public ResponseEntity<PageableData<UserVm>> getUser (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword
     ) {
-        return ResponseEntity.ok().body(userService.getUsers(pageNum, pageSize));
+        return ResponseEntity.ok().body(userService.getUsers(pageNum, pageSize, keyword));
     }
 
     @PostMapping({"/admin/users"})

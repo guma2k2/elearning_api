@@ -32,6 +32,15 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             """)
     List<Cart> findByUserEmail(@Param("email") String email);
 
+    @Query("""
+            select c 
+            from Cart c
+            left join fetch c.student u
+            left join fetch c.course co
+            where u.email = :email and c.buyLater = false
+            """)
+    List<Cart> findByUserEmailWithBuyLater(@Param("email") String email);
+
 
     @Modifying
     @Query("""

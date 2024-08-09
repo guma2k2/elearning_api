@@ -72,10 +72,10 @@ public class StatisticService {
             long totalStudents = studentRepository.findTotalStudents();
             return new Dashboard(totalOrders, totalReviews, totalCourses, totalStudents);
         }
-        long totalReviews = reviewRepository.findTotalReviews(email);
-        long totalCourses = courseRepository.findTotalCourses(email);
-        long totalOrders = orderDetailRepository.countByInstructor(email);
-        long totalStudents = learningCourseRepository.countStudentByInstructorEmail(email);
+        Long totalReviews = reviewRepository.findTotalReviews(email);
+        Long totalCourses = courseRepository.findTotalCourses(email);
+        Long totalOrders = orderDetailRepository.countByInstructor(email);
+        Long totalStudents = learningCourseRepository.countStudentByInstructorEmail(email);
         return new Dashboard(totalOrders, totalReviews, totalCourses, totalStudents);
     }
 
@@ -88,8 +88,8 @@ public class StatisticService {
         }
         int numberMonthOfYear = 12;
         List<StatisticTime> statisticTimes = new ArrayList<>();
-        List<Statistic> statistics = paymentRepository.findByYear(year, email);
-
+        List<Statistic> statistics = email != null ? orderDetailRepository.findByYearAndEmail(year, email) :
+                paymentRepository.findByYear(year);
         for (Statistic statistic: statistics) {
             String name = String.format(MONTH_PATTERN, statistic.getTime());
             Long total = statistic.getTotal();
@@ -122,7 +122,8 @@ public class StatisticService {
         int numberOfDayInMonth = getNumberOfDaysInMonth(year, month);
         log.info(numberOfDayInMonth+"");
         List<StatisticTime> statisticTimes = new ArrayList<>();
-        List<Statistic> statistics = paymentRepository.findByMonthAndYear(month, year, email);
+        List<Statistic> statistics = email != null ? orderDetailRepository.findByMonthAndYearAndEmail(month, year, email) :
+                paymentRepository.findByMonthAndYear(month, year);
         for (Statistic statistic: statistics) {
             String name = String.format(DAY_PATTERN, statistic.getTime());
             Long total = statistic.getTotal();

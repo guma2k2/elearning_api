@@ -19,15 +19,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
                       SUM(p.amount)
                   )
         FROM Payment p
-        WHERE 
+        WHERE
             (EXTRACT(YEAR FROM p.payDate) = :year)
-            AND (:email is null or (select u.email 
-                                    from OrderDetail od 
-                                    join od.course c 
-                                    join c.user u ) = :email)
         GROUP BY EXTRACT(MONTH FROM p.payDate)
     """)
-    List<Statistic> findByYear(@Param("year") int year, @Param("email")String email);
+    List<Statistic> findByYear(@Param("year") int year);
+
 
 
     @Query("""
@@ -38,15 +35,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
         FROM Payment p
         WHERE EXTRACT(MONTH FROM p.payDate) = :month 
             AND EXTRACT(YEAR FROM p.payDate) = :year
-            AND (:email is null or (select u.email 
-                                    from OrderDetail od 
-                                    join od.course c 
-                                    join c.user u ) = :email)
         GROUP BY EXTRACT(DAY FROM p.payDate)
     """)
     List<Statistic> findByMonthAndYear(@Param("month") int month,
-                                       @Param("year") int year,
-                                       @Param("email")String email
+                                       @Param("year") int year
     );
 
 

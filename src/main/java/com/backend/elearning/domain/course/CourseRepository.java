@@ -3,6 +3,7 @@ package com.backend.elearning.domain.course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query(value = """
             select count(1)
             from Course c
-            where c.title = :title and (c.id != :id or :id != null)
+            where c.title = :title and (:id is  null or c.id != :id )
             """)
     Long countExistByTitle(@Param("title") String title,
                            @Param("id") Long id);
@@ -36,6 +37,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             join fetch c.category ca
             left join fetch ca.parent
             join fetch c.topic
+            join fetch c.user
             where c.id = :id
             """)
     Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
@@ -118,8 +120,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         join fetch c.topic t
         join fetch c.user u
         left join fetch c.reviews
-        where (:title IS NULL or LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')))
-        and (:level IS NULL or c.level in :level)
+        where (:level IS NULL or c.level in :level)
         and (:free IS NULL or c.free in :free)
         and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
         and (:topicId IS NULL or t.id = :topicId)
@@ -131,7 +132,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               group by rc.id) >= :ratingStar)
     """)
     Page<Course> findByMultiQuery(Pageable pageable,
-                                  @Param("title") String title,
                                   @Param("ratingStar") Float ratingStar,
                                   @Param("level") String[] level,
                                   @Param("free") Boolean[] free,
@@ -139,6 +139,41 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                                   @Param("topicId") Integer topicId
                                   );
 
-    // group by c.id, cat.id, p.id, t.id, u.id, r.id
-    //            HAVING COALESCE(AVG(r.ratingStar), 0) > :ratingStar
+    @Query(value = """
+        select c
+        from Course c
+        join fetch c.category cat
+        left join fetch cat.parent p
+        join fetch c.topic t
+        join fetch c.user u
+        left join fetch c.reviews
+        where LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))
+        and (:level IS NULL or c.level in :level)
+        and (:free IS NULL or c.free in :free)
+        and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
+        and (:topicId IS NULL or t.id = :topicId)
+        and (:ratingStar IS NULL or
+             (select avg(r.ratingStar)
+              from Review r
+              join r.course rc 
+              where rc.id = c.id 
+              group by rc.id) >= :ratingStar)
+    """)
+    Page<Course> findByMultiQueryWithKeyword(Pageable pageable,
+                                  @Param("title") String title,
+                                  @Param("ratingStar") Float ratingStar,
+                                  @Param("level") String[] level,
+                                  @Param("free") Boolean[] free,
+                                  @Param("categoryName") String categoryName,
+                                  @Param("topicId") Integer topicId
+    );
+
+    @Modifying
+    @Query("""
+        update 
+        Course s 
+        set s.publish = :status
+        where s.id = :id
+    """)
+    void updateStatusCourse(@Param("status") boolean status, @Param("id") Long courseId);
 }

@@ -7,7 +7,7 @@ public record OrderDetailVM(
 
         CourseGetVM course,
 
-        Double price
+        Long price
 ) {
     public static OrderDetailVM fromModel(OrderDetail orderDetail, CourseGetVM course) {
 

@@ -15,6 +15,7 @@ public record CoursePostVM(
 
          String description,
          String level,
+         Long price,
          String image,
          boolean free,
          Integer categoryId,

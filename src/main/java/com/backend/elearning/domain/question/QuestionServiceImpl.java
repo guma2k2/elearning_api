@@ -40,6 +40,7 @@ public class QuestionServiceImpl implements QuestionService{
             questionVM.answers().forEach(answerVM -> {
                 Answer answer = Answer.builder()
                         .answerText(answerVM.answerText())
+                        .correct(answerVM.correct())
                         .reason(answerVM.reason())
                         .question(savedQuestion)
                         .build();

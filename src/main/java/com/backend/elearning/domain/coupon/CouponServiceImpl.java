@@ -82,15 +82,14 @@ public class CouponServiceImpl implements CouponService{
         if (checkExistCoupon(couponId, couponPostVM.code())) {
             throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
-        Coupon coupon = couponRepository.findByCode(couponPostVM.code()).orElseThrow();
-        coupon.setCode(coupon.getCode());
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, couponId));
+        coupon.setCode(couponPostVM.code());
         coupon.setDiscountPercent(couponPostVM.discountPercent());
         LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
         LocalDateTime endTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.endTime(), DateTimeUtils.NORMAL_TYPE);
         coupon.setStartTime(startTime);
         coupon.setEndTime(endTime);
         Coupon updatedCoupon = couponRepository.save(coupon);
-
         return CouponVM.fromModel(updatedCoupon);
     }
 

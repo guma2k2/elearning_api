@@ -55,7 +55,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             from Category c
             left join fetch c.parent
             left join fetch c.topics
-            where c.id = :id
+            where c.id = :id 
             """)
     Optional<Category> findByIdTopics(@Param("id") Integer id);
 
@@ -63,7 +63,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             select c
             from Category c
             left join fetch c.childrenList
-            where c.parent IS NULL
+            where c.parent IS NULL and c.publish = true 
             """)
     List<Category> findAllParents();
 

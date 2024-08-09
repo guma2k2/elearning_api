@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class LearningCourse {
 
     @Id

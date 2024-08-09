@@ -131,7 +131,8 @@ public class ReviewServiceImpl implements ReviewService {
     public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword) {
         List<ReviewGetListVM> reviewVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Review> reviewPage = reviewRepository.findAllCustom(pageable, keyword);
+        Page<Review> reviewPage = keyword != null ? reviewRepository.findAllCustomWithKeyword(pageable, keyword) :
+                reviewRepository.findAllCustom(pageable);
         List<Review> reviews = reviewPage.getContent();
         for (Review review : reviews) {
             reviewVMS.add(ReviewGetListVM.fromModel(review));

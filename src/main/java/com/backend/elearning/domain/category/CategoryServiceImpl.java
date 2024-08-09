@@ -11,6 +11,7 @@ import com.backend.elearning.utils.Constants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,8 @@ public class CategoryServiceImpl implements CategoryService{
     private final CategoryRepository categoryRepository;
 
     private final TopicRepository topicRepository;
+
+    private final String sortBy = "updatedAt";
     private final CourseRepository courseRepository;
     public CategoryServiceImpl(CategoryRepository categoryRepository, TopicRepository topicRepository, CourseRepository courseRepository) {
         this.categoryRepository = categoryRepository;
@@ -34,7 +37,9 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public PageableData<CategoryVM> getPageableCategories(int pageNum, int pageSize, String keyword) {
         List<CategoryVM> categoryGetVms = new ArrayList<>();
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Sort sort = Sort.by(sortBy);
+        sort.descending();
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 
 
         Page<Category> categoryPage = categoryRepository.findAllCustom(pageable, keyword);
@@ -55,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public CategoryVM create(CategoryPostVM categoryPostVM) {
         if (categoryRepository.countExistByName(categoryPostVM.name(), null) > 0L) {
-            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED);
+            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED, categoryPostVM.name());
         }
 
         Category category = Category.builder()
@@ -93,7 +98,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public void update(CategoryPostVM categoryPutVM, Integer categoryId) {
         if (categoryRepository.countExistByName(categoryPutVM.name(), categoryId) > 0l) {
-            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED);
+            throw new DuplicateException(Constants.ERROR_CODE.CATEGORY_NAME_DUPLICATED, categoryPutVM.name());
         }
         Category category = categoryRepository.findByIdWithParent(categoryId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND,categoryId));

@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.order;
 
 import com.backend.elearning.domain.cart.Cart;
+import com.backend.elearning.domain.statitic.Statistic;
 import com.backend.elearning.domain.statitic.StatisticCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         from OrderDetail  od 
         join od.course c 
         join c.user 
-        where c.user = :email
+        where c.user.email = :email
     """)
     long countByInstructor(@Param("email") String email);
     @Query("""
@@ -42,8 +43,40 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         where o.id = :orderId
     """)
     List<OrderDetail> findByOrderId (@Param("orderId") Long orderId);
+    @Query("""
+        SELECT new com.backend.elearning.domain.statitic.Statistic(
+                      EXTRACT(MONTH FROM o.createdAt),
+                      SUM(od.price)
+                  )
+        FROM OrderDetail od
+        join od.order o
+        join od.course c 
+        join c.user u 
+        WHERE 
+            (EXTRACT(YEAR FROM o.createdAt) = :year)
+            AND u.email = :email
+        GROUP BY EXTRACT(MONTH FROM o.createdAt)
+    """)
+    List<Statistic> findByYearAndEmail(@Param("year") int year, @Param("email")String email);
 
-
+    @Query("""
+        SELECT new com.backend.elearning.domain.statitic.Statistic(
+                      EXTRACT(DAY FROM o.createdAt),
+                      SUM(od.price)
+                  )
+        FROM OrderDetail od 
+        join od.order o
+        join od.course c 
+        join c.user u 
+        WHERE EXTRACT(MONTH FROM o.createdAt) = :month 
+            AND EXTRACT(YEAR FROM o.createdAt) = :year
+            AND u.email = :email
+            and o.status = 'SUCCESS'
+        GROUP BY EXTRACT(DAY FROM o.createdAt)
+    """)
+    List<Statistic> findByMonthAndYearAndEmail(@Param("month") int month,
+                                       @Param("year") int year, @Param("email")String email
+    );
 
     @Query("""
         select new com.backend.elearning.domain.statitic.StatisticCourse(od.course.title, count(*), sum(od.price))

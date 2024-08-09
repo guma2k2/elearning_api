@@ -35,7 +35,7 @@ public class JWTUtil {
             String subject,
             Map<String, Object> claims) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, 15);
+        calendar.add(Calendar.DAY_OF_WEEK, 15);
         Date expirationDate = calendar.getTime();
         String token = Jwts
                 .builder()
