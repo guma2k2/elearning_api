@@ -5,7 +5,7 @@ public final class Constants {
     public final class ERROR_CODE {
 
         public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
-
+        public static final String ORDER_NOT_FOUND = "ORDER_NOT_FOUND";
         public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
         public static final String QUESTION_NOT_FOUND = "QUESTION_NOT_FOUND";
         public static final String COURSE_NOT_FOUND = "COURSE_NOT_FOUND";
@@ -35,7 +35,7 @@ public final class Constants {
     }
 
     public final class PageableConstant {
-        public static final String DEFAULT_PAGE_SIZE = "10";
+        public static final String DEFAULT_PAGE_SIZE = "5";
 
         public static final String DEFAULT_COURSE_PAGE_SIZE = "5";
         public static final String DEFAULT_PAGE_SIZE_REVIEW = "4";

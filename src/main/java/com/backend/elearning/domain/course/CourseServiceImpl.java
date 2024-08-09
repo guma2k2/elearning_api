@@ -35,9 +35,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,7 +66,7 @@ public class CourseServiceImpl implements CourseService{
 
     private final static String LECTURE_TYPE = "lecture";
     private final static String QUIZ_TYPE = "quiz";
-
+    private final String sortBy = "updatedAt";
     public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
@@ -85,6 +88,8 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Sort sort = Sort.by(sortBy);
+        sort.descending();
         if (email != null) {
             User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND));
             if (user.getRole().equals(ERole.ROLE_ADMIN)) {
@@ -92,7 +97,7 @@ public class CourseServiceImpl implements CourseService{
             }
         }
         List<CourseVM> courseVMS = new ArrayList<>();
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
         Page<Course> coursePage = courseRepository.findAllCustomByRole(pageable, email, keyword);
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
@@ -110,32 +115,40 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM create(CoursePostVM coursePostVM) {
+        log.info(coursePostVM.toString());
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         if (courseRepository.countExistByTitle(coursePostVM.title(), null) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
-        Category category = categoryRepository.findById(coursePostVM.categoryId()).orElseThrow();
-        Topic topic = topicRepository.findById(coursePostVM.topicId()).orElseThrow();
+        Category category = categoryRepository.findById(coursePostVM.categoryId()).orElseThrow(
+                () -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND)
+        );
+        Topic topic = topicRepository.findById(coursePostVM.topicId()).orElseThrow(
+                () -> new NotFoundException(Constants.ERROR_CODE.TOPIC_NOT_FOUND)
+        );
         User user = userService.getByEmail(email);
-
         String slug = ConvertTitleToSlug.convertTitleToSlug(coursePostVM.title());
         Course course = Course.builder()
                 .title(coursePostVM.title())
                 .category(category)
-
                 .topic(topic)
                 .user(user)
                 .slug(slug)
                 .build();
+        if (!course.isFree()) {
+            course.setPrice(coursePostVM.price());
+        }
+        course.setCreatedAt(LocalDateTime.now());
+        course.setUpdatedAt(LocalDateTime.now());
         return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>(),0, 0.0,0,"", null, false);
     }
 
     @Override
     public CourseVM update(CoursePostVM coursePutVM, Long userId, Long courseId) {
         Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow();
-        if (oldCourse.getUser().getId() != userId) {
-            throw new BadRequestException("You don't have permission to edit this course");
-        }
+//        if (oldCourse.getUser().getId() != userId) {
+//            throw new BadRequestException("You don't have permission to edit this course");
+//        }
         if (courseRepository.countExistByTitle(coursePutVM.title(), courseId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
@@ -155,10 +168,16 @@ public class CourseServiceImpl implements CourseService{
         oldCourse.setDescription(coursePutVM.description());
         oldCourse.setTargetAudiences(coursePutVM.targetAudiences());
         oldCourse.setFree(coursePutVM.free());
+        oldCourse.setUpdatedAt(LocalDateTime.now());
+        if (!coursePutVM.free()) {
+            oldCourse.setPrice(coursePutVM.price());
+        }
         if (coursePutVM.image() != "") {
             oldCourse.setImageId(coursePutVM.image());
         }
-        oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
+        if (coursePutVM.level() != null && !coursePutVM.level().isBlank()) {
+            oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
+        }
         return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>(),0, 0.0,0,"", null , false);
     }
 
@@ -305,7 +324,8 @@ public class CourseServiceImpl implements CourseService{
                                                          String categoryName, Integer topicId
     ) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Course> coursePage = courseRepository.findByMultiQuery(pageable, title, rating, level, free, categoryName, topicId);
+        Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
+                courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
         List<Course> courses = coursePage.getContent();
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
             List<Review> reviews = course.getReviews();
@@ -369,6 +389,12 @@ public class CourseServiceImpl implements CourseService{
             throw new BadRequestException("Course had bought");
         }
         courseRepository.delete(course);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatusCourse(boolean status, Long courseId) {
+        courseRepository.updateStatusCourse(status, courseId);
     }
 
 

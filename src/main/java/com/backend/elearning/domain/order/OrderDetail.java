@@ -25,5 +25,5 @@ public class OrderDetail {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    private Double price;
+    private Long price;
 }

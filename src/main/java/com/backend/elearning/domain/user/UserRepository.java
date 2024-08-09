@@ -1,5 +1,8 @@
 package com.backend.elearning.domain.user;
 
+import com.backend.elearning.domain.student.Student;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +21,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.email = :email AND (:id is null or u.id != :id)
             """)
     Long countByExistedEmail (@Param("email") String email, @Param("id") Long id) ;
-
+    @Query(value = """
+            select c
+            from User c
+            where COALESCE(:keyword, '') = '' OR LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            """)
+    Page<User> findAllCustom(Pageable pageable, @Param("keyword") String keyword);
 
     @Query("""
         select u 

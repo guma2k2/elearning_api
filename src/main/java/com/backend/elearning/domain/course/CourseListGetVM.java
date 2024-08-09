@@ -13,7 +13,7 @@ public record CourseListGetVM(
         double averageRating,
         int ratingCount,
         String image,
-        double price,
+        Long price,
         String createdBy
 ) {
 
@@ -26,6 +26,8 @@ public record CourseListGetVM(
     ) {
         User user = course.getUser();
         String fullName = user.getFirstName() + " " + user.getLastName();
-        return new CourseListGetVM(course.getId(), course.getTitle(), course.getHeadline() ,course.getLevel().toString(), course.getSlug(), totalDurationCourse, totalLectures, averageRating, ratingCount, course.getImageId(), course.getPrice(), fullName);
+        Long price = course.getPrice() != null ? course.getPrice() : 0L;
+
+        return new CourseListGetVM(course.getId(), course.getTitle(), course.getHeadline() ,course.getLevel().toString(), course.getSlug(), totalDurationCourse, totalLectures, averageRating, ratingCount, course.getImageId(), price, fullName);
     }
 }

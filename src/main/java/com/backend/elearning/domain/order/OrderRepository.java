@@ -26,6 +26,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         """)
     List<Order> findAllByStudent(@Param("email")String email);
 
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.coupon c
+            left join fetch o.orderDetails 
+            where o.id = :id
+        """)
+    Optional<Order> findByIdCustom(@Param("id")Long orderId);
 
     @Query("""
             select o
@@ -33,9 +42,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.student s 
             left join fetch o.coupon 
             left join fetch o.orderDetails 
-            where (:orderId IS NULL or o.id = :orderId)
         """)
-    Page<Order> findAllCustom(Pageable pageable, @Param("orderId") Long orderId);
+    Page<Order> findAllCustom(Pageable pageable);
+
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.coupon 
+            left join fetch o.orderDetails 
+            where o.id = :orderId
+        """)
+    Page<Order> findAllCustomWithId(Pageable pageable, @Param("orderId") Long orderId);
 
 
     @Query("""

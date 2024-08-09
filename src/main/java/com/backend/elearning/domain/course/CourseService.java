@@ -31,4 +31,6 @@ public interface CourseService {
     List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId);
 
     void delete(Long id);
+
+    void updateStatusCourse(boolean status, Long courseId);
 }

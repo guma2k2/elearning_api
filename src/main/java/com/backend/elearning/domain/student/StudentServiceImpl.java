@@ -29,7 +29,8 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public PageableData<StudentListGetVM> getStudents(int pageNum, int pageSize, String keyword) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Student> studentPage = studentRepository.findAllCustom(pageable, keyword);
+        Page<Student> studentPage = keyword != null ? studentRepository.findAllWithKeyword(pageable, keyword) :
+                studentRepository.findAll(pageable);
         List<Student> students = studentPage.getContent();
         List<StudentListGetVM> studentListGetVMS = students.stream().map((student) -> StudentListGetVM.fromModelStudent(student)).toList();
         return new PageableData<>(

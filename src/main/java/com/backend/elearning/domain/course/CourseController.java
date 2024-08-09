@@ -74,6 +74,11 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseVM);
     }
 
+    @PutMapping("/admin/courses/{id}/status/{status}")
+    public ResponseEntity<Void> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long courseId){
+        courseService.updateStatusCourse(status, courseId);
+        return ResponseEntity.noContent().build();
+    }
     @PutMapping("/admin/courses/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Accepted", content =

@@ -20,7 +20,7 @@ public record CourseVM(
         String createdAt,
         String updatedAt,
         boolean free,
-        Double price,
+        Long price,
         boolean isPublish,
         Integer categoryId,
         Integer topicId,
@@ -46,15 +46,18 @@ public record CourseVM(
         String categoryParentName = course.getCategory().getParent() != null ? course.getCategory().getParent().getName() : "";
         String breadcrumb = categoryParentName.concat("-").concat(categoryChildName).concat("-").concat(topicName);
         User user = course.getUser();
-        String createdBy = user.getFirstName() + " " + user.getLastName()   ;
+        String createdBy = user.getFirstName() + " " + user.getLastName();
+        Long price = course.getPrice() != null ? course.getPrice() : 0L;
+        String createdAt = course.getCreatedAt() != null ? course.getCreatedAt().toString() : "";
+        String updatedAt = course.getUpdatedAt() != null ? course.getUpdatedAt().toString() : "";
         return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getSlug(), course.getObjectives(), course.getRequirements(),
                 course.getTargetAudiences(),
                 course.getDescription(),level,
                 course.getImageId(),
-                course.getCreatedAt().toString(),
-                course.getUpdatedAt().toString() ,
+                createdAt,
+                updatedAt,
                 course.isFree(),
-                course.getPrice(),
+                price,
                 course.isPublish(),
                 course.getCategory().getId(),
                 course.getTopic().getId(),

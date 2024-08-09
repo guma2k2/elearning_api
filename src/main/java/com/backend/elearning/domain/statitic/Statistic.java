@@ -4,11 +4,10 @@ public class Statistic {
    private int time;
    private long total;
 
-   public Statistic(int time, long total) {
+   public Statistic(int time, Long total) {
       this.time = time;
       this.total = total;
    }
-
    public Statistic() {
    }
 

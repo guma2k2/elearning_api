@@ -3,7 +3,7 @@ package com.backend.elearning.domain.user;
 import com.backend.elearning.domain.common.PageableData;
 
 public interface UserService {
-    PageableData<UserVm> getUsers(int pageNum, int pageSize);
+    PageableData<UserVm> getUsers(int pageNum, int pageSize, String keyword);
     UserGetDetailVm getUser(Long userId);
     UserVm create (UserPostVm userPostVm);
     UserVm update (UserPutVm userPutVm, Long userId);

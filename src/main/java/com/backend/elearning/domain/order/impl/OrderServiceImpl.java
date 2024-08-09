@@ -1,5 +1,7 @@
 package com.backend.elearning.domain.order.impl;
 
+import com.backend.elearning.domain.cart.Cart;
+import com.backend.elearning.domain.cart.CartRepository;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.coupon.Coupon;
 import com.backend.elearning.domain.course.Course;
@@ -8,8 +10,6 @@ import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.order.*;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
-import com.backend.elearning.domain.user.ERole;
-import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -31,19 +31,22 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final StudentRepository studentRepository;
     private final CourseRepository  courseRepository;
-
     private final UserRepository userRepository;
 
+    private final CartRepository cartRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository) {
+
+    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
     }
 
     @Override
+    @Transactional
     public Long createOrder(OrderPostDto orderPostDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Student student = studentRepository.findByEmail( email).orElseThrow();
@@ -64,6 +67,12 @@ public class OrderServiceImpl implements OrderService {
                     .price(orderPostDetail.price())
                     .build();
             orderDetails.add(orderDetail);
+            List<Cart> carts = cartRepository.findByUserEmailWithBuyLater(email);
+            if (carts.size() > 0) {
+                for (Cart cart: carts) {
+                    cartRepository.delete(cart);
+                }
+            }
         }
         orderDetailRepository.saveAll(orderDetails);
         return savedOrder.getId();
@@ -76,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderVM> orderVMS = orders.stream().map(order -> {
             Long orderId = order.getId();
             Coupon coupon = order.getCoupon();
-            AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
+            AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
             List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
             List<OrderDetailVM> orderDetailVMS = orderDetails.stream().map(orderDetail -> {
                 Long courseId = orderDetail.getCourse().getId();
@@ -85,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
                 totalPrice.updateAndGet(v -> v + orderDetail.getPrice());
                 return OrderDetailVM.fromModel(orderDetail, courseVM);
             }).toList();
-            Double total = totalPrice.get();
+            Long total = totalPrice.get();
             if (coupon != null) {
                 total = total - coupon.getDiscountPercent() * total / 100;
             }
@@ -106,12 +115,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Order> orderPage = orderRepository.findAllCustom(pageable, keyword);
+        Page<Order> orderPage = keyword != null ?
+                orderRepository.findAllCustomWithId(pageable, keyword) :
+                orderRepository.findAllCustom(pageable);
         List<Order> orders = orderPage.getContent();
         List<OrderVM> orderVMS = orders.stream().map(order -> {
             Long orderId = order.getId();
             Coupon coupon = order.getCoupon();
-            AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
+            AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
             List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
             List<OrderDetailVM> orderDetailVMS = orderDetails.stream().map(orderDetail -> {
                 Long courseId = orderDetail.getCourse().getId();
@@ -120,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
                 totalPrice.updateAndGet(v -> v + orderDetail.getPrice());
                 return OrderDetailVM.fromModel(orderDetail, courseVM);
             }).toList();
-            Double total = totalPrice.get();
+            Long total = totalPrice.get();
             if (coupon != null) {
                 total = total - coupon.getDiscountPercent() * total / 100;
             }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class TopicServiceImpl implements TopicService{
     private final CategoryRepository categoryRepository;
 
     private final CourseRepository courseRepository ;
+    private final String sortBy = "updatedAt";
 
     public TopicServiceImpl(TopicRepository topicRepository, CategoryRepository categoryRepository, CourseRepository courseRepository) {
         this.topicRepository = topicRepository;
@@ -42,6 +44,8 @@ public class TopicServiceImpl implements TopicService{
     @Override
     public PageableData<TopicVM> getPageableTopics(int pageNum, int pageSize, String keyword) {
         List<TopicVM> topicVMS = new ArrayList<>();
+        Sort sort = Sort.by(sortBy);
+        sort.descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Topic> topicPage = topicRepository.findAllCustom(pageable, keyword);
         List<Topic> topics = topicPage.getContent();
@@ -60,7 +64,7 @@ public class TopicServiceImpl implements TopicService{
     @Override
     public TopicVM create(TopicPostVM topicPostVM) {
         if (topicRepository.countByNameAndId(topicPostVM.name(), null) > 0){
-            throw new DuplicateException(Constants.ERROR_CODE.TOPIC_NAME_DUPLICATED);
+            throw new DuplicateException(Constants.ERROR_CODE.TOPIC_NAME_DUPLICATED, topicPostVM.name());
         }
         Topic topic = Topic.builder()
                 .name(topicPostVM.name())
@@ -97,7 +101,7 @@ public class TopicServiceImpl implements TopicService{
     @Override
     public void update(TopicPostVM topicPostVM, Integer topicId) {
         if (topicRepository.countByNameAndId(topicPostVM.name(), topicId) > 0){
-            throw new DuplicateException(Constants.ERROR_CODE.TOPIC_NAME_DUPLICATED);
+            throw new DuplicateException(Constants.ERROR_CODE.TOPIC_NAME_DUPLICATED, topicPostVM.name());
         }
         Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.TOPIC_NOT_FOUND));
         topic.setName(topicPostVM.name());

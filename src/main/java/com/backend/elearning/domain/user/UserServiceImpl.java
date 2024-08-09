@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService{
     private final ReviewService reviewService;
     private final PasswordEncoder passwordEncoder;
     private final LearningCourseRepository learningCourseRepository;
+    private final String sortBy = "updatedAt";
 
 
     public UserServiceImpl(UserRepository userRepository, ReviewService reviewService, PasswordEncoder passwordEncoder, LearningCourseRepository learningCourseRepository) {
@@ -46,9 +48,11 @@ public class UserServiceImpl implements UserService{
 
 
     @Override
-    public PageableData<UserVm> getUsers(int pageNum, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<User> userPage = userRepository.findAll(pageable);
+    public PageableData<UserVm> getUsers(int pageNum, int pageSize, String keyword) {
+        Sort sort = Sort.by(sortBy);
+        sort.descending();
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+        Page<User> userPage = userRepository.findAllCustom(pageable, keyword);
         List<User> users = userPage.getContent();
         List<UserVm> userVms = users.stream().map(UserVm::fromModel).toList();
         return new PageableData<>(
@@ -106,6 +110,7 @@ public class UserServiceImpl implements UserService{
         if (userRepository.countByExistedEmail(userPutVm.email(), userId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userPutVm.email());
         }
+
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, userId));
         user.setEmail(userPutVm.email());
         user.setFirstName(userPutVm.firstName());
