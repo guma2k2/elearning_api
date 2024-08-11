@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.order;
 
 import com.backend.elearning.domain.student.Student;
+import com.backend.elearning.utils.DateTimeUtils;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ public record OrderVM(
     public static OrderVM fromModel(Order order, List<OrderDetailVM> orderDetails, Long total) {
         String student = order.getStudent().getEmail();
         String coupon = order.getCoupon() != null ? order.getCoupon().getCode() : "No coupon";
-        return new OrderVM(order.getId(),student, coupon, order.getCreatedAt().toString(), order.getStatus().toString(), orderDetails, total);
+        String createdAt = order.getCreatedAt() != null ?
+                DateTimeUtils.convertLocalDateTimeToString(order.getCreatedAt()) : "";
+        return new OrderVM(order.getId(),student, coupon, createdAt, order.getStatus().toString(), orderDetails, total);
     }
 }

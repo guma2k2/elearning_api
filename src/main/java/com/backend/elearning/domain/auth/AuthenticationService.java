@@ -20,6 +20,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,7 +41,7 @@ public class AuthenticationService {
 
     private final StudentRepository studentRepository;
     private final JWTUtil jwtUtil;
-
+    private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
 
     private final PasswordEncoder passwordEncoder;
@@ -62,16 +64,23 @@ public class AuthenticationService {
 
     private final String GRANT_TYPE = "authorization_code";
 
-    public AuthenticationService(UserRepository userRepository, JWTUtil jwtUtil, RestTemplate restTemplate, StudentRepository studentRepository, PasswordEncoder passwordEncoder, MailService mailService) {
+    public AuthenticationService(UserRepository userRepository, JWTUtil jwtUtil, RestTemplate restTemplate, StudentRepository studentRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, MailService mailService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.restTemplate = restTemplate;
         this.studentRepository = studentRepository;
+        this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
+        );
         Optional<User> user = userRepository.findByEmail(request.email());
         Optional<Student> student = studentRepository.findByEmail(request.email());
         if (!user.isPresent() && !student.isPresent()) {
