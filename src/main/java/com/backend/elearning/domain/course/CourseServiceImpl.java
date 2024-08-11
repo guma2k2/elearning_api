@@ -323,10 +323,12 @@ public class CourseServiceImpl implements CourseService{
                                                          Boolean[] free,
                                                          String categoryName, Integer topicId
     ) {
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
-                courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
-        List<Course> courses = coursePage.getContent();
+//        Pageable pageable = PageRequest.of(pageNum, pageSize);
+//        Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
+//                courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
+//        List<Course> courses = coursePage.getContent();
+        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
+                courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
             List<Review> reviews = course.getReviews();
             int ratingCount = reviews.size();
@@ -349,18 +351,25 @@ public class CourseServiceImpl implements CourseService{
             String formattedHours = String.format("%.1f hours", roundedHours);
             return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
         }).toList();
+//        return new PageableData(
+//                pageNum,
+//                pageSize,
+//                (int) coursePage.getTotalElements(),
+//                coursePage.getTotalPages(),
+//                courseListGetVMS
+//        );
         return new PageableData(
                 pageNum,
                 pageSize,
-                (int) coursePage.getTotalElements(),
-                coursePage.getTotalPages(),
+                (int) courses.size(),
+                courses.size()/ pageSize,
                 courseListGetVMS
         );
     }
 
     @Override
     public List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId) {
-        List<Course> courses = courseRepository.findByCategoryId(categoryId);
+        List<Course> courses = courseRepository.findByCategoryIdWithStatus(categoryId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
         return courseListGetVMS;
     }

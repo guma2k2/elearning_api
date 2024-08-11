@@ -4,6 +4,7 @@ import com.backend.elearning.domain.cart.Cart;
 import com.backend.elearning.domain.cart.CartRepository;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.coupon.Coupon;
+import com.backend.elearning.domain.coupon.CouponRepository;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseGetVM;
 import com.backend.elearning.domain.course.CourseRepository;
@@ -32,16 +33,17 @@ public class OrderServiceImpl implements OrderService {
     private final StudentRepository studentRepository;
     private final CourseRepository  courseRepository;
     private final UserRepository userRepository;
-
+    private final CouponRepository couponRepository;
     private final CartRepository cartRepository;
 
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository, CartRepository cartRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository, CouponRepository couponRepository, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.couponRepository = couponRepository;
         this.cartRepository = cartRepository;
     }
 
@@ -49,12 +51,16 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Long createOrder(OrderPostDto orderPostDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Coupon coupon = orderPostDto.couponCode() != null ? couponRepository.findByCode(orderPostDto.couponCode()).orElseThrow() : null;
         Student student = studentRepository.findByEmail( email).orElseThrow();
         Order order = Order.builder()
                 .status(EOrderStatus.PENDING)
                 .student(student)
                 .createdAt(LocalDateTime.now())
                 .build();
+        if (coupon != null) {
+            order.setCoupon(coupon);
+        }
         Order savedOrder = orderRepository.saveAndFlush(order);
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (OrderDetailPostDto orderPostDetail: orderPostDto.orderDetails()) {

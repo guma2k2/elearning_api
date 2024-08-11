@@ -3,6 +3,7 @@ package com.backend.elearning.domain.course;
 import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserProfileVM;
+import com.backend.elearning.utils.DateTimeUtils;
 
 import java.util.List;
 
@@ -48,8 +49,10 @@ public record CourseVM(
         User user = course.getUser();
         String createdBy = user.getFirstName() + " " + user.getLastName();
         Long price = course.getPrice() != null ? course.getPrice() : 0L;
-        String createdAt = course.getCreatedAt() != null ? course.getCreatedAt().toString() : "";
-        String updatedAt = course.getUpdatedAt() != null ? course.getUpdatedAt().toString() : "";
+        String createdAt = course.getCreatedAt() != null ?
+                DateTimeUtils.convertLocalDateTimeToString(course.getCreatedAt()) : "";
+        String updatedAt = course.getUpdatedAt() != null ?
+                DateTimeUtils.convertLocalDateTimeToString(course.getUpdatedAt()) : "";
         return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getSlug(), course.getObjectives(), course.getRequirements(),
                 course.getTargetAudiences(),
                 course.getDescription(),level,

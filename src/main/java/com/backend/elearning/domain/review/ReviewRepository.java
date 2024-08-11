@@ -46,7 +46,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             from Review r
             left join fetch r.course c
             left join fetch r.student u
-            where c.id = :courseId
+            where c.id = :courseId and r.status = true
             """)
     Page<Review> findByCourseId(@Param("courseId") Long courseId, Pageable pageable);
 

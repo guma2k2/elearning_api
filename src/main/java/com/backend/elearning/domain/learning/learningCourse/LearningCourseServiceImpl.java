@@ -69,6 +69,7 @@ public class LearningCourseServiceImpl implements LearningCourseService {
     @Override
     public void createLearningCourseForStudent(Long courseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info(email);
         if (!learningCourseRepository.findByStudentAndCourse(email, courseId).isPresent()) {
             Student student = studentRepository.findByEmail(email).orElseThrow();
             Course course = courseRepository.findById(courseId).orElseThrow();

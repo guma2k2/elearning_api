@@ -9,6 +9,7 @@ public class DateTimeUtils {
     public static final String PATTERN_PAYMENT = "yyyyMMddHHmmss";
 
     public static final String PATTERN_NORMAL = "yyyy-MM-dd HH:mm:ss";
+    public static final String PATTERN_STRING = "dd/MM/yyyy HH:mm:ss";
 
     public static final String MONTH_YEAR= "tháng %s năm %s";
 
@@ -37,6 +38,8 @@ public class DateTimeUtils {
 
 
     public static String convertLocalDateTimeToString(LocalDateTime localDateTime) {
-        return null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_STRING);
+        String formattedDateTime = localDateTime.format(formatter);
+        return formattedDateTime;
     }
 }

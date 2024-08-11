@@ -3,15 +3,15 @@ package com.backend.elearning.domain.statitic;
 public class StatisticCourse {
     private String course;
     private Long quantity;
-    private Double price;
+    private Long price;
 
-    public StatisticCourse() {
-    }
-
-    public StatisticCourse(String course, Long quantity, Double price) {
+    public StatisticCourse(String course, Long quantity, Long price) {
         this.course = course;
         this.quantity = quantity;
         this.price = price;
+    }
+
+    public StatisticCourse() {
     }
 
     public String getCourse() {
@@ -30,11 +30,11 @@ public class StatisticCourse {
         this.quantity = quantity;
     }
 
-    public Double getPrice() {
+    public Long getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
 }
