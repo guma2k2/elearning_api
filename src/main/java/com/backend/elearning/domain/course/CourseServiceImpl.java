@@ -58,12 +58,10 @@ public class CourseServiceImpl implements CourseService{
     private final LearningLectureRepository learningLectureRepository;
     private final LearningQuizRepository learningQuizRepository;
     private final LearningCourseRepository learningCourseRepository;
-
     private final OrderDetailRepository orderDetailRepository;
     private final CartRepository cartRepository;
     private final UserService userService;
     private final UserRepository userRepository;
-
     private final static String LECTURE_TYPE = "lecture";
     private final static String QUIZ_TYPE = "quiz";
     private final String sortBy = "updatedAt";
@@ -202,8 +200,7 @@ public class CourseServiceImpl implements CourseService{
             totalDurationCourse.addAndGet(totalSeconds);
 
         });
-        double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
-        String formattedHours = String.format("%.1f hours", roundedHours);
+        String formattedHours = convertSeconds(totalDurationCourse.get());
 
 
         List<SectionVM> sections = new ArrayList<>(course.getSections()
@@ -231,14 +228,14 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseListGetVM getCourseListGetVMById(Long id) {
-        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException("course not found"));
+        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, id));
         Long courseId = course.getId();
         List<Review> reviews = reviewService.findByCourseId(courseId);
         int ratingCount = reviews.size();
         Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
         double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
 
-        // get totalCur, total duration of course by section
+        // get totalCurriculum, total duration of course by section
         AtomicInteger totalCurriculumCourse = new AtomicInteger();
         AtomicInteger totalDurationCourse = new AtomicInteger();
 
@@ -254,8 +251,7 @@ public class CourseServiceImpl implements CourseService{
                     .sum();
             totalDurationCourse.addAndGet(totalSeconds);
         });
-        double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
-        String formattedHours = String.format("%.1f hours", roundedHours);
+        String formattedHours = convertSeconds(totalDurationCourse.get());
 
         return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
     }
@@ -263,11 +259,11 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public CourseLearningVm getCourseBySlug(String slug) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//        String email = "thuanngo3072002@gmail.com";
-        Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow();
+        Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow(
+                () -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, slug)
+        );
 
         AtomicInteger totalCurriculumCourse = new AtomicInteger();
-
         List<SectionVM> sections = new ArrayList<>(course.getSections()
                 .stream().map(section -> sectionService.getById(section.getId(), email)).toList());
         sections.forEach(sectionVM -> {
@@ -296,9 +292,9 @@ public class CourseServiceImpl implements CourseService{
             var quiz = maxAccessTimeByEmailAndCourseSlugQuiz.get();
             return new CourseLearningVm(courseVM, quiz.getQuiz().getSection().getId(), quiz.getQuiz().getId(), null, QUIZ_TYPE);
         }
-        if (sections.size() == 0) {
-            throw new BadRequestException("course dont have lecture");
-        }
+//        if (sections.size() == 0) {
+//            throw new BadRequestException("course dont have lecture");
+//        }
         Long sectionId = sections.get(0).id();
         Long curriculumId = sections.get(0).curriculums().get(0).getId();
         if (sections.get(0).curriculums().get(0).getType().equals(ECurriculumType.lecture)){
@@ -347,17 +343,9 @@ public class CourseServiceImpl implements CourseService{
                         .sum();
                 totalDurationCourse.addAndGet(totalSeconds);
             });
-            double roundedHours = Math.round(totalDurationCourse.get() * 2) / 7200.0;
-            String formattedHours = String.format("%.1f hours", roundedHours);
+            String formattedHours = convertSeconds(totalDurationCourse.get());
             return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
         }).toList();
-//        return new PageableData(
-//                pageNum,
-//                pageSize,
-//                (int) coursePage.getTotalElements(),
-//                coursePage.getTotalPages(),
-//                courseListGetVMS
-//        );
         return new PageableData(
                 pageNum,
                 pageSize,
@@ -378,24 +366,25 @@ public class CourseServiceImpl implements CourseService{
     public void delete(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         if (course.getSections().size() > 0 ) {
-            throw new BadRequestException("Course had section");
+            throw new BadRequestException(Constants.ERROR_CODE.COURSE_HAD_SECTION, id);
         }
 
         List<LearningCourse> learningCourses = learningCourseRepository.findByCourseId(id);
 
 
         if (learningCourses.size() > 0) {
-            throw new BadRequestException("Course had person who is learning");
+            throw new BadRequestException(Constants.ERROR_CODE.COURSE_HAD_BEEN_BOUGHT, id);
         }
 
         List<Cart> carts = cartRepository.findByCourseId(id);
         if (carts.size() > 0) {
-            throw new BadRequestException("Course had cart");
+            throw new BadRequestException(Constants.ERROR_CODE.COURSE_HAD_CART, id);
+
         }
 
         List<OrderDetail> orderDetails = orderDetailRepository.findByCourseId(id);
         if (orderDetails.size() > 0) {
-            throw new BadRequestException("Course had bought");
+            throw new BadRequestException(Constants.ERROR_CODE.COURSE_HAD_BEEN_BOUGHT, id);
         }
         courseRepository.delete(course);
     }
@@ -404,6 +393,18 @@ public class CourseServiceImpl implements CourseService{
     @Transactional
     public void updateStatusCourse(boolean status, Long courseId) {
         courseRepository.updateStatusCourse(status, courseId);
+    }
+
+    private String convertSeconds(int seconds) {
+        if (seconds < 3600) {
+            int minutes = seconds / 60;
+            int remainingSeconds = seconds % 60;
+            return minutes + " phút " + remainingSeconds + " giây";
+        } else {
+            int hours = seconds / 3600;
+            int minutes = (seconds % 3600) / 60;
+            return hours + " giờ " + minutes + " phút";
+        }
     }
 
 
