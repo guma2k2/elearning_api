@@ -26,6 +26,7 @@ public class Note {
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @Column(length = 500)
     private String content;
 
     private int time;

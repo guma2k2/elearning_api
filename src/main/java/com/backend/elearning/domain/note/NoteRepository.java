@@ -31,4 +31,11 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     """)
     List<Note> findByCourse(@Param("courseId") Long courseId);
 
+    @Query("""
+        select n
+        from Note n 
+        join fetch n.lecture l 
+    """)
+    Optional<Note> findByIdCustom(@Param("noteId") Long noteId);
+
 }
