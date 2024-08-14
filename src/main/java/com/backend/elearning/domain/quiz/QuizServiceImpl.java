@@ -7,6 +7,8 @@ import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class QuizServiceImpl implements QuizService{
     private final QuizRepository quizRepository;
@@ -27,6 +29,8 @@ public class QuizServiceImpl implements QuizService{
                 .description(quizPostVM.description())
                 .section(section)
                 .build();
+        quiz.setCreatedAt(LocalDateTime.now());
+        quiz.setUpdatedAt(LocalDateTime.now());
         Quiz savedQuiz = quizRepository.save(quiz);
         return new QuizVM(savedQuiz);
     }
@@ -41,6 +45,7 @@ public class QuizServiceImpl implements QuizService{
         quiz.setTitle(quizPutVM.title());
         quiz.setDescription(quizPutVM.description());
         quiz.setNumber(quizPutVM.number());
+        quiz.setUpdatedAt(LocalDateTime.now());
         Quiz savedQuiz = quizRepository.saveAndFlush(quiz);
         return new QuizVM(savedQuiz);
     }

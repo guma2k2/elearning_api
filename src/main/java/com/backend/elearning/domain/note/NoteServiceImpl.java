@@ -40,16 +40,16 @@ public class NoteServiceImpl implements NoteService {
                 .time(notePostVM.second())
                 .build();
 
-        return NoteVM.fromModel(noteRepository.saveAndFlush(note));
+        return NoteVM.fromModel(noteRepository.saveAndFlush(note), lecture.getId());
     }
 
     @Override
     public NoteVM update(NotePostVM notePostVM) {
-        Note note = noteRepository.findById(notePostVM.id()).orElseThrow(() ->
+        Note note = noteRepository.findByIdCustom(notePostVM.id()).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.NOTE_NOT_FOUND, notePostVM.lectureId()));
         note.setContent(notePostVM.content());
         note.setTime(notePostVM.second());
-        return NoteVM.fromModel(noteRepository.saveAndFlush(note));
+        return NoteVM.fromModel(noteRepository.saveAndFlush(note), null);
     }
 
     @Override
@@ -60,14 +60,14 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public List<NoteVM> getBySectionStudent(Long sectionId) {
         List<Note> notes = noteRepository.findBySection(sectionId);
-        List<NoteVM> noteVMS = notes.stream().map(note -> NoteVM.fromModel(note)).toList();
+        List<NoteVM> noteVMS = notes.stream().map(note -> NoteVM.fromModel(note, null)).toList();
         return noteVMS;
     }
 
     @Override
     public List<NoteVM> getAllByCourse(Long courseId) {
         List<Note> notes = noteRepository.findByCourse(courseId);
-        List<NoteVM> noteVMS = notes.stream().map(note -> NoteVM.fromModel(note)).toList();
+        List<NoteVM> noteVMS = notes.stream().map(note -> NoteVM.fromModel(note, null)).toList();
         return noteVMS;
     }
 }
