@@ -1,7 +1,7 @@
 spring:
   datasource:
     username: root
-    url: jdbc:postgresql://elearning-postgres:5432/elearning
+    url: jdbc:postgresql://elearning-db:5432/elearning
     password: 'password'
   mail:
     properties:
@@ -32,9 +32,9 @@ spring:
       max-request-size: 100MB
       max-file-size: 100MB
 ui:
-  url: "http://localhost:5173"
+  url: "http://localhost"
   forgot-password:
-    url: ${ui.url}/forgotpassword
+    url: ${ui.url}/password-confirm
 outbound:
   identity:
     client-id: "267032846386-hchqmc5j59qi1ti287asu2bgb9fafqk1.apps.googleusercontent.com"
@@ -50,6 +50,5 @@ payment:
     version: "2.1.0"
     command: "pay"
     orderType: "bill"
-
 server:
   port: 8082
