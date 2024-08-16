@@ -34,7 +34,7 @@ spring:
 ui:
   url: "http://localhost:5173"
   forgot-password:
-    url: ${ui.url}/forgotpassword
+    url: ${ui.url}/password-confirm
 outbound:
   identity:
     client-id: "267032846386-hchqmc5j59qi1ti287asu2bgb9fafqk1.apps.googleusercontent.com"

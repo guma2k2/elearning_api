@@ -46,7 +46,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteVM update(NotePostVM notePostVM) {
         Note note = noteRepository.findByIdCustom(notePostVM.id()).orElseThrow(() ->
-                new NotFoundException(Constants.ERROR_CODE.NOTE_NOT_FOUND, notePostVM.lectureId()));
+                new NotFoundException(Constants.ERROR_CODE.NOTE_NOT_FOUND, notePostVM.id()));
         note.setContent(notePostVM.content());
         note.setTime(notePostVM.second());
         return NoteVM.fromModel(noteRepository.saveAndFlush(note), null);
