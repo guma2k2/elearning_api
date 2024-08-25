@@ -30,14 +30,12 @@ Elearning website is a full-stack application that enables student to search, bu
 #### Class diagram
 ![Class diagram](screenshots/class-diagram.png)
 
-#### Spring security diagram
+#### Usecasae diagram
 ![Security diagram](screenshots/security.png)
 
-#### Backend pipeline
+#### Sequence pipeline
 ![Security diagram](screenshots/be-pipeline.png)
 
-#### Backend pipeline
-![Security diagram](screenshots/fe-pipeline.png)
 
 ## Technologies Used
 
