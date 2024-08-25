@@ -28,7 +28,7 @@ Elearning website is a full-stack application that enables student to search, bu
   
 
 #### Class diagram
-![Class diagram](screenshots/class-diagram.png)
+![Class diagram](screenshots/class-diagram.drawio.svg)
 
 #### Usecasae diagram
 ![Security diagram](screenshots/security.png)
