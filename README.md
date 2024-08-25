@@ -30,10 +30,10 @@ The Elearning website is a comprehensive full-stack application designed to faci
 ![Class diagram](screenshots/class-diagram.drawio.svg)
 
 #### Usecasae diagram
-![Security diagram](screenshots/security.png)
+![Security diagram](screenshots/usecase-diagram.png)
 
 #### Sequence diagram
-![Security diagram](screenshots/be-pipeline.png)
+![Security diagram](screenshots/sequence-diagram.drawio.png)
 
 
 ## Technologies Used
