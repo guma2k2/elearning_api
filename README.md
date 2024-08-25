@@ -5,8 +5,8 @@
 - [Overview](#overview)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
-    - [Backend (elearning-api)](#backend-book-social-network)
-    - [Frontend (elearning-ui)](#frontend-book-social-network-ui)
+    - [Backend (elearning-api)]
+    - [Frontend (elearning-ui)]
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Contributors](#contributors)
@@ -14,32 +14,31 @@
 
 ## Overview
 
-Elearning website is a full-stack application that enables student to search, buy and learn course online, meanwhile admin or instructor can create their courses. It offers features such as user registration, profile management . The application ensures security using JWT tokens and adheres to best practices in REST API design. The backend is built with Spring Boot 3 and Spring Security 6, while the frontend is developed using ReactJS with Antd design for styling.
+The Elearning website is a comprehensive full-stack application designed to facilitate online learning. Students can search for, purchase, and take courses, while admins or instructors can create and manage their content. Key features include user registration with Google SSO, secure payments via VNPAY sandbox, and robust security measures using JWT tokens. The application follows best practices in REST API design, with the backend powered by Spring Boot 3 and Spring Security 6, and the frontend developed using ReactJS with Ant Design for styling.
 
 ## Features
-
-- User Registration: Users can register for a new account.
-- Course search: Users can filer course by rating star, category,..
-- Cart management, Learning-course management, Profile management
-- Handle login sso with google
-- Hanlde payment for course with VNPAY sanbox
-- Course, category, user, topic, order, review, student management
-- Revenue by time (range day, month, year).
+- User Registration: Users can easily create a new account.
+- Course Search: Users can filter courses by rating, category, and more.
+- Management: Includes cart management, learning-course tracking, and profile customization.
+- Google SSO Login: Streamlined login using Google Single Sign-On.
+- Payment Processing: Secure course payments via VNPAY sandbox.
+- Comprehensive Management: Manage categories, users, topics, orders, reviews, coupons, and students.
+- Course Management: Create and organize courses with sections, lectures, and quizzes.
+- Analytics: View statistics by custom date ranges, including daily, monthly, and yearly reports.
   
-
 #### Class diagram
 ![Class diagram](screenshots/class-diagram.drawio.svg)
 
 #### Usecasae diagram
 ![Security diagram](screenshots/security.png)
 
-#### Sequence pipeline
+#### Sequence diagram
 ![Security diagram](screenshots/be-pipeline.png)
 
 
 ## Technologies Used
 
-### Backend (book-network)
+### Backend (elearning-be)
 
 - Spring Boot 3
 - Spring Security 6
@@ -50,7 +49,7 @@ Elearning website is a full-stack application that enables student to search, bu
 - Docker
 - GitHub Action
 
-### Frontend (book-network-ui)
+### Frontend (elearning-fe)
 
 - ReactJs
 - Component-Based Architecture
