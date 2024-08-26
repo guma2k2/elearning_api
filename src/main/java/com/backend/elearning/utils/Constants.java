@@ -5,6 +5,8 @@ public final class Constants {
     public final class ERROR_CODE {
 
         public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+        public static final String CART_NOT_FOUND = "CART_NOT_FOUND";
+
         public static final String ORDER_NOT_FOUND = "ORDER_NOT_FOUND";
         public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
         public static final String QUESTION_NOT_FOUND = "QUESTION_NOT_FOUND";

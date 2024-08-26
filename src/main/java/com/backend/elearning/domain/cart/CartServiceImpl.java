@@ -57,14 +57,14 @@ public class CartServiceImpl implements CartService{
     @Override
     @Transactional
     public void deleteCourseInCart(Long cartId) {
-        Cart cart = cartRepository.findById(cartId).orElseThrow();
+        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CART_NOT_FOUND, cartId));
         cartRepository.delete(cart);
     }
 
     @Override
     @Transactional
     public void updateCartBuyLater(Long cartId) {
-        Cart cart = cartRepository.findById(cartId).orElseThrow();
+        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CART_NOT_FOUND, cartId));
         boolean newStatus = !cart.isBuyLater();
         cartRepository.updateCartBuyLater(newStatus, cartId);
     }

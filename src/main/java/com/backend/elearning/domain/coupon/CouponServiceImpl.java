@@ -28,7 +28,7 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM createCoupon(CouponPostVM couponPostVM) {
-        if (checkExistCoupon(null, couponPostVM.code())) {
+        if (couponRepository.findByCodeAndId(couponPostVM.code(), null) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
         LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
@@ -79,7 +79,7 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM updateCoupon(CouponPostVM couponPostVM, Long couponId) {
-        if (checkExistCoupon(couponId, couponPostVM.code())) {
+        if (couponRepository.findByCodeAndId(couponPostVM.code(), couponId) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, couponId));
