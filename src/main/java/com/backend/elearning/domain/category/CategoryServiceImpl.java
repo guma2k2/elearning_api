@@ -24,13 +24,11 @@ public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
 
-    private final TopicRepository topicRepository;
 
     private final String sortBy = "updatedAt";
     private final CourseRepository courseRepository;
-    public CategoryServiceImpl(CategoryRepository categoryRepository, TopicRepository topicRepository, CourseRepository courseRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CourseRepository courseRepository) {
         this.categoryRepository = categoryRepository;
-        this.topicRepository = topicRepository;
         this.courseRepository = courseRepository;
     }
 
@@ -75,8 +73,8 @@ public class CategoryServiceImpl implements CategoryService{
                     new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryPostVM.parentId()));
             category.setParent(parent);
         }
-        categoryRepository.saveAndFlush(category);
-        return CategoryVM.fromModel(category);
+        Category savedCategory = categoryRepository.saveAndFlush(category);
+        return CategoryVM.fromModel(savedCategory);
     }
     @Override
     public CategoryVM getCategoryById(Integer categoryId) {
@@ -154,7 +152,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
 
-    private boolean checkParent (Integer id, Category category) {
+    public boolean checkParent (Integer id, Category category) {
         if (id.equals(category.getId())) {
             return false;
         }
