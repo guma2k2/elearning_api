@@ -30,7 +30,6 @@ public class SectionServiceImpl implements SectionService{
     private final SectionRepository sectionRepository;
     private final CourseRepository courseRepository;
     private final QuestionService questionService;
-
     private final LearningLectureRepository learningLectureRepository;
     private final LearningQuizRepository learningQuizRepository;
     public SectionServiceImpl(SectionRepository sectionRepository, CourseRepository courseRepository, QuestionService questionService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository) {

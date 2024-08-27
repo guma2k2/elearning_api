@@ -143,10 +143,13 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM update(CoursePostVM coursePutVM, Long userId, Long courseId) {
-        Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow();
-//        if (oldCourse.getUser().getId() != userId) {
+        //        if (oldCourse.getUser().getId() != userId) {
 //            throw new BadRequestException("You don't have permission to edit this course");
 //        }
+        Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow(() -> new NotFoundException(
+                Constants.ERROR_CODE.COURSE_NOT_FOUND, courseId
+        ));
+
         if (courseRepository.countExistByTitle(coursePutVM.title(), courseId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
         }
