@@ -37,15 +37,11 @@ public class AuthenticationService {
 
 
     private final UserRepository userRepository;
-
-
     private final StudentRepository studentRepository;
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
-
     private final PasswordEncoder passwordEncoder;
-
     private final MailService mailService;
 
     private final String EXCHANGE_TOKEN_URL = "https://oauth2.googleapis.com/token";

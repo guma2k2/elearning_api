@@ -116,6 +116,7 @@ public class UserServiceImpl implements UserService{
         user.setFirstName(userPutVm.firstName());
         user.setLastName(userPutVm.lastName());
         user.setActive(userPutVm.active());
+        user.setGender(EGender.valueOf(userPutVm.gender()));
         user.setRole(ERole.valueOf(userPutVm.role()));
         user.setDateOfBirth(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()));
         user.setUpdatedAt(LocalDateTime.now());
