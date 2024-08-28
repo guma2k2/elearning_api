@@ -29,8 +29,6 @@ public class Topic extends AbstractAuditEntity {
 
     private boolean publish;
 
-    //Don’t use CascadeType.REMOVE with @ManyToMany associations:
-    // https://vladmihalcea.com/orphanremoval-jpa-hibernate/
     @Builder.Default
     @ManyToMany(cascade = {
             CascadeType.PERSIST,

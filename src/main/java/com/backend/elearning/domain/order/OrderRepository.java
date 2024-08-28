@@ -17,6 +17,14 @@ import java.util.Set;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("""
+        update Order o
+        set o.status =:status
+        where o.id = :orderId
+    """)
+    @Modifying
+    void updateOrderStatus(@Param("orderId") Long orderId, @Param("status") EOrderStatus status);
+
+    @Query("""
             select o
             from Order o 
             left join fetch o.student s 
@@ -56,13 +64,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findAllCustomWithId(Pageable pageable, @Param("orderId") Long orderId);
 
 
-    @Query("""
-        update Order o
-        set o.status =:status
-        where o.id = :orderId
-    """)
-    @Modifying
-    void updateOrderStatus(@Param("orderId") Long orderId, @Param("status") EOrderStatus status);
+
 
 
     @Query("""

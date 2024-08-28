@@ -1,6 +1,7 @@
 package com.backend.elearning.repository;
 
 import com.backend.elearning.TestConfig;
+import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
 import com.backend.elearning.domain.learning.learningLecture.LearningLectureRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({TestConfig.class})
 public class LearningLectureRepoTest {
 
@@ -22,6 +22,9 @@ public class LearningLectureRepoTest {
     public void canFindById () {
         // given
         Long id = 1L;
+
+        LearningLecture learningLecture = LearningLecture.builder().id(id).build();
+        underTest.save(learningLecture);
         // when
         var result = underTest.findById(id);
         // then

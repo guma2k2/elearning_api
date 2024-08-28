@@ -57,7 +57,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         from Cart c 
         join c.course co
         where co.id = :courseId
-""")
+    """)
     List<Cart> findByCourseId(@Param("courseId") Long courseId);
 
 }
