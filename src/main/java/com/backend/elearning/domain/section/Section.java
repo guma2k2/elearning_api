@@ -17,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Builder
 @EntityListeners(value = CustomAuditingEntityListener.class)
 public class Section extends AbstractAuditEntity {
@@ -36,8 +37,10 @@ public class Section extends AbstractAuditEntity {
     private Course course;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Lecture> lectures = new ArrayList<>();
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Quiz> quizzes = new ArrayList<>();
 }

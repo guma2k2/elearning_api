@@ -13,6 +13,7 @@ import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.Constants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,17 +33,15 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final StudentRepository studentRepository;
     private final CourseRepository  courseRepository;
-    private final UserRepository userRepository;
     private final CouponRepository couponRepository;
     private final CartRepository cartRepository;
 
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository, CouponRepository couponRepository, CartRepository cartRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, StudentRepository studentRepository, CourseRepository courseRepository, CouponRepository couponRepository, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
         this.couponRepository = couponRepository;
         this.cartRepository = cartRepository;
     }
@@ -52,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     public Long createOrder(OrderPostDto orderPostDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Coupon coupon = orderPostDto.couponCode() != null ? couponRepository.findByCode(orderPostDto.couponCode()).orElseThrow() : null;
-        Student student = studentRepository.findByEmail( email).orElseThrow();
+        Student student = studentRepository.findByEmail( email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND, email));
         Order order = Order.builder()
                 .status(EOrderStatus.PENDING)
                 .student(student)
@@ -65,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (OrderDetailPostDto orderPostDetail: orderPostDto.orderDetails()) {
             Long courseId = orderPostDetail.courseId();
-            Course course = courseRepository.findById(courseId).orElseThrow();
+            Course course = courseRepository.findById(courseId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, courseId));
             OrderDetail orderDetail = OrderDetail
                     .builder()
                     .order(savedOrder)

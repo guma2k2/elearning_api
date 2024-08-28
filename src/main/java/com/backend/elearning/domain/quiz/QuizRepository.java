@@ -21,6 +21,14 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     Optional<Quiz> findByIdReturnSection(@Param("id") Long id);
 
     @Query(value = """
+            select l
+            from Quiz l
+            left join fetch l.section s
+            where s.id = :sectionId
+            """)
+    List<Quiz> findBySectionId(@Param("sectionId") Long sectionId);
+
+    @Query(value = """
             select q
             from Quiz q
             left join fetch q.questions
@@ -29,11 +37,5 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     Optional<Quiz> findByIdReturnQuestions(@Param("id") Long id);
 
 
-    @Query(value = """
-            select l
-            from Quiz l
-            left join fetch l.section s
-            where s.id = :sectionId
-            """)
-    List<Quiz> findBySectionId(@Param("sectionId") Long sectionId);
+
 }
