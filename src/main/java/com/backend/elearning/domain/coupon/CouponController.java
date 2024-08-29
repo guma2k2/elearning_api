@@ -59,6 +59,14 @@ public class CouponController {
         return ResponseEntity.ok().body(pageableCoupons);
     }
 
+    @DeleteMapping("/admin/coupons/{id}")
+    public ResponseEntity<Void> delete (
+            @PathVariable("id") Long id
+    ) {
+        couponService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @GetMapping("/coupons/code/{code}")
     public ResponseEntity<CouponVM> getCourseById (
@@ -68,11 +76,5 @@ public class CouponController {
         return ResponseEntity.ok().body(couponVm);
     }
 
-    @DeleteMapping("/admin/coupons/{id}")
-    public ResponseEntity<Void> delete (
-            @PathVariable("id") Long id
-    ) {
-        couponService.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+
 }

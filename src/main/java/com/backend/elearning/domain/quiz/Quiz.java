@@ -31,5 +31,14 @@ public class Quiz extends AbstractAuditEntity {
     private Section section;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Question> questions = new ArrayList<>();
+
+    public Quiz(QuizPostVM quizPostVM, Section section) {
+        this.id = quizPostVM.id();
+        this.title = quizPostVM.title();
+        this.number = quizPostVM.number();
+        this.description = quizPostVM.description();
+        this.section = section;
+    }
 }

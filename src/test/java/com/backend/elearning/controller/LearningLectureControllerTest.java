@@ -32,6 +32,7 @@ public class LearningLectureControllerTest {
 
     @MockBean
     private JWTUtil jwtUtil;
+
     @MockBean
     private UserDetailsServiceImpl userDetailsService;
 
@@ -52,10 +53,10 @@ public class LearningLectureControllerTest {
         String requestBody = objectMapper.writeValueAsString(request);
 
         // Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/learning-lectures")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/learning-lectures")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
     }
 
 }

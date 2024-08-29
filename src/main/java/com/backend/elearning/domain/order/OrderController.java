@@ -17,10 +17,10 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    private final OrderDetailServiceImpl orderDetailService;
+    private final OrderDetailService orderDetailService;
 
 
-    public OrderController(OrderService orderService, OrderDetailServiceImpl orderDetailService) {
+    public OrderController(OrderService orderService, OrderDetailService orderDetailService) {
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
     }
@@ -40,11 +40,6 @@ public class OrderController {
         orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/orders/user")
-    public ResponseEntity<List<OrderVM>> findAllByUserId() {
-        List<OrderVM> orderVMS = orderService.findAllByUserId();
-        return ResponseEntity.ok().body(orderVMS);
-    }
 
     @GetMapping("/admin/orders/paging")
     public ResponseEntity<PageableData<OrderVM>> getPageableCategory (
@@ -55,6 +50,13 @@ public class OrderController {
         PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize, orderId);
         return ResponseEntity.ok().body(pageableData);
     }
+    @GetMapping("/orders/user")
+    public ResponseEntity<List<OrderVM>> findAllByUserId() {
+        List<OrderVM> orderVMS = orderService.findAllByUserId();
+        return ResponseEntity.ok().body(orderVMS);
+    }
+
+
 
     @GetMapping("/orders/beseller-courses")
     public ResponseEntity<List<CourseListGetVM>> get10BestSellerProducts() {

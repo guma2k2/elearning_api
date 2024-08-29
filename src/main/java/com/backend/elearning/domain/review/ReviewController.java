@@ -31,14 +31,6 @@ public class ReviewController {
         return ResponseEntity.ok().body(updatedReview);
     }
 
-
-    @PutMapping("/admin/reviews/{id}/status/{status}")
-    public ResponseEntity<Void> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long reviewId){
-        reviewService.updateStatusReview(status, reviewId);
-        return ResponseEntity.noContent().build();
-    }
-
-
     @GetMapping("/admin/reviews/paging")
     public ResponseEntity<PageableData<ReviewGetListVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
@@ -48,6 +40,16 @@ public class ReviewController {
         PageableData<ReviewGetListVM> pageableReviews = reviewService.getPageableReviews(pageNum, pageSize, keyword);
         return ResponseEntity.ok().body(pageableReviews);
     }
+
+
+    @PutMapping("/admin/reviews/{id}/status/{status}")
+    public ResponseEntity<Void> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long reviewId){
+        reviewService.updateStatusReview(status, reviewId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 
     @GetMapping("/reviews/search/{courseId}")
     public ResponseEntity<PageableData<ReviewVM>> getByBaseProductId(
