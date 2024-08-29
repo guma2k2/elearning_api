@@ -35,4 +35,13 @@ public class Lecture extends AbstractAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
     private Section section;
+
+    public Lecture(LecturePostVM lecturePostVM, Section section) {
+        this.title = lecturePostVM.title();
+        this.number = lecturePostVM.number();
+        this.videoId = lecturePostVM.video();
+        this.lectureDetails = lecturePostVM.lectureDetails();
+        this.duration = lecturePostVM.duration();
+        this.section = section;
+    }
 }
