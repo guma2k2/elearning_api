@@ -74,7 +74,8 @@ public class CartServiceTest {
                 4.7,                                     // averageRating
                 1500,                                    // ratingCount
                 "https://example.com/images/java.png",   // image
-                4999L,                                   // price
+                4999L,
+                false,// price
                 "John Doe"                               // createdBy
         );
 
@@ -116,7 +117,8 @@ public class CartServiceTest {
                 4.7,                                     // averageRating
                 1500,                                    // ratingCount
                 "https://example.com/images/java.png",   // image
-                4999L,                                   // price
+                4999L,
+                false,// price
                 "John Doe"                               // createdBy
         );
 
@@ -243,12 +245,13 @@ public class CartServiceTest {
                 4.7,                                     // averageRating
                 1500,                                    // ratingCount
                 "https://example.com/images/java.png",   // image
-                4999L,                                   // price
+                4999L,
+                false,// price
                 "John Doe"                               // createdBy
         );
         CourseListGetVM courseListGetVM2 = new CourseListGetVM(
                 2L, "Advanced Java", "Deep dive into Java", "Advanced", "advanced-java",
-                "15h 45m", 35, 4.9, 3000, "https://example.com/images/java_advanced.png", 7999L, "Jane Smith"
+                "15h 45m", 35, 4.9, 3000, "https://example.com/images/java_advanced.png", 7999L, false,"Jane Smith"
         );
 
         List<Cart> carts = List.of(cart1, cart2);

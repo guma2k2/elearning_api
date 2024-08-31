@@ -56,7 +56,7 @@ public class CartControllerTest {
         CourseListGetVM courseListGetVM = new CourseListGetVM(
                 1L, "Course Title", "Course Headline", "Beginner",
                 "course-slug", "10h 30m", 25, 4.5, 100,
-                "image-url", 1999L, "Author Name"
+                "image-url", 1999L, false, "Author Name"
         );
         CartListGetVM cartListGetVM = new CartListGetVM(1L, courseListGetVM, false);
         when(cartService.addCourseToCart(courseId)).thenReturn(cartListGetVM);
@@ -76,12 +76,12 @@ public class CartControllerTest {
         CourseListGetVM course1 = new CourseListGetVM(
                 1L, "Course Title 1", "Course Headline 1", "Beginner",
                 "course-slug-1", "10h 30m", 25, 4.5, 100,
-                "image-url-1", 1999L, "Author Name 1"
+                "image-url-1", 1999L, false, "Author Name 1"
         );
         CourseListGetVM course2 = new CourseListGetVM(
                 2L, "Course Title 2", "Course Headline 2", "Intermediate",
                 "course-slug-2", "8h 15m", 20, 4.2, 80,
-                "image-url-2", 2999L, "Author Name 2"
+                "image-url-2", 2999L, false, "Author Name 2"
         );
         List<CartListGetVM> cartList = List.of(
                 new CartListGetVM(1L, course1, false),
