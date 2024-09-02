@@ -80,7 +80,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 ![Manage course](screenshots/admin/manage-course-admin.png)
 
 #### Edit course page
-![Edit course](screenshots/admin)
+![Edit course](screenshots/admin/couse-edit.png)
 
 
 ### For Instructor
