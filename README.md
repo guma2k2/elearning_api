@@ -4,6 +4,7 @@
 
 - [Overview](#overview)
 - [Features](#features)
+- [User interfaces](#features)
 - [Technologies Used](#technologies-used)
     - [Backend (elearning-api)]
     - [Frontend (elearning-ui)]
@@ -25,20 +26,10 @@ The Elearning website is a comprehensive full-stack application designed to faci
 - Comprehensive Management: Manage categories, users, topics, orders, reviews, coupons, and students.
 - Course Management: Create and organize courses with sections, lectures, and quizzes.
 - Analytics: View statistics by custom date ranges, including daily, monthly, and yearly reports.
-  
-#### Class diagram
-![Class diagram](screenshots/class-diagram.drawio.svg)
-
-#### Usecasae diagram
-![Security diagram](screenshots/usecase-diagram.png)
-
-#### Sequence diagram
-![Security diagram](screenshots/sequence-diagram.drawio.png)
-
 
 ## Technologies Used
 
-### Backend (elearning-be)
+### Backend (Elearning-be)
 
 - Spring Boot 3
 - Spring Security 6
@@ -49,11 +40,44 @@ The Elearning website is a comprehensive full-stack application designed to faci
 - Docker
 - GitHub Action
 
-### Frontend (elearning-fe)
+### Frontend (Elearning-fe)
 
 - ReactJs
 - Component-Based Architecture
 - Antd design
+
+## User interfaces
+- Ideas from https://www.udemy.com and https://fullstack.edu.vn .
+### Guest
+![Login](screenshots/guest/login.png)
+![Filter course](screenshots/guest/filter-course.png)
+### Student
+![Home](screenshots/student/home.png)
+![Cart](screenshots/student/cart.png)
+![Payment](screenshots/student/payment.png)
+![Learning](screenshots/student/learning-course.png)
+### Admin
+![Dashboard](screenshots/admin/dashboard-admin.png)
+![Manage course](screenshots/admin/manage-course-admin.png)
+![Edit course](screenshots/admin)
+### Instructor
+![Dashboard](screenshots/instructor/dashboard-instructor.png)
+![Manage course](screenshots/instructor/manage-course-instructor.png)
+
+
+## System design
+
+#### Class diagram
+![Class diagram](screenshots/class-diagram.drawio.svg)
+
+#### Usecasae diagram
+![Security diagram](screenshots/usecase-diagram.png)
+
+#### Sequence diagram
+![Security diagram](screenshots/sequence-diagram.drawio.png)
+
+
+
 
 ## License
 
@@ -63,8 +87,6 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 
 To get started with the Book Social Network project, follow the setup instructions in the respective directories:
 
-- [Backend Setup Instructions](/book-network/README.md)
-- [Frontend Setup Instructions](book-network-ui/README.md)
 
 ## Contributors
 
