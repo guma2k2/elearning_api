@@ -11,7 +11,6 @@
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Contributors](#contributors)
-- [Acknowledgments](#acknowledgments)
 
 ## Overview
 
@@ -112,13 +111,12 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 
 ## Getting Started
 
-To get started with the Book Social Network project, follow the setup instructions in the respective directories:
-
+To get started with the Elearning project, follow the setup instructions in the respective directories:
+- Clone this project
+- Run cmd : docker compose up -d --build
 
 ## Contributors
 
 - [NGO DUC THUAN](https://github.com/guma2k2)
 
-## Acknowledgments
 
-Special thanks to the developers and maintainers of the technologies used in this project. Their hard work and dedication make projects like this possible.
