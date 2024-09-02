@@ -48,7 +48,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 
 ## User interfaces
 - Ideas from https://www.udemy.com and https://fullstack.edu.vn .
-### Guest
+### For Guest
 
 #### Login page
 ![Login](screenshots/guess/login.png)
@@ -57,7 +57,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 ![Filter course](screenshots/guess/filter-course.png)
 
 
-### Student
+### For Student
 
 #### Home page
 ![Home](screenshots/student/home.png)
@@ -71,7 +71,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 #### Learning page
 ![Learning](screenshots/student/learning-course.png)
 
-### Admin 
+### For Admin 
 
 #### Dashboard page
 ![Dashboard](screenshots/admin/dashboard.png)
@@ -83,7 +83,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 ![Edit course](screenshots/admin)
 
 
-### Instructor
+### For Instructor
 
 ### Dashboard page 
 ![Dashboard](screenshots/instructor/dashboard-instructor.png)
