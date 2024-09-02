@@ -49,37 +49,46 @@ The Elearning website is a comprehensive full-stack application designed to faci
 ## User interfaces
 - Ideas from https://www.udemy.com and https://fullstack.edu.vn .
 ### Guest
+
+#### Login page
 ![Login](screenshots/guess/login.png)
+
+#### Filter course page
 ![Filter course](screenshots/guess/filter-course.png)
+
+
 ### Student
-#### Home
+
+#### Home page
 ![Home](screenshots/student/home.png)
 
-#### Cart
+#### Cart page
 ![Cart](screenshots/student/cart.png)
 
-#### Payment
+#### Payment page
 ![Payment](screenshots/student/payment.png)
 
-#### Learning
+#### Learning page
 ![Learning](screenshots/student/learning-course.png)
 
-### Admin
+### Admin 
 
-#### Dashboard
+#### Dashboard page
 ![Dashboard](screenshots/admin/dashboard.png)
 
-#### Manage course
+#### Manage course page
 ![Manage course](screenshots/admin/manage-course-admin.png)
 
-#### Edit course
+#### Edit course page
 ![Edit course](screenshots/admin)
+
+
 ### Instructor
 
-### Dashboard
+### Dashboard page 
 ![Dashboard](screenshots/instructor/dashboard-instructor.png)
 
-### Manage course
+### Manage course page
 ![Manage course](screenshots/instructor/manage-course-instructor.png)
 
 
