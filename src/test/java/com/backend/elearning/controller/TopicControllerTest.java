@@ -67,7 +67,7 @@ public class TopicControllerTest {
         when(topicService.getPageableTopics(pageNum, pageSize, keyword)).thenReturn(pageableData);
 
         // When & Then
-        mockMvc.perform(get("/api/v1/admin/topic/paging")
+        mockMvc.perform(get("/api/v1/admin/topics/paging")
                         .param("pageNum", String.valueOf(pageNum))
                         .param("pageSize", String.valueOf(pageSize))
                         .param("keyword", keyword))
@@ -100,7 +100,7 @@ public class TopicControllerTest {
         when(topicService.create(topicPostVM)).thenReturn(createdTopic);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/admin/topic")
+        mockMvc.perform(post("/api/v1/admin/topics")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(topicPostVM)))
                 .andExpect(status().isCreated())
@@ -129,7 +129,7 @@ public class TopicControllerTest {
         doNothing().when(topicService).update(topicPostVM, topicId);
 
         // When & Then
-        mockMvc.perform(put("/api/v1/admin/topic/{id}", topicId)
+        mockMvc.perform(put("/api/v1/admin/topics/{id}", topicId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(topicPostVM)))
                 .andExpect(status().isNoContent());
@@ -142,7 +142,7 @@ public class TopicControllerTest {
         doNothing().when(topicService).delete(topicId);
 
         // When & Then
-        mockMvc.perform(delete("/api/v1/admin/topic/{id}", topicId))
+        mockMvc.perform(delete("/api/v1/admin/topics/{id}", topicId))
                 .andExpect(status().isOk());
     }
 }
