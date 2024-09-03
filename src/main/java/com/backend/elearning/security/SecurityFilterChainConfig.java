@@ -17,6 +17,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityFilterChainConfig {
+
+    private final String ROLE_INSTRUCTOR = "INSTRUCTOR";
+    private final String ROLE_ADMIN = "ADMIN";
+    private final String ROLE_STUDENT = "STUDENT";
+
+
     private final AuthenticationProvider authenticationProvider;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
@@ -37,7 +43,30 @@ public class SecurityFilterChainConfig {
                 .authorizeHttpRequests(
                 auth ->
                         auth
-                                .requestMatchers("/api/v1/sdafas").authenticated()
+                                .requestMatchers("/api/v1/users/**",
+                                        "/api/v1/admin/category/**",
+                                        "/api/v1/admin/topics/**",
+                                        "/api/v1/admin/coupons/**",
+                                        "/api/v1/admin/reviews/**",
+                                        "/api/v1/admin/students/**",
+                                        "/api/v1/admin/orders/**",
+                                        "/api/v1/admin/courses/**/status/**"
+                                        ).hasRole(ROLE_ADMIN)
+                                .requestMatchers(
+                                        "/api/v1/admin/courses/**",
+                                        "/api/v1/admin/lectures/**",
+                                        "/api/v1/admin/quizzes/**",
+                                        "/api/v1/statistic/**",
+                                        "/api/v1/medias/**"
+                                ).hasAnyRole(ROLE_INSTRUCTOR, ROLE_ADMIN)
+                                .requestMatchers("/api/v1/payments/**",
+                                        "/api/v1/orders/**",
+                                        "/api/v1/notes/**",
+                                        "/api/v1/learning-course/**",
+                                        "/api/v1/learning-lectures/**",
+                                        "/api/v1/learning-quizzes/**" ,
+                                        "/api/v1/carts/**"
+                                ).hasRole(ROLE_STUDENT)
                                 .anyRequest().permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -46,7 +75,6 @@ public class SecurityFilterChainConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint))
                 .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.logoutUrl("/api/v1/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
-
         return http.build();
 
     }

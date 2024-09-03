@@ -26,7 +26,7 @@ public class TopicController {
     }
 
 
-    @GetMapping("/topic/{id}")
+    @GetMapping("/topics/{id}")
     public ResponseEntity<TopicVM> getTopicById (
             @PathVariable("id") Integer topicId
     ) {
@@ -41,7 +41,7 @@ public class TopicController {
         return ResponseEntity.ok().body(topics);
     }
 
-    @GetMapping("/admin/topic/paging")
+    @GetMapping("/admin/topics/paging")
     public ResponseEntity<PageableData<TopicVM>> getPageableTopic (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
@@ -52,7 +52,7 @@ public class TopicController {
         return ResponseEntity.ok().body(pageableTopics);
     }
 
-    @PostMapping("/admin/topic")
+    @PostMapping("/admin/topics")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content =
             @Content(schema = @Schema(implementation = TopicVM.class))),
@@ -66,7 +66,7 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(topicVM);
     }
 
-    @PutMapping("/admin/topic/{id}")
+    @PutMapping("/admin/topics/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No content"),
             @ApiResponse(responseCode = "404", description = "Not found", content =
@@ -85,7 +85,7 @@ public class TopicController {
 
 
 
-    @DeleteMapping("/admin/topic/{id}")
+    @DeleteMapping("/admin/topics/{id}")
     public ResponseEntity<Void> delete (
             @PathVariable("id") Integer id
     ) {
