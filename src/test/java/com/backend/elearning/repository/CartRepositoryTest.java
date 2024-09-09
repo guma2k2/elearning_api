@@ -49,7 +49,11 @@ public class CartRepositoryTest {
         // given
         String email = "thuan@gmail.com";
         Long courseId = 1L;
-        Student student = Student.builder().email(email).build();
+        Student student = Student.builder().email(email)
+                .firstName("firstName")
+                .lastName("lastName")
+                .password("1234567")
+                .build();
         Course course = Course.builder().id(courseId).title("Course title").build();
 
         studentRepository.saveAndFlush(student);
@@ -78,7 +82,9 @@ public class CartRepositoryTest {
         String FakeEmail = faker.internet().safeEmailAddress() + "-" + UUID.randomUUID();
         String email = "thuan@gmail.com";
         Long courseId = 1L;
-        Student student = Student.builder().email(email).build();
+        Student student = Student.builder().email(email).firstName("firstName")
+                .lastName("lastName")
+                .password("1234567").build();
         Course course = Course.builder().id(courseId).title("Course title").build();
 
         studentRepository.saveAndFlush(student);
@@ -101,7 +107,9 @@ public class CartRepositoryTest {
         String email = "thuan@gmail.com";
         Long courseId = 1L;
         boolean expected = true;
-        Student student = Student.builder().email(email).build();
+        Student student = Student.builder().email(email).firstName("firstName")
+                .lastName("lastName")
+                .password("1234567").build();
         Course course = Course.builder().id(courseId).title("Course title").build();
 
         Cart cart = Cart.builder().buyLater(false).course(course).student(student).build();

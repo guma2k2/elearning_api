@@ -6,11 +6,24 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 public class VNPayUtils {
+    private static Random rand;
+
+    {
+        try {
+            rand = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public static String hmacSHA512(final String key, final String data) {
         try {
             if (key == null || data == null) {
@@ -47,11 +60,10 @@ public class VNPayUtils {
     }
 
     public static String getRandomNumber(int len) {
-        Random rnd = new Random();
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
-            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+            sb.append(chars.charAt(rand.nextInt(chars.length())));
         }
         return sb.toString();
     }

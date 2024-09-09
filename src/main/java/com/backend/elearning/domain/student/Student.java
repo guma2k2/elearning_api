@@ -6,6 +6,7 @@ import com.backend.elearning.domain.learning.learningCourse.LearningCourse;
 import com.backend.elearning.domain.user.EGender;
 import com.backend.elearning.domain.user.ERole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,6 +35,8 @@ public class Student extends AbstractAuditEntity implements UserDetails {
     @Column(unique = true, length = 50)
     private String email;
 
+    @Column(nullable = false)
+    @Min(value = 6)
     private String password;
 
     @Column(length = 20)

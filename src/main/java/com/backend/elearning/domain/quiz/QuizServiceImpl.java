@@ -8,6 +8,7 @@ import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class QuizServiceImpl implements QuizService{
@@ -39,7 +40,7 @@ public class QuizServiceImpl implements QuizService{
     public QuizVM update(QuizPostVM quizPutVM, Long quizId) {
         Quiz quiz = quizRepository.findByIdReturnSection(quizId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.LECTURE_NOT_FOUND, quizId));
-        if (quiz.getSection().getId() != quizPutVM.sectionId()) {
+        if (!Objects.equals(quiz.getSection().getId(), quizPutVM.sectionId())) {
             throw new BadRequestException(Constants.ERROR_CODE.LECTURE_SECTION_NOT_SAME, quizPutVM.sectionId());
         }
         quiz.setTitle(quizPutVM.title());

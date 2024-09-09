@@ -33,12 +33,15 @@ public class StudentRepositoryTest {
                 .email("john.doe@example.com")
                 .firstName("John")
                 .lastName("Doe")
+                .password("1234567")
                 .build();
 
         Student student2 = Student.builder()
                 .email("jane.smith@example.com")
                 .firstName("Jane")
                 .lastName("Smith")
+                .password("1234567")
+
                 .build();
 
         Student student3 = Student.builder()
@@ -46,6 +49,7 @@ public class StudentRepositoryTest {
                 .email("john.smith@example.com")
                 .firstName("John")
                 .lastName("Smith")
+                .password("1234567")
                 .build();
 
         // Save entities

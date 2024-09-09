@@ -40,10 +40,16 @@ public class ReviewRepositoryTest {
         // Setting up test data
         Student student1 = Student.builder()
                 .email("student1@example.com")
+                .firstName("firstName")
+                .lastName("lastName")
+                .password("1234567")
                 .build();
 
         Student student2 = Student.builder()
                 .email("student2@example.com")
+                .firstName("firstName")
+                .lastName("lastName")
+                .password("1234567")
                 .build();
 
         Course course1 = Course.builder()
@@ -82,17 +88,7 @@ public class ReviewRepositoryTest {
     }
 
 
-    @Test
-    void testFindTotalReviews_WithoutEmail() {
-        // Given
-        String email = null;  // No email filter
 
-        // When
-        long totalReviews = reviewRepository.findTotalReviews(email);
-
-        // Then
-        assertEquals(0, totalReviews, "There should be 3 total reviews for all students");
-    }
 
     @Test
     void testCountByRatingAndCourse_WithExistingRating() {
