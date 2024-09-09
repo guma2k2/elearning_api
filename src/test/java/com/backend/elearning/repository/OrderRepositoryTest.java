@@ -51,6 +51,9 @@ public class OrderRepositoryTest {
         // Setting up test data
         Student student = Student.builder()
                 .email("student@example.com")
+                .firstName("firstName")
+                .lastName("lastName")
+                .password("1234567")
                 .build();
 
         Coupon coupon = Coupon.builder()

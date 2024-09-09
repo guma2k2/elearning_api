@@ -158,7 +158,7 @@ public class CourseServiceImpl implements CourseService{
             oldCourse.setCategory(category);
         }
 
-        if (oldCourse.getTopic().getId() != coursePutVM.topicId()) {
+        if (!Objects.equals(oldCourse.getTopic().getId(), coursePutVM.topicId())) {
             Topic topic = topicRepository.findById(coursePutVM.topicId()).orElseThrow();
             oldCourse.setTopic(topic);
         }
@@ -173,7 +173,7 @@ public class CourseServiceImpl implements CourseService{
         if (!coursePutVM.free()) {
             oldCourse.setPrice(coursePutVM.price());
         }
-        if (coursePutVM.image() != "") {
+        if (!Objects.equals(coursePutVM.image(), "")) {
             oldCourse.setImageId(coursePutVM.image());
         }
         if (coursePutVM.level() != null && !coursePutVM.level().isBlank()) {
@@ -184,7 +184,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM getCourseById(Long id) {
-        Course course = courseRepository.findByIdReturnSections(id).orElseThrow();
+        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         Long courseId = course.getId();
         List<Review> reviews = reviewService.findByCourseId(courseId);
         int ratingCount = reviews.size();

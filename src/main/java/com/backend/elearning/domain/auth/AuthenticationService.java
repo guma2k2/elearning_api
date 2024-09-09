@@ -153,7 +153,10 @@ public class AuthenticationService {
     }
 
     public void forgotPassword(String email) {
-        studentRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Email is not existed in system"));
+        Optional<Student> studentOptional = studentRepository.findByEmail(email);
+        if (!studentOptional.isPresent()) {
+            throw new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND, email);
+        }
         String toAddress = email;
         String url = FORGOTPASSWORD_LINK + "?email=" + email;
         String subject = "Confirm and change password" ;
