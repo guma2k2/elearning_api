@@ -40,7 +40,7 @@ public class JWTUtil {
         String token = Jwts
                 .builder()
                 .setClaims(claims)
-                .setSubject(subject.toString())
+                .setSubject(subject)
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(
                         expirationDate

@@ -21,7 +21,7 @@ public class SecurityConfig {
     @Bean
     public RestTemplate restTemplate () {
         return new RestTemplate();
-    };
+    }
 
     public SecurityConfig(UserRepository userRepository, StudentRepository studentRepository) {
         this.userRepository = userRepository;

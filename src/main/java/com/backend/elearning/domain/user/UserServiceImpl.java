@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
     private final ReviewService reviewService;
     private final PasswordEncoder passwordEncoder;
     private final LearningCourseRepository learningCourseRepository;
-    private final String sortBy = "updatedAt";
+    private static final String sortBy = "updatedAt";
 
 
     public UserServiceImpl(UserRepository userRepository, ReviewService reviewService, PasswordEncoder passwordEncoder, LearningCourseRepository learningCourseRepository) {

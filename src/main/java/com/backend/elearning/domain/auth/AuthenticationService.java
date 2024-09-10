@@ -44,8 +44,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
 
-    private final String EXCHANGE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-    private final String EXCHANGE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
+    private static final  String EXCHANGE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private static final String EXCHANGE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
     @Value("${outbound.identity.client-id}")
     protected String CLIENT_ID;
 
@@ -58,7 +58,7 @@ public class AuthenticationService {
     @Value("${ui.forgot-password.url}")
     protected String FORGOTPASSWORD_LINK;
 
-    private final String GRANT_TYPE = "authorization_code";
+    private static final String GRANT_TYPE = "authorization_code";
 
     public AuthenticationService(UserRepository userRepository, JWTUtil jwtUtil, RestTemplate restTemplate, StudentRepository studentRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, MailService mailService) {
         this.userRepository = userRepository;
@@ -169,7 +169,7 @@ public class AuthenticationService {
         try {
             mailService.sendEmail(toAddress, content, subject);
         } catch (MessagingException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BadRequestException(e.getMessage());
         }
     }
 
