@@ -1,5 +1,6 @@
 package com.backend.elearning.utils;
 
+import com.backend.elearning.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 
 import javax.crypto.Mac;
@@ -19,7 +20,7 @@ public class VNPayUtils {
         try {
             rand = SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
     }
 

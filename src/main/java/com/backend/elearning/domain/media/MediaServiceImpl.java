@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.media;
 
+import com.backend.elearning.exception.BadRequestException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class MediaServiceImpl implements MediaService {
             }
             return media;
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -62,7 +63,7 @@ public class MediaServiceImpl implements MediaService {
         try {
             cloudinary.uploader().destroy(uuid, ObjectUtils.emptyMap());
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BadRequestException(e.getMessage());
         }
     }
 

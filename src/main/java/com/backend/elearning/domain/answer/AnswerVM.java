@@ -1,7 +1,10 @@
 package com.backend.elearning.domain.answer;
 
+import jakarta.validation.constraints.NotNull;
+
 public record AnswerVM(
          Long id,
+         @NotNull(message = "answer test must not be null")
          String answerText,
          String reason,
          boolean correct

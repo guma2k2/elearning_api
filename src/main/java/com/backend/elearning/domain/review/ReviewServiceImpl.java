@@ -29,14 +29,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final CourseRepository courseRepository;
 
-    private final static int fiveStar = 5;
-    private final static int fourStar = 4;
-    private final static int threeStar = 3;
-    private final static int twoStar = 2;
-    private final static int oneStar = 1;
+    private static final int fiveStar = 5;
+    private static final int fourStar = 4;
+    private static final int threeStar = 3;
+    private static final int twoStar = 2;
+    private static final int oneStar = 1;
 
 
-    private final static String sortField = "createdAt";
+    private static final String sortField = "createdAt";
     public ReviewServiceImpl(ReviewRepository reviewRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.reviewRepository = reviewRepository;
         this.studentRepository = studentRepository;
