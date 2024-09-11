@@ -29,9 +29,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         Page<Long> bestSellerCourses = orderDetailRepository.getBestSellerCourses(pageable);
         List<Long> courseIds = bestSellerCourses.getContent();
         // convert id to list of CourseListGetVM
-        List<CourseListGetVM> courseListGetVMS = courseIds.stream().map(id -> {
-            return courseService.getCourseListGetVMById(id);
-        }).toList();
+        List<CourseListGetVM> courseListGetVMS = courseIds.stream().map(id -> courseService.getCourseListGetVMById(id)).toList();
         return courseListGetVMS;
     }
 }

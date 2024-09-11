@@ -1,8 +1,11 @@
 package com.backend.elearning.domain.review;
 
+import jakarta.validation.constraints.NotNull;
+
 public record ReviewPostVM(
         Long courseId,
         String content,
-        int ratingStar
+        @NotNull(message = "rating star must not be null")
+        Integer ratingStar
 ) {
 }

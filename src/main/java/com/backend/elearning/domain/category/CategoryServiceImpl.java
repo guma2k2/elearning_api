@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService{
     private final CategoryRepository categoryRepository;
 
 
-    private final String sortBy = "updatedAt";
+    private static final String sortBy = "updatedAt";
     private final CourseRepository courseRepository;
     public CategoryServiceImpl(CategoryRepository categoryRepository, CourseRepository courseRepository) {
         this.categoryRepository = categoryRepository;

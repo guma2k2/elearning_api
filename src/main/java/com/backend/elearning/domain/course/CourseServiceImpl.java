@@ -62,9 +62,9 @@ public class CourseServiceImpl implements CourseService{
     private final CartRepository cartRepository;
     private final UserService userService;
     private final UserRepository userRepository;
-    private final static String LECTURE_TYPE = "lecture";
-    private final static String QUIZ_TYPE = "quiz";
-    private final String sortBy = "updatedAt";
+    private static final  String LECTURE_TYPE = "lecture";
+    private static final String QUIZ_TYPE = "quiz";
+    private static final String sortBy = "updatedAt";
     public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
@@ -143,9 +143,6 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM update(CoursePostVM coursePutVM, Long userId, Long courseId) {
-        //        if (oldCourse.getUser().getId() != userId) {
-//            throw new BadRequestException("You don't have permission to edit this course");
-//        }
         Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow(() -> new NotFoundException(
                 Constants.ERROR_CODE.COURSE_NOT_FOUND, courseId
         ));
@@ -221,10 +218,8 @@ public class CourseServiceImpl implements CourseService{
 
         boolean learning = true;
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (email != null) {
-            if (!learningCourseRepository.findByStudentAndCourse(email, courseId).isPresent()) {
-                learning = false;
-            }
+        if (email != null && !learningCourseRepository.findByStudentAndCourse(email, courseId).isPresent()) {
+            learning = false;
         }
         return CourseVM.fromModel(course, sections,ratingCount, roundedAverageRating, totalCurriculumCourse.get(),formattedHours, userProfileVM, learning);
     }
@@ -352,7 +347,7 @@ public class CourseServiceImpl implements CourseService{
         return new PageableData(
                 pageNum,
                 pageSize,
-                (int) courses.size(),
+                courses.size(),
                 courses.size()/ pageSize,
                 courseListGetVMS
         );

@@ -6,6 +6,8 @@ import com.backend.elearning.domain.user.UserProfileVM;
 import com.backend.elearning.utils.DateTimeUtils;
 
 import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
 
 public record CourseVM(
         Long id,
@@ -35,6 +37,81 @@ public record CourseVM(
         boolean learning,
         String breadcrumb
 ) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CourseVM that = (CourseVM) o;
+        return free == that.free &&
+                isPublish == that.isPublish &&
+                ratingCount == that.ratingCount &&
+                Double.compare(that.averageRating, averageRating) == 0 &&
+                totalLectureCourse == that.totalLectureCourse &&
+                learning == that.learning &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(headline, that.headline) &&
+                Objects.equals(slug, that.slug) &&
+                Arrays.equals(objectives, that.objectives) &&
+                Arrays.equals(requirements, that.requirements) &&
+                Arrays.equals(targetAudiences, that.targetAudiences) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(level, that.level) &&
+                Objects.equals(image, that.image) &&
+                Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(updatedAt, that.updatedAt) &&
+                Objects.equals(price, that.price) &&
+                Objects.equals(categoryId, that.categoryId) &&
+                Objects.equals(topicId, that.topicId) &&
+                Objects.equals(totalDurationCourse, that.totalDurationCourse) &&
+                Objects.equals(createdBy, that.createdBy) &&
+                Objects.equals(sections, that.sections) &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(breadcrumb, that.breadcrumb);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(id, title, headline, slug, description, level, image, createdAt, updatedAt, free,
+                price, isPublish, categoryId, topicId, ratingCount, averageRating, totalLectureCourse,
+                totalDurationCourse, createdBy, sections, user, learning, breadcrumb);
+        result = 31 * result + Arrays.hashCode(objectives);
+        result = 31 * result + Arrays.hashCode(requirements);
+        result = 31 * result + Arrays.hashCode(targetAudiences);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CourseVM{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", headline='" + headline + '\'' +
+                ", slug='" + slug + '\'' +
+                ", objectives=" + Arrays.toString(objectives) +
+                ", requirements=" + Arrays.toString(requirements) +
+                ", targetAudiences=" + Arrays.toString(targetAudiences) +
+                ", description='" + description + '\'' +
+                ", level='" + level + '\'' +
+                ", image='" + image + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                ", free=" + free +
+                ", price=" + price +
+                ", isPublish=" + isPublish +
+                ", categoryId=" + categoryId +
+                ", topicId=" + topicId +
+                ", ratingCount=" + ratingCount +
+                ", averageRating=" + averageRating +
+                ", totalLectureCourse=" + totalLectureCourse +
+                ", totalDurationCourse='" + totalDurationCourse + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", sections=" + sections +
+                ", user=" + user +
+                ", learning=" + learning +
+                ", breadcrumb='" + breadcrumb + '\'' +
+                '}';
+    }
     public static CourseVM fromModel (Course course, List<SectionVM> sections, int ratingCount,
                                       double averageRating,
                                       int totalLectureCourse,
