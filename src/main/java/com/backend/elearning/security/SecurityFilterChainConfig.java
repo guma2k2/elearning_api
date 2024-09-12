@@ -43,29 +43,29 @@ public class SecurityFilterChainConfig {
                 .authorizeHttpRequests(
                 auth ->
                         auth
-                                .requestMatchers("/api/v1/users/**",
-                                        "/api/v1/admin/category/**",
-                                        "/api/v1/admin/topics/**",
-                                        "/api/v1/admin/coupons/**",
-                                        "/api/v1/admin/reviews/**",
-                                        "/api/v1/admin/students/**",
-                                        "/api/v1/admin/orders/**",
-                                        "/api/v1/admin/courses/**/status/**"
+                                .requestMatchers("/api/v1/users/*",
+                                        "/api/v1/admin/category/*",
+                                        "/api/v1/admin/topics/*",
+                                        "/api/v1/admin/coupons/*",
+                                        "/api/v1/admin/reviews/*",
+                                        "/api/v1/admin/students/*",
+                                        "/api/v1/admin/orders/*",
+                                        "/api/v1/admin/courses/*/status/*"
                                         ).hasRole(ROLE_ADMIN)
                                 .requestMatchers(
-                                        "/api/v1/admin/courses/**",
-                                        "/api/v1/admin/lectures/**",
-                                        "/api/v1/admin/quizzes/**",
-                                        "/api/v1/statistic/**",
-                                        "/api/v1/medias/**"
+                                        "/api/v1/admin/courses/*",
+                                        "/api/v1/admin/lectures/*",
+                                        "/api/v1/admin/quizzes/*",
+                                        "/api/v1/statistic/*",
+                                        "/api/v1/medias/*"
                                 ).hasAnyRole(ROLE_INSTRUCTOR, ROLE_ADMIN)
-                                .requestMatchers("/api/v1/payments/**",
-                                        "/api/v1/orders/**",
-                                        "/api/v1/notes/**",
-                                        "/api/v1/learning-course/**",
-                                        "/api/v1/learning-lectures/**",
-                                        "/api/v1/learning-quizzes/**" ,
-                                        "/api/v1/carts/**"
+                                .requestMatchers("/api/v1/payments/*",
+                                        "/api/v1/orders/*",
+                                        "/api/v1/notes/*",
+                                        "/api/v1/learning-course/*",
+                                        "/api/v1/learning-lectures/*",
+                                        "/api/v1/learning-quizzes/*" ,
+                                        "/api/v1/carts/*"
                                 ).hasRole(ROLE_STUDENT)
                                 .anyRequest().permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer

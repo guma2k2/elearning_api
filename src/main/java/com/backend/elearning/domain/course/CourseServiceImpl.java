@@ -317,12 +317,12 @@ public class CourseServiceImpl implements CourseService{
                                                          Boolean[] free,
                                                          String categoryName, Integer topicId
     ) {
-//        Pageable pageable = PageRequest.of(pageNum, pageSize);
-//        Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
-//                courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
-//        List<Course> courses = coursePage.getContent();
-        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
-                courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
+                courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
+        List<Course> courses = coursePage.getContent();
+//        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
+//                courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
             List<Review> reviews = course.getReviews();
             int ratingCount = reviews.size();
@@ -347,8 +347,8 @@ public class CourseServiceImpl implements CourseService{
         return new PageableData(
                 pageNum,
                 pageSize,
-                courses.size(),
-                courses.size()/ pageSize,
+                coursePage.getTotalElements(),coursePage.getTotalPages()
+                ,
                 courseListGetVMS
         );
     }
