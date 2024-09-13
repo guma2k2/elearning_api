@@ -36,7 +36,6 @@ public class Student extends AbstractAuditEntity implements UserDetails {
     private String email;
 
     @Column(nullable = false)
-    @Min(value = 6)
     private String password;
 
     @Column(length = 20)

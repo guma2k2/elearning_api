@@ -14,17 +14,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class VNPayUtils {
-    private static Random rand;
-
-    {
-        try {
-            rand = SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new BadRequestException(e.getMessage());
-        }
-    }
-
-
     public static String hmacSHA512(final String key, final String data) {
         try {
             if (key == null || data == null) {
@@ -61,10 +50,11 @@ public class VNPayUtils {
     }
 
     public static String getRandomNumber(int len) {
+        Random rnd = new Random();
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
-            sb.append(chars.charAt(rand.nextInt(chars.length())));
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
         }
         return sb.toString();
     }
