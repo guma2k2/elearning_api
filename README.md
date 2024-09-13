@@ -111,6 +111,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+If you have any improvement or weird things about my project, please send an email to thuanngo3072002@gmail.com. Thank you so much.
 
 ## Getting Started
 
