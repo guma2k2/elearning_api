@@ -4,7 +4,7 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Demo].(#demo).
+- [Demo](#demo)
 - [User interfaces](#user-interfaces)
 - [Technologies Used](#technologies-used)
     - [Backend (elearning-api)]
