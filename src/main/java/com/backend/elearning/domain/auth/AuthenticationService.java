@@ -24,6 +24,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -174,10 +175,16 @@ public class AuthenticationService {
     }
 
     public void updatePassword(AuthenticationPostVm request) {
-        Student student = studentRepository
-                .findByEmail(request.email())
-                .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, request.email()));
-        student.setPassword(passwordEncoder.encode(request.password()));
-        studentRepository.save(student);
+        try {
+            Student student = studentRepository
+                    .findByEmail(request.email())
+                    .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, request.email()));
+            student.setPassword(passwordEncoder.encode(request.password()));
+            studentRepository.save(student);
+        } catch (Exception e) {
+            // Log the exception to understand the issue
+            log.error("Error updating password", e);
+            throw e; // Rethrow the exception if needed
+        }
     }
 }
