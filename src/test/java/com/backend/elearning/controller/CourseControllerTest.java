@@ -19,9 +19,11 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,5 +74,24 @@ public class CourseControllerTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(mockCourseList)));
+    }
+
+    @Test
+    void testDeleteCourseById() throws Exception {
+        // Given
+        Long courseId = 1L;
+
+        // Mock the behavior of courseService to do nothing when deleting the course
+        doNothing().when(courseService).delete(courseId);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(delete("/api/v1/admin/courses/{id}", courseId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Then
+        resultActions.andExpect(status().isNoContent());
+
+        // Verify that the delete method in courseService was called with the correct courseId
+        verify(courseService).delete(courseId);
     }
 }
