@@ -4,6 +4,8 @@ import com.backend.elearning.domain.coupon.CouponController;
 import com.backend.elearning.domain.course.CourseController;
 import com.backend.elearning.domain.course.CourseListGetVM;
 import com.backend.elearning.domain.course.CourseService;
+import com.backend.elearning.domain.course.CourseVM;
+import com.backend.elearning.domain.user.UserProfileVM;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.security.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -93,5 +96,52 @@ public class CourseControllerTest {
 
         // Verify that the delete method in courseService was called with the correct courseId
         verify(courseService).delete(courseId);
+    }
+
+    @Test
+    void testGetCourseById() throws Exception {
+        // Given
+        Long courseId = 1L;
+
+        CourseVM mockCourseVM = new CourseVM(
+                courseId,
+                "Course Title",
+                "Course Headline",
+                "course-title",
+                new String[]{"Objective 1", "Objective 2"},
+                new String[]{"Requirement 1", "Requirement 2"},
+                new String[]{"Audience 1", "Audience 2"},
+                "Course description",
+                "Beginner",
+                "course-image.jpg",
+                "2024-09-01",
+                "2024-09-10",
+                true,
+                1000L,
+                true,
+                1,
+                2,
+                100,
+                4.5,
+                12,
+                "10 hours",
+                "John Doe",
+                Collections.emptyList(),  // Empty sections
+                new UserProfileVM(1L, "John Doe", "john@example.com", 4.0,1,1,1, Collections.emptyList()),
+                false,
+                "Home > Category > Course"
+        );
+
+        // Mock the behavior of courseService
+        when(courseService.getCourseById(courseId)).thenReturn(mockCourseVM);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/courses/{id}", courseId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
     }
 }
