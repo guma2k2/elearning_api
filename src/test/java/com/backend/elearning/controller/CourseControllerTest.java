@@ -1,11 +1,11 @@
 package com.backend.elearning.controller;
 
 import com.backend.elearning.domain.coupon.CouponController;
-import com.backend.elearning.domain.course.CourseController;
-import com.backend.elearning.domain.course.CourseListGetVM;
-import com.backend.elearning.domain.course.CourseService;
-import com.backend.elearning.domain.course.CourseVM;
+import com.backend.elearning.domain.course.*;
 import com.backend.elearning.domain.user.UserProfileVM;
+import com.backend.elearning.exception.BadRequestException;
+import com.backend.elearning.exception.DuplicateException;
+import com.backend.elearning.exception.ErrorVm;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.security.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,9 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -24,9 +26,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -143,5 +144,102 @@ public class CourseControllerTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
+    }
+
+    @Test
+    void testCreateCourse() throws Exception {
+        // Given
+        CoursePostVM coursePostVM = new CoursePostVM(
+                null,
+                "Course Title",
+                "Course Headline",
+                new String[]{"Objective 1", "Objective 2"},
+                new String[]{"Requirement 1", "Requirement 2"},
+                new String[]{"Audience 1", "Audience 2"},
+                "Course description",
+                "Beginner",
+                1000L,
+                "course-image.jpg",
+                true,
+                1,
+                2
+        );
+
+        CourseVM mockCourseVM = new CourseVM(
+                1L,
+                "Course Title",
+                "Course Headline",
+                "course-title",
+                new String[]{"Objective 1", "Objective 2"},
+                new String[]{"Requirement 1", "Requirement 2"},
+                new String[]{"Audience 1", "Audience 2"},
+                "Course description",
+                "Beginner",
+                "course-image.jpg",
+                "2024-09-01",
+                "2024-09-10",
+                true,
+                1000L,
+                true,
+                1,
+                2,
+                0,
+                0.0,
+                0,
+                "0 hours",
+                "John Doe",
+                Collections.emptyList(),  // Empty sections
+                new UserProfileVM(1L, "John Doe", "john@example.com", 4.0,1,1,1, Collections.emptyList()),
+                false,
+                "Home > Category > Course"
+        );
+
+        // Mock the behavior of courseService
+        when(courseService.create(coursePostVM)).thenReturn(mockCourseVM);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/admin/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(coursePostVM)));
+
+        // Then
+        resultActions.andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
+    }
+
+    @Test
+    void testCreateCourse_DuplicateTitle() throws Exception {
+        // Given
+        CoursePostVM coursePostVM = new CoursePostVM(
+                null,
+                "Duplicated Title",
+                "Course Headline",
+                new String[]{"Objective 1", "Objective 2"},
+                new String[]{"Requirement 1", "Requirement 2"},
+                new String[]{"Audience 1", "Audience 2"},
+                "Course description",
+                "Beginner",
+                1000L,
+                "course-image.jpg",
+                true,
+                1,
+                2
+        );
+
+        ErrorVm errorVm = new ErrorVm(HttpStatus.CONFLICT.toString(), HttpStatus.CONFLICT.getReasonPhrase(), "Duplicated title",Collections.emptyList());
+
+        // Mock the behavior of courseService to throw an exception
+        when(courseService.create(coursePostVM)).thenThrow(new DuplicateException("Duplicated title"));
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/api/v1/admin/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(coursePostVM)));
+
+        // Then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(errorVm)));
     }
 }
