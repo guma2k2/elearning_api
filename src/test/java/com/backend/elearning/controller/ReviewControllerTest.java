@@ -15,9 +15,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Collections;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -166,5 +168,22 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.content[0].createdAt").value("2024-08-29T10:00:00Z"))
                 .andExpect(jsonPath("$.content[0].updatedAt").value("2024-08-29T10:00:00Z"))
                 .andExpect(jsonPath("$.content[0].status").value(true));
+    }
+
+    @Test
+    void testUpdateReviewStatus() throws Exception {
+        // Given
+        Long reviewId = 1L;
+        boolean status = true;
+
+        // Mock the behavior of reviewService to do nothing (successful update)
+        doNothing().when(reviewService).updateStatusReview(status, reviewId);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(put("/api/v1/admin/reviews/{id}/status/{status}", reviewId, status)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Then
+        resultActions.andExpect(status().isNoContent());
     }
 }
