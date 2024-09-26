@@ -16,7 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -144,5 +146,34 @@ public class TopicControllerTest {
         // When & Then
         mockMvc.perform(delete("/api/v1/admin/topics/{id}", topicId))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetTopicsByCategoryId_Success() throws Exception {
+        // Given
+        Integer categoryId = 1;
+        List<TopicVM> topics = Arrays.asList(
+                new TopicVM(1, "Topic 1", "Description 1", true, Arrays.asList("Category 1"), "2024-09-20", "2024-09-21"),
+                new TopicVM(2, "Topic 2", "Description 2", false, Arrays.asList("Category 2"), "2024-09-20", "2024-09-21")
+        );
+
+        // Mock the behavior of topicService to return the list of topics
+        when(topicService.getTopicsByCategoryId(categoryId)).thenReturn(topics);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/topics/category/{id}", categoryId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(topics.size()))
+                .andExpect(jsonPath("$[0].id").value(topics.get(0).id()))
+                .andExpect(jsonPath("$[0].name").value(topics.get(0).name()))
+                .andExpect(jsonPath("$[0].description").value(topics.get(0).description()))
+                .andExpect(jsonPath("$[0].isPublish").value(topics.get(0).isPublish()))
+                .andExpect(jsonPath("$[0].categories[0]").value(topics.get(0).categories().get(0)))
+                .andExpect(jsonPath("$[1].id").value(topics.get(1).id()))
+                .andExpect(jsonPath("$[1].name").value(topics.get(1).name()))
+                .andExpect(jsonPath("$[1].description").value(topics.get(1).description()));
     }
 }
