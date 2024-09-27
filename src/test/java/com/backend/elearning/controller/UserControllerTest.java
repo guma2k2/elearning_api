@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -170,4 +171,52 @@ public class UserControllerTest {
         mockMvc.perform(delete("/api/v1/admin/users/{id}", userId))
                 .andExpect(status().isNoContent());
     }
+    @Test
+    void testGetUserProfile_WithEmptyCourses() throws Exception {
+        // Given
+        Long userId = 1L;
+
+        // Create UserGetDetailVm object with empty courses
+        UserGetDetailVm userGetDetailVm = new UserGetDetailVm();
+        userGetDetailVm.setId(userId);
+        userGetDetailVm.setEmail("test@example.com");
+        userGetDetailVm.setFirstName("John");
+        userGetDetailVm.setLastName("Doe");
+        userGetDetailVm.setFullName("John Doe");
+        userGetDetailVm.setHeadline("Software Developer");
+        userGetDetailVm.setGender("male");
+        userGetDetailVm.setActive(true);
+        userGetDetailVm.setPhoto("photo_url");
+        userGetDetailVm.setDateOfBirth("01-01-1990");
+        userGetDetailVm.setRole("USER");
+        userGetDetailVm.setNumberOfReview(10);
+        userGetDetailVm.setNumberOfStudent(50);
+        userGetDetailVm.setCourses(Collections.emptyList());
+
+        // Mock the behavior of userService and courseService
+        when(userService.getUserProfile(userId)).thenReturn(userGetDetailVm);
+        when(courseService.getByUserId(userId)).thenReturn(Collections.emptyList());
+
+        // When
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/users/{id}", userId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userGetDetailVm.getId()))
+                .andExpect(jsonPath("$.email").value(userGetDetailVm.getEmail()))
+                .andExpect(jsonPath("$.firstName").value(userGetDetailVm.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(userGetDetailVm.getLastName()))
+                .andExpect(jsonPath("$.fullName").value(userGetDetailVm.getFullName()))
+                .andExpect(jsonPath("$.headline").value(userGetDetailVm.getHeadline()))
+                .andExpect(jsonPath("$.gender").value(userGetDetailVm.getGender()))
+                .andExpect(jsonPath("$.active").value(userGetDetailVm.isActive()))
+                .andExpect(jsonPath("$.photo").value(userGetDetailVm.getPhoto()))
+                .andExpect(jsonPath("$.dateOfBirth").value(userGetDetailVm.getDateOfBirth()))
+                .andExpect(jsonPath("$.role").value(userGetDetailVm.getRole()))
+                .andExpect(jsonPath("$.numberOfReview").value(userGetDetailVm.getNumberOfReview()))
+                .andExpect(jsonPath("$.numberOfStudent").value(userGetDetailVm.getNumberOfStudent()))
+                .andExpect(jsonPath("$.courses").isEmpty());
+    }
+
 }
