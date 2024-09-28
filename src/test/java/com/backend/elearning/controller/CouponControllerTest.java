@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
@@ -115,6 +116,30 @@ public class CouponControllerTest {
         // When & Then
         mockMvc.perform(delete("/api/v1/admin/coupons/{id}", couponId))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testGetCouponByCode() throws Exception {
+        // Given
+        String couponCode = "DISCOUNT2024";
+
+        // Create a CouponVM object to return when couponService.getByCode() is called
+        CouponVM couponVm = new CouponVM(1L, 20, couponCode, "2024-01-01T00:00:00", "2024-12-31T23:59:59");
+
+        // Mock the couponService behavior
+        when(couponService.getByCode(couponCode)).thenReturn(couponVm);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(get("/api/v1/coupons/code/{code}", couponCode)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(couponVm.id()))
+                .andExpect(jsonPath("$.discountPercent").value(couponVm.discountPercent()))
+                .andExpect(jsonPath("$.code").value(couponVm.code()))
+                .andExpect(jsonPath("$.startTime").value(couponVm.startTime()))
+                .andExpect(jsonPath("$.endTime").value(couponVm.endTime()));
     }
 
 }
