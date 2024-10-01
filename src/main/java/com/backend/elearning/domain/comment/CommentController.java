@@ -10,12 +10,25 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 @Slf4j
 public class CommentController {
 
-    @MessageMapping("/chat/{eventId}/add")
-    @SendTo("/topic/event/{eventId}")
-    public Comment addUser(
+    @MessageMapping("/chat/{lectureId}/add")
+    @SendTo("/topic/lecture/{lectureId}")
+    public Comment lecture(
             @Payload Comment chatMessage,
             SimpMessageHeaderAccessor headerAccessor,
-            @DestinationVariable("eventId") Long eventId
+            @DestinationVariable("lectureId") Long eventId
+    ) {
+        // Add username in web socket session
+//        log.info(chatMessage.getSender() + " joined");
+//        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+        headerAccessor.getSessionAttributes().put("eventId", eventId);
+        return chatMessage;
+    }
+    @MessageMapping("/chat/{quizId}/add")
+    @SendTo("/topic/quiz/{quizId}")
+    public Comment quiz(
+            @Payload Comment chatMessage,
+            SimpMessageHeaderAccessor headerAccessor,
+            @DestinationVariable("quizId") Long eventId
     ) {
         // Add username in web socket session
 //        log.info(chatMessage.getSender() + " joined");
