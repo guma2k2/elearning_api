@@ -27,10 +27,11 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     """)
     long countByInstructor(@Param("email") String email);
     @Query("""
-            select od.course.id
+            select c.id
             from OrderDetail od
-            GROUP BY od.course.id
-            ORDER BY COUNT(od.course.id) DESC
+            left join fetch od.course c
+            GROUP BY c.id
+            ORDER BY COUNT(c.id) DESC
         """)
     Page<Long> getBestSellerCourses(Pageable pageable);
 
