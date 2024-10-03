@@ -29,7 +29,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     @Query("""
             select c.id
             from OrderDetail od
-            left join fetch od.course c
+            join od.course c
             GROUP BY c.id
             ORDER BY COUNT(c.id) DESC
         """)
@@ -40,7 +40,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         select od 
         from OrderDetail od 
         join fetch od.order o 
-        left join fetch od.course
+        join fetch  od.course
         where o.id = :orderId
     """)
     List<OrderDetail> findByOrderId (@Param("orderId") Long orderId);
