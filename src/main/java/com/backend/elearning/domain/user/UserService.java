@@ -11,4 +11,6 @@ public interface UserService {
     UserProfileVM getById(Long userId);
     User getByEmail(String email);
     UserGetDetailVm getUserProfile(Long id);
+
+    void updateStatus(boolean status, Long userId);
 }

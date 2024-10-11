@@ -4,6 +4,7 @@ import com.backend.elearning.domain.student.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -35,4 +36,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
         where u.id = :id
     """)
     Optional<User> findByIdCustom(@Param("id") Long id);
+
+    @Modifying
+    @Query("""
+        update 
+        User s 
+        set s.active = :status
+        where s.id = :id
+    """)
+    void updateStatusUser(@Param("status") boolean status, @Param("id") Long userId);
 }

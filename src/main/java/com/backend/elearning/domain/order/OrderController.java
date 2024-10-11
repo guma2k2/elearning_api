@@ -58,7 +58,7 @@ public class OrderController {
 
 
 
-    @GetMapping("/beseller-courses")
+    @GetMapping("/orders/beseller-courses")
     public ResponseEntity<List<CourseListGetVM>> get10BestSellerProducts() {
         List<CourseListGetVM> courseListGetVMS = orderDetailService.getTopCourseBestSeller(10);
         return ResponseEntity.ok().body(courseListGetVMS);
