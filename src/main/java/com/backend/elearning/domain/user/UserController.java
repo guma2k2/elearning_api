@@ -3,6 +3,7 @@ package com.backend.elearning.domain.user;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.CourseListGetVM;
 import com.backend.elearning.domain.course.CourseService;
+import com.backend.elearning.domain.review.ReviewVM;
 import com.backend.elearning.exception.ErrorVm;
 import com.backend.elearning.utils.Constants;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -82,6 +83,12 @@ public class UserController {
             @PathVariable("id") Long id
     ) {
         userService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/admin/users/{id}/status/{status}")
+    public ResponseEntity<ReviewVM> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long userId){
+        userService.updateStatus(status, userId);
         return ResponseEntity.noContent().build();
     }
 

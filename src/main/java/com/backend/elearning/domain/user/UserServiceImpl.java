@@ -189,4 +189,10 @@ public class UserServiceImpl implements UserService{
         return userGetDetailVm;
     }
 
+    @Override
+    @Transactional
+    public void updateStatus(boolean status, Long userId) {
+        userRepository.updateStatusUser(status, userId);
+    }
+
 }
