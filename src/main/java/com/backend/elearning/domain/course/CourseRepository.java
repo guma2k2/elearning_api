@@ -59,7 +59,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             join fetch c.category ca
             left join fetch ca.parent
             join fetch c.topic
-            where ca.id = :id and c.publish = true
+            where ca.id = :id and c.status = 'PUBLISHED'
             """)
     List<Course> findByCategoryIdWithStatus(@Param("id") Integer categoryId);
 
@@ -140,7 +140,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               join r.course rc 
               where rc.id = c.id 
               group by rc.id) >= :ratingStar)
-        and c.publish = true 
+        and c.status = 'PUBLISHED'
     """)
     Page<Course> findByMultiQuery(Pageable pageable,
                                   @Param("ratingStar") Float ratingStar,
@@ -167,7 +167,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               join r.course rc 
               where rc.id = c.id 
               group by rc.id) >= :ratingStar)
-        and c.publish = true 
+        and c.status = 'PUBLISHED' 
     """)
     List<Course> findByMultiQuery(
                                   @Param("ratingStar") Float ratingStar,
@@ -195,7 +195,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               join r.course rc 
               where rc.id = c.id 
               group by rc.id) >= :ratingStar)
-        and c.publish = true 
+        and c.status = 'PUBLISHED'
     """)
     Page<Course> findByMultiQueryWithKeyword(Pageable pageable,
                                   @Param("title") String title,
@@ -226,7 +226,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               join r.course rc 
               where rc.id = c.id 
               group by rc.id) >= :ratingStar)
-        and c.publish = true 
+        and c.status = 'PUBLISHED'
     """)
     List<Course> findByMultiQueryWithKeyword(
                                              @Param("title") String title,
@@ -240,8 +240,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("""
         update 
         Course s 
-        set s.publish = :status
+        set s.status = :status, s.reasonRefused = :reason
         where s.id = :id
     """)
-    void updateStatusCourse(@Param("status") boolean status, @Param("id") Long courseId);
+    void updateStatusCourse(@Param("status") CourseStatus status, @Param("reason") String reason ,@Param("id") Long courseId);
 }

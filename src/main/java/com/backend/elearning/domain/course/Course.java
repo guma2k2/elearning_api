@@ -51,7 +51,11 @@ public class Course extends AbstractAuditEntity {
 
     private boolean free;
 
-    private boolean publish;
+
+    @Enumerated(EnumType.STRING)
+    private CourseStatus status;
+
+    private String reasonRefused;
 
     private Long price;
 

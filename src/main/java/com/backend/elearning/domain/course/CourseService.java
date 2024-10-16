@@ -32,5 +32,5 @@ public interface CourseService {
 
     void delete(Long id);
 
-    void updateStatusCourse(boolean status, Long courseId);
+    void updateStatusCourse(CourseStatusPostVM courseStatusPostVM, Long courseId);
 }

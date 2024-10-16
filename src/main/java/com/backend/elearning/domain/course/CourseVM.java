@@ -24,7 +24,7 @@ public record CourseVM(
         String updatedAt,
         boolean free,
         Long price,
-        boolean isPublish,
+        String status,
         Integer categoryId,
         Integer topicId,
         int ratingCount,
@@ -43,7 +43,7 @@ public record CourseVM(
         if (o == null || getClass() != o.getClass()) return false;
         CourseVM that = (CourseVM) o;
         return free == that.free &&
-                isPublish == that.isPublish &&
+                status == that.status &&
                 ratingCount == that.ratingCount &&
                 Double.compare(that.averageRating, averageRating) == 0 &&
                 totalLectureCourse == that.totalLectureCourse &&
@@ -73,7 +73,7 @@ public record CourseVM(
     @Override
     public int hashCode() {
         int result = Objects.hash(id, title, headline, slug, description, level, image, createdAt, updatedAt, free,
-                price, isPublish, categoryId, topicId, ratingCount, averageRating, totalLectureCourse,
+                price, status, categoryId, topicId, ratingCount, averageRating, totalLectureCourse,
                 totalDurationCourse, createdBy, sections, user, learning, breadcrumb);
         result = 31 * result + Arrays.hashCode(objectives);
         result = 31 * result + Arrays.hashCode(requirements);
@@ -98,7 +98,7 @@ public record CourseVM(
                 ", updatedAt='" + updatedAt + '\'' +
                 ", free=" + free +
                 ", price=" + price +
-                ", isPublish=" + isPublish +
+                ", isPublish=" + status.toString() +
                 ", categoryId=" + categoryId +
                 ", topicId=" + topicId +
                 ", ratingCount=" + ratingCount +
@@ -138,7 +138,7 @@ public record CourseVM(
                 updatedAt,
                 course.isFree(),
                 price,
-                course.isPublish(),
+                course.getStatus().name(),
                 course.getCategory().getId(),
                 course.getTopic().getId(),
                 ratingCount,

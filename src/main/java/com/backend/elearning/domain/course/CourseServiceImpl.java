@@ -389,8 +389,8 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     @Transactional
-    public void updateStatusCourse(boolean status, Long courseId) {
-        courseRepository.updateStatusCourse(status, courseId);
+    public void updateStatusCourse(CourseStatusPostVM courseStatusPostVM, Long courseId) {
+        courseRepository.updateStatusCourse(courseStatusPostVM.status(), courseStatusPostVM.reason(), courseId);
     }
 
     private String convertSeconds(int seconds) {
