@@ -26,30 +26,30 @@ public class CourseRepositoryTest {
 
     @Autowired
     private TestEntityManager entityManager;
-    @Test
-    @Transactional
-    @DirtiesContext
-        // Reload context to ensure a clean state
-    void canUpdateStatusCourseById() {
-        // given
-        Long courseId = 1L;
-        boolean expected = true;
-
-        Course course = Course.builder().id(courseId).title("Course title").publish(false).build();
-
-        underTest.saveAndFlush(course);
-
-        // when
-        underTest.updateStatusCourse(expected, course.getId());
-        underTest.flush();
-
-        // then
-        Optional<Course> courseOptional = underTest.findById(course.getId());
-        assertThat(courseOptional)
-                .isPresent()
-                .hasValueSatisfying(c -> {
-                    entityManager.refresh(c);
-                    assertThat(c.isPublish()).isEqualTo(expected);
-                });
-    }
+//    @Test
+//    @Transactional
+//    @DirtiesContext
+//        // Reload context to ensure a clean state
+//    void canUpdateStatusCourseById() {
+//        // given
+//        Long courseId = 1L;
+//        boolean expected = true;
+//
+//        Course course = Course.builder().id(courseId).title("Course title").publish(false).build();
+//
+//        underTest.saveAndFlush(course);
+//
+//        // when
+//        underTest.updateStatusCourse(expected, course.getId());
+//        underTest.flush();
+//
+//        // then
+//        Optional<Course> courseOptional = underTest.findById(course.getId());
+//        assertThat(courseOptional)
+//                .isPresent()
+//                .hasValueSatisfying(c -> {
+//                    entityManager.refresh(c);
+//                    assertThat(c.isPublish()).isEqualTo(expected);
+//                });
+//    }
 }

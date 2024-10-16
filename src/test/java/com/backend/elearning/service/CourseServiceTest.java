@@ -128,7 +128,7 @@ import static org.mockito.Mockito.when;
               .imageId(coursePostVM.image())
               .level(ELevel.Beginner)
               .free(true)
-              .publish(true)
+              .status(CourseStatus.PUBLISHED)
               .price(100000L)
               .user(user)  // Assuming `user` is a pre-existing User object
               .topic(topic)  // Assuming `topic` is a pre-existing Topic object
@@ -205,6 +205,7 @@ import static org.mockito.Mockito.when;
         oldCourse.setFree(false);
         oldCourse.setPrice(200L);
         oldCourse.setUser(user);
+        oldCourse.setStatus(CourseStatus.PUBLISHED);
 
         CoursePostVM coursePutVM = new CoursePostVM(
                 courseId,

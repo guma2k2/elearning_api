@@ -9,6 +9,7 @@ import com.backend.elearning.exception.ErrorVm;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.security.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -119,7 +120,7 @@ public class CourseControllerTest {
                 "2024-09-10",
                 true,
                 1000L,
-                true,
+                CourseStatus.PUBLISHED.name(),
                 1,
                 2,
                 100,
@@ -180,7 +181,7 @@ public class CourseControllerTest {
                 "2024-09-10",
                 true,
                 1000L,
-                true,
+                CourseStatus.PUBLISHED.name(),
                 1,
                 2,
                 0,

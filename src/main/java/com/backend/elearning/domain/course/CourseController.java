@@ -74,9 +74,9 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseVM);
     }
 
-    @PutMapping("/admin/courses/{id}/status/{status}")
-    public ResponseEntity<Void> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long courseId){
-        courseService.updateStatusCourse(status, courseId);
+    @PutMapping("/admin/courses/{id}/status")
+    public ResponseEntity<Void> updateReview(@RequestBody CourseStatusPostVM courseStatusPostVM, @PathVariable("id") Long courseId){
+        courseService.updateStatusCourse(courseStatusPostVM, courseId);
         return ResponseEntity.noContent().build();
     }
     @PutMapping("/admin/courses/{id}")
