@@ -52,6 +52,8 @@ public class Student extends AbstractAuditEntity implements UserDetails {
 
     private LocalDate dateOfBirth;
 
+    private String verificationCode;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<LearningCourse> learningCourses = new ArrayList<>();

@@ -354,6 +354,34 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
+    public List<CourseListGetVM> getCoursesByMultiQueryReturnList(int pageNum, int pageSize, String title, Float rating, String[] level, Boolean[] free, String categoryName, Integer topicId) {
+        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
+            courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
+        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
+        List<Review> reviews = course.getReviews();
+        int ratingCount = reviews.size();
+        Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
+        double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
+        AtomicInteger totalCurriculumCourse = new AtomicInteger();
+        AtomicInteger totalDurationCourse = new AtomicInteger();
+        List<Section> sections = sectionService.findByCourseId(course.getId());
+        sections.forEach(section -> {
+            List<Lecture> lectures = section.getLectures();
+            List<Quiz> quizzes = section.getQuizzes();
+            totalCurriculumCourse.addAndGet(lectures.size());
+            totalCurriculumCourse.addAndGet(quizzes.size());
+            int totalSeconds = lectures.stream()
+                    .mapToInt(lecture -> lecture.getDuration())
+                    .sum();
+            totalDurationCourse.addAndGet(totalSeconds);
+        });
+        String formattedHours = convertSeconds(totalDurationCourse.get());
+        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
+        }).toList();
+        return courseListGetVMS;
+    }
+
+    @Override
     public List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId) {
         List<Course> courses = courseRepository.findByCategoryIdWithStatus(categoryId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
