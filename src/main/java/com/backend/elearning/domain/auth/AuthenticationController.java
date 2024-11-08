@@ -41,6 +41,14 @@ public class AuthenticationController {
         return ResponseEntity.ok().body(result);
     }
 
+    @PostMapping("/outbound/authentication/mobile")
+    ResponseEntity<AuthenticationVm> outboundAuthenticateForMobile(
+            @RequestBody OutboundUserRequest request
+    ){
+        AuthenticationVm result = authenticationService.outboundAuthenticateForMobile(request);
+        return ResponseEntity.ok().body(result);
+    }
+
 
 
     @PostMapping("/login")
@@ -59,6 +67,18 @@ public class AuthenticationController {
         AuthenticationVm response = authenticationService.register(request);
         return ResponseEntity.ok()
                 .body(response);
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<String> verfify (
+            @RequestParam String code
+    ) {
+        if (authenticationService.verify(code)) {
+            return ResponseEntity.ok()
+                    .body("Verify Success");
+        }
+        return ResponseEntity.badRequest()
+                .body("Verify Fail");
     }
 
 }

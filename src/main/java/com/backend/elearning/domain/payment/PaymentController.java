@@ -19,6 +19,11 @@ public class PaymentController {
     public ResponseEntity<PaymentVM.VNPayResponse> pay(@RequestBody PaymentRequestVM request, HttpServletRequest httpServletRequest) {
         return ResponseEntity.ok().body(paymentService.createVNPayPayment(request, httpServletRequest));
     }
+
+    @PostMapping("/vn-pay/mobile")
+    public ResponseEntity<PaymentVM.VNPayResponse> payForMobile(@RequestBody PaymentRequestVM request, HttpServletRequest httpServletRequest) {
+        return ResponseEntity.ok().body(paymentService.createVNPayPaymentMobile(request, httpServletRequest));
+    }
     @GetMapping("/vn-pay-callback")
     public ResponseEntity<PaymentVM.VNPayResponse> payCallbackHandler(@RequestParam String vnp_ResponseCode) {
         if (vnp_ResponseCode.equals("00")) {

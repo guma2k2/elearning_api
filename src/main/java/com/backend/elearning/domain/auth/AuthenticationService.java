@@ -13,6 +13,7 @@ import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.utils.Constants;
+import com.backend.elearning.utils.RandomString;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -146,11 +147,23 @@ public class AuthenticationService {
                 .lastName(request.lastName())
                 .email(request.email())
                 .photo("")
+                .active(false)
                 .build());
+        String randomCode = RandomString.make(64);
+        student.setVerificationCode(randomCode);
         String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
         UserVm userVm = UserVm.fromModelStudent(student);
         AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
         return authenticationVm ;
+    }
+
+    public boolean verify(String verificationCode) {
+        Optional<Student> studentOptional = studentRepository.findByVerificationCode(verificationCode);
+        if (studentOptional.isPresent()) {
+            studentOptional.get().setActive(true);
+            return true;
+        }
+        return false ;
     }
 
     public void forgotPassword(String email) {
@@ -186,5 +199,20 @@ public class AuthenticationService {
             log.error("Error updating password", e);
             throw e; // Rethrow the exception if needed
         }
+    }
+
+    public AuthenticationVm outboundAuthenticateForMobile(OutboundUserRequest userInfo) {
+        Student student = studentRepository.findByEmail(userInfo.email()).orElseGet(
+                () -> studentRepository.saveAndFlush(Student.builder()
+                        .active(true)
+                        .firstName(userInfo.familyName())
+                        .lastName(userInfo.givenName())
+                        .email(userInfo.email())
+                        .photo(userInfo.picture())
+                        .build()));
+        String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
+        UserVm userVm = UserVm.fromModelStudent(student);
+        AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
+        return authenticationVm ;
     }
 }

@@ -5,5 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface PaymentService {
     PaymentVM.VNPayResponse createVNPayPayment(PaymentRequestVM request, HttpServletRequest httpServletRequest);
 
+    PaymentVM.VNPayResponse createVNPayPaymentMobile(PaymentRequestVM request, HttpServletRequest httpServletRequest);
+
+
     void savePayment(PaymentPostVM request);
 }

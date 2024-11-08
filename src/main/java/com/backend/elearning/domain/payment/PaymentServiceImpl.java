@@ -58,6 +58,27 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public PaymentVM.VNPayResponse createVNPayPaymentMobile(PaymentRequestVM request, HttpServletRequest httpServletRequest) {
+        long amount = request.amount() * 100L;
+        String bankCode = request.bankCode();
+        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfigForAndroid(request);
+        vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
+        if (bankCode != null && !bankCode.isEmpty()) {
+            vnpParamsMap.put("vnp_BankCode", bankCode);
+        }
+        vnpParamsMap.put("vnp_IpAddr", VNPayUtils.getIpAddress(httpServletRequest));
+        //build query url
+        String queryUrl = VNPayUtils.getPaymentURL(vnpParamsMap, true);
+        String hashData = VNPayUtils.getPaymentURL(vnpParamsMap, false);
+        queryUrl += "&vnp_SecureHash=" + VNPayUtils.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
+        String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+        return PaymentVM.VNPayResponse.builder()
+                .code("ok")
+                .message("success")
+                .paymentUrl(paymentUrl).build();
+    }
+
+    @Override
     public void savePayment(PaymentPostVM request) {
         Order order = orderRepository.findById(request.orderId()).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.ORDER_NOT_FOUND, request.orderId()));
         Payment payment = Payment.builder()
