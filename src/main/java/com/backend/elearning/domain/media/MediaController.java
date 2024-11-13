@@ -1,9 +1,13 @@
 package com.backend.elearning.domain.media;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/medias")
@@ -23,6 +27,20 @@ public class MediaController {
         return ResponseEntity.ok().body(media);
     }
 
+    @GetMapping("/download")
+    public ResponseEntity<byte[]> downloadFile(@RequestParam String fileUrl, @RequestParam String fileName) {
+        try {
+            byte[] fileBytes = mediaService.downloadFile(fileUrl);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+            headers.set(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+
+            return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
     @PutMapping("/{id}")

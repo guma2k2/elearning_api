@@ -14,4 +14,6 @@ public class Media {
 
     private String duration;
 
+    private String fileName;
+
 }
