@@ -56,8 +56,7 @@ public class SecurityFilterChainConfig {
                                         "/api/v1/admin/courses/*",
                                         "/api/v1/admin/lectures/*",
                                         "/api/v1/admin/quizzes/*",
-                                        "/api/v1/statistic/*",
-                                        "/api/v1/medias/*"
+                                        "/api/v1/statistic/*"
                                 ).hasAnyRole(ROLE_INSTRUCTOR, ROLE_ADMIN)
                                 .requestMatchers("/api/v1/payments/*",
                                         "/api/v1/orders",

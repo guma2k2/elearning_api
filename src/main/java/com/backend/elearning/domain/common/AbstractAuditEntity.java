@@ -22,14 +22,8 @@ public class AbstractAuditEntity {
     @Column(name = "created_at")
     protected LocalDateTime createdAt;
 
-    @CreatedBy
-    private String createdBy;
-
-
     @LastModifiedDate
     @Column(name = "updated_at")
     protected LocalDateTime updatedAt;
 
-    @LastModifiedBy
-    private String lastModifiedBy;
 }

@@ -4,6 +4,7 @@ import com.backend.elearning.exception.BadRequestException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,8 +17,11 @@ public class MediaServiceImpl implements MediaService {
 
     private final Cloudinary cloudinary;
 
-    public MediaServiceImpl(Cloudinary cloudinary) {
+    private final RestTemplate restTemplate;
+
+    public MediaServiceImpl(Cloudinary cloudinary, RestTemplate restTemplate) {
         this.cloudinary = cloudinary;
+        this.restTemplate = restTemplate;
     }
 
 
@@ -36,11 +40,12 @@ public class MediaServiceImpl implements MediaService {
             Map uploadResult = cloudinary.uploader()
                     .upload(multipartFile.getBytes(), map);
             String url = uploadResult
-                    .get("url")
+                    .get("secure_url")
                     .toString();
             Media media =  Media.builder()
                     .id(fileId)
                     .url(url)
+                    .fileName(multipartFile.getOriginalFilename())
                     .build();
             if (type.equals("video")) {
                 String duration = uploadResult.get("duration").toString();
@@ -65,6 +70,11 @@ public class MediaServiceImpl implements MediaService {
         } catch (IOException e) {
             throw new BadRequestException(e.getMessage());
         }
+    }
+
+    @Override
+    public byte[] downloadFile(String fileUrl) throws IOException {
+        return restTemplate.getForObject(fileUrl, byte[].class);
     }
 
 
