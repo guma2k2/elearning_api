@@ -26,6 +26,15 @@ public class ClassroomController {
         return ResponseEntity.ok().body(classroomVM);
     }
 
+    @PostMapping("/classrooms/{classroomId}")
+    public ResponseEntity<ClassroomVM> update (
+            @RequestBody ClassroomPostVM classroomPostVM,
+            @PathVariable("classroomId") Long classroomId
+    ) {
+        ClassroomVM classroomVM = classroomService.update(classroomPostVM, classroomId);
+        return ResponseEntity.ok().body(classroomVM);
+    }
+
     @GetMapping("/classrooms/course/{courseId}")
     public ResponseEntity<List<ClassroomVM>> getByCourseId (
             @PathVariable("courseId") Long courseId
