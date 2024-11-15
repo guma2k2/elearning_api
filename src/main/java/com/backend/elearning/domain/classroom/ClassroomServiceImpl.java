@@ -49,6 +49,17 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
+    public ClassroomVM update(ClassroomPostVM classroomPostVM, Long classroomId) {
+
+        Classroom classroom = classroomRepository.findById(classroomId).orElseThrow();
+        classroom.setName(classroom.getName());
+        classroom.setDescription(classroomPostVM.description());
+
+        Classroom updatedClassroom = classroomRepository.save(classroom);
+        return ClassroomVM.fromModel(updatedClassroom);
+    }
+
+    @Override
     public List<ClassroomVM> getByCourseId(Long courseId) {
         List<Classroom> classrooms = classroomRepository.findByCourseId(courseId);
         return classrooms.stream().map(ClassroomVM::fromModel).toList();
