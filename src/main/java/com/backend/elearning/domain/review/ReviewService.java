@@ -8,10 +8,11 @@ import java.util.List;
 public interface ReviewService {
 
     ReviewVM createReviewForProduct(ReviewPostVM reviewPost);
+    ReviewVM updateReview(ReviewPostVM reviewPostVM, Long reviewId);
+
 
     PageableDataReview<ReviewVM> getByMultiQuery(Long courseId, Integer pageNum, int pageSize, Integer ratingStar, String sortDir);
 
-    ReviewVM updateReview(ReviewPostVM reviewPostVM, Long reviewId);
 
     List<Review> findByCourseId(Long courseId);
 

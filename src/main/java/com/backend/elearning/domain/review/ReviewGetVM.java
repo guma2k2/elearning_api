@@ -7,7 +7,7 @@ public record ReviewGetVM(
         Long id,
         String content,
         int ratingStar,
-        String updated_at
+        String updatedAt
 ) {
     public static ReviewGetVM fromModel(Review review) {
         String updatedAt = review.getUpdatedAt() != null ?
