@@ -4,10 +4,7 @@ package com.backend.elearning.domain.meeting;
 import com.backend.elearning.domain.classroom.ClassroomPostVM;
 import com.backend.elearning.domain.classroom.ClassroomVM;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,5 +22,22 @@ public class MeetingController {
     ) {
         MeetingVM meetingVM = meetingService.create(meetingPostVM);
         return ResponseEntity.ok().body(meetingVM);
+    }
+
+    @PutMapping("/meetings/{meetingId}")
+    public ResponseEntity<MeetingVM> update (
+            @RequestBody MeetingPostVM meetingPostVM,
+            @PathVariable("meetingId") Long meetingId
+    ) {
+        MeetingVM meetingVM = meetingService.update(meetingPostVM, meetingId);
+        return ResponseEntity.ok().body(meetingVM);
+    }
+
+    @DeleteMapping("/meetings/{meetingId}")
+    public ResponseEntity<String> delete (
+            @PathVariable("meetingId") Long meetingId
+    ) {
+        meetingService.delete( meetingId);
+        return ResponseEntity.ok().body("deleted");
     }
 }

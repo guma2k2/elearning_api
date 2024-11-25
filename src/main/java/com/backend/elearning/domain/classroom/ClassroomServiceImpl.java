@@ -1,17 +1,13 @@
 package com.backend.elearning.domain.classroom;
 
-import com.backend.elearning.domain.common.Curriculum;
 import com.backend.elearning.domain.common.Event;
 import com.backend.elearning.domain.common.EventType;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.meeting.Meeting;
 import com.backend.elearning.domain.meeting.MeetingGetVM;
-import com.backend.elearning.domain.referencefile.ReferenceFile;
 import com.backend.elearning.domain.referencefile.ReferenceFileService;
 import com.backend.elearning.domain.referencefile.ReferenceFileVM;
-import com.backend.elearning.domain.section.Section;
-import com.backend.elearning.domain.section.SectionVM;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.reference.Reference;
 import com.backend.elearning.reference.ReferenceGetVM;
@@ -21,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static com.backend.elearning.utils.DateTimeUtils.convertLocalDateTimeToMonthYearText;
+import static com.backend.elearning.utils.DateTimeUtils.convertLocalDateTimeToString;
 
 @Service
 public class ClassroomServiceImpl implements ClassroomService {
@@ -50,10 +49,11 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Override
     public ClassroomVM update(ClassroomPostVM classroomPostVM, Long classroomId) {
-
         Classroom classroom = classroomRepository.findById(classroomId).orElseThrow();
         classroom.setName(classroom.getName());
         classroom.setDescription(classroomPostVM.description());
+        classroom.setImage(classroomPostVM.image());
+
 
         Classroom updatedClassroom = classroomRepository.save(classroom);
         return ClassroomVM.fromModel(updatedClassroom);
@@ -85,8 +85,8 @@ public class ClassroomServiceImpl implements ClassroomService {
             meetingGetVM.setId(meeting.getId());
             meetingGetVM.setCode(meeting.getCode());
             meetingGetVM.setType(EventType.meeting);
-            meetingGetVM.setStartTime(meeting.getStartTime().toString());
-            meetingGetVM.setEndTime(meeting.getEndTime().toString());
+            meetingGetVM.setStartTime(convertLocalDateTimeToString(meeting.getStartTime()));
+            meetingGetVM.setEndTime(convertLocalDateTimeToString(meeting.getEndTime()));
             meetingGetVM.setCreatedAt(meeting.getCreatedAt());
             events.add(meetingGetVM);
         }

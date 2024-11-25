@@ -36,4 +36,9 @@ public class ReferenceFileServiceImpl implements ReferenceFileService {
         List<ReferenceFile> referenceFiles = referenceFileRepo.findByReferenceId(referenceId);
         return referenceFiles.stream().map(referenceFile -> ReferenceFileVM.fromModel(referenceFile)).toList();
     }
+
+    @Override
+    public void delete(Long referenceFileId) {
+        referenceFileRepo.deleteById(referenceFileId);
+    }
 }
