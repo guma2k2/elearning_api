@@ -4,10 +4,7 @@ import com.backend.elearning.domain.meeting.MeetingPostVM;
 import com.backend.elearning.domain.meeting.MeetingService;
 import com.backend.elearning.domain.meeting.MeetingVM;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,5 +22,22 @@ public class ReferenceController {
     ) {
         ReferenceVM referenceVM = referenceService.create(referencePostVM);
         return ResponseEntity.ok().body(referenceVM);
+    }
+
+    @PutMapping("/references/{referenceId}")
+    public ResponseEntity<ReferenceVM> update (
+            @RequestBody ReferencePostVM referencePostVM,
+            Long referenceId
+    ) {
+        ReferenceVM referenceVM = referenceService.update(referencePostVM, referenceId);
+        return ResponseEntity.ok().body(referenceVM);
+    }
+
+    @DeleteMapping("/references/{referenceId}")
+    public ResponseEntity<String> delete (
+          @PathVariable("referenceId")  Long referenceId
+    ) {
+        referenceService.delete(referenceId);
+        return ResponseEntity.ok().body("deleted ");
     }
 }

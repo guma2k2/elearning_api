@@ -26,7 +26,7 @@ public class ClassroomController {
         return ResponseEntity.ok().body(classroomVM);
     }
 
-    @PostMapping("/classrooms/{classroomId}")
+    @PutMapping("/classrooms/{classroomId}")
     public ResponseEntity<ClassroomVM> update (
             @RequestBody ClassroomPostVM classroomPostVM,
             @PathVariable("classroomId") Long classroomId
