@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.student;
 
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.user.EGender;
 import com.backend.elearning.domain.user.UserVm;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
@@ -57,13 +58,17 @@ public class StudentServiceImpl implements StudentService {
         student.setEmail(studentPutVM.email());
         student.setFirstName(studentPutVM.firstName());
         student.setLastName(studentPutVM.lastName());
+
+        if (studentPutVM.gender() != null) {
+            student.setGender(EGender.valueOf(studentPutVM.gender()));
+        }
         if (studentPutVM.day() != null) {
             student.setDateOfBirth(LocalDate.of(studentPutVM.year(), studentPutVM.month(), studentPutVM.day()));
         }
-        if (!studentPutVM.photo().isEmpty() && !studentPutVM.photo().isBlank()) {
+        if (studentPutVM.photo() != null && !studentPutVM.photo().isEmpty() && !studentPutVM.photo().isBlank()) {
             student.setPhoto(studentPutVM.photo());
         }
-        if (!studentPutVM.password().isEmpty() && !studentPutVM.password().isBlank()) {
+        if (studentPutVM.photo() != null && !studentPutVM.password().isEmpty() && !studentPutVM.password().isBlank() ) {
             student.setPassword(passwordEncoder.encode(studentPutVM.password()));
         }
         // update

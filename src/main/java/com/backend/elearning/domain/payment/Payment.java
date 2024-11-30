@@ -20,7 +20,7 @@ public class Payment {
     private long amount;
     private String bankCode ;
     private String bankTranNo ;
-    private String cartType ;
+    private String cardType ;
     private LocalDateTime payDate;
 
     @OneToOne(fetch = FetchType.LAZY)

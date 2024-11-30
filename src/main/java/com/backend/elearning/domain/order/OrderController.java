@@ -57,6 +57,13 @@ public class OrderController {
     }
 
 
+    @GetMapping("/orders/user/status/{status}")
+    public ResponseEntity<List<OrderVM>> findAllByUserId(@PathVariable("status") EOrderStatus status) {
+        List<OrderVM> orders = orderService.findAllByUserIdAndStatus(status);
+        return ResponseEntity.ok().body(orders);
+    }
+
+
 
     @GetMapping("/orders/beseller-courses")
     public ResponseEntity<List<CourseListGetVM>> get10BestSellerProducts() {

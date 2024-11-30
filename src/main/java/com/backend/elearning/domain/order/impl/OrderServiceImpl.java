@@ -109,6 +109,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderVM> findAllByUserIdAndStatus(EOrderStatus status) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Order> orders = orderRepository.findAllByStudentAndStatus(email, status);
+        List<OrderVM> orderVMS = orders.stream().map(order -> {
+            Long orderId = order.getId();
+            Coupon coupon = order.getCoupon();
+            AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+            List<OrderDetailVM> orderDetailVMS = orderDetails.stream().map(orderDetail -> {
+                Long courseId = orderDetail.getCourse().getId();
+                Course course = courseRepository.findById(courseId).orElseThrow();
+                CourseGetVM courseVM = CourseGetVM.fromModel(course);
+                totalPrice.updateAndGet(v -> v + orderDetail.getPrice());
+                return OrderDetailVM.fromModel(orderDetail, courseVM);
+            }).toList();
+            Long total = totalPrice.get();
+            if (coupon != null) {
+                total = total - coupon.getDiscountPercent() * total / 100;
+            }
+            return OrderVM.fromModel(order, orderDetailVMS, total);
+        }).toList();
+        return orderVMS;
+    }
+
+    @Override
     @Transactional
     public void updateOrderStatus(Long orderId, String orderStatus) {
         EOrderStatus status = EOrderStatus.valueOf(orderStatus);
