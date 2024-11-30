@@ -85,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .bankTranNo(request.bankTranNo())
                 .payDate(DateTimeUtils.convertStringToLocalDateTime(request.payDate(), DateTimeUtils.PAYMENT_TYPE))
                 .amount(request.amount())
-                .cartType(request.cartType())
+                .cardType(request.cardType())
                 .bankCode(request.bankCode())
                 .order(order)
                 .build();

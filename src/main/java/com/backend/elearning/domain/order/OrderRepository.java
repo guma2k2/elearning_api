@@ -40,6 +40,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.student s 
             left join fetch o.coupon c
             left join fetch o.orderDetails 
+            where s.email =:email and o.status = :status
+        """)
+    List<Order> findAllByStudentAndStatus(@Param("email")String email,
+                                          @Param("status") EOrderStatus status);
+
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.coupon c
+            left join fetch o.orderDetails 
             where o.id = :id
         """)
     Optional<Order> findByIdCustom(@Param("id")Long orderId);

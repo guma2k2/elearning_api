@@ -7,6 +7,9 @@ import java.util.List;
 public interface OrderService {
     Long createOrder(OrderPostDto orderPostDto);
     List<OrderVM> findAllByUserId();
+
+    List<OrderVM> findAllByUserIdAndStatus(EOrderStatus status);
+
     void updateOrderStatus(Long orderId, String orderStatus);
     PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long orderId);
 }
