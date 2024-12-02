@@ -50,7 +50,7 @@ public class StudentServiceTest {
     }
     @Test
     void shouldUpdateStudentDetailsSuccessfully_whenValidStudentPutVMProvided() {
-        StudentPutVM studentPutVM = new StudentPutVM(1L, "newemail@example.com", "John", "Doe", "password", "Male", "photo.png", 1, 1, 1990);
+        StudentPutVM studentPutVM = new StudentPutVM(1L, "newemail@example.com", "John", "Doe", "password", "MALE", "photo.png", 1, 1, 1990);
         Student student = new Student();
         when(studentRepository.countByExistedEmail(studentPutVM.email(), studentPutVM.id())).thenReturn(0L);
         when(studentRepository.findById(studentPutVM.id())).thenReturn(Optional.of(student));
@@ -68,7 +68,7 @@ public class StudentServiceTest {
 
     @Test
     void shouldNotUpdatePhoto_whenPhotoIsEmptyOrNull() {
-        StudentPutVM studentPutVM = new StudentPutVM(1L, "newemail@example.com", "John", "Doe", "password", "Male", "", 1, 1, 1990);
+        StudentPutVM studentPutVM = new StudentPutVM(1L, "newemail@example.com", "John", "Doe", "password", "MALE", "", 1, 1, 1990);
         Student student = new Student();
         student.setPhoto("existing_photo.png");
         when(studentRepository.countByExistedEmail(studentPutVM.email(), studentPutVM.id())).thenReturn(0L);
@@ -82,7 +82,7 @@ public class StudentServiceTest {
 
     @Test
     void shouldNotUpdatePassword_whenPasswordIsEmptyOrNull() {
-        StudentPutVM studentPutVM = new StudentPutVM(1L, "newemail@example.com", "John", "Doe", "", "Male", "photo.png", 1, 1, 1990);
+        StudentPutVM studentPutVM = new StudentPutVM(1L, "newemail@example.com", "John", "Doe", "", "MALE", "photo.png", 1, 1, 1990);
         Student student = new Student();
         student.setPassword("existing_password");
         when(studentRepository.countByExistedEmail(studentPutVM.email(), studentPutVM.id())).thenReturn(0L);
