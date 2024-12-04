@@ -31,7 +31,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -141,29 +143,70 @@ public class AuthenticationService {
         if (checkExisted > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, request.email());
         }
-        Student student = studentRepository.saveAndFlush(Student.builder()
+        Student student = Student.builder()
                 .active(true)
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
                 .photo("")
                 .active(false)
-                .build());
-        String randomCode = RandomString.make(64);
-        student.setVerificationCode(randomCode);
+                .build();
+        student.setVerificationCode(generateVerificationCode());
+        student.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+        student.setCreatedAt(LocalDateTime.now());
+        student.setUpdatedAt(LocalDateTime.now());
+        studentRepository.saveAndFlush(student);
+        sendVerificationEmail(student);
         String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
         UserVm userVm = UserVm.fromModelStudent(student);
         AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
         return authenticationVm ;
     }
 
-    public boolean verify(String verificationCode) {
-        Optional<Student> studentOptional = studentRepository.findByVerificationCode(verificationCode);
-        if (studentOptional.isPresent()) {
-            studentOptional.get().setActive(true);
-            return true;
+    private void sendVerificationEmail(Student student) {
+        String subject = "Account Verification";
+        String verificationCode = "VERIFICATION CODE " + student.getVerificationCode();
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            mailService.sendEmail(student.getEmail(), subject, htmlMessage);
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
         }
-        return false ;
+    }
+
+
+    public void verify(VerifyStudentVM request) {
+        Optional<Student> studentOptional = studentRepository.findByEmail(request.email());
+        if (studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+            if (student.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
+                throw new BadRequestException("Verification code has expired");
+            }
+            if (student.getVerificationCode().equals(student.getVerificationCode())) {
+                student.setActive(true);
+                student.setVerificationCode(null);
+                student.setVerificationCodeExpiresAt(null);
+                studentRepository.save(student);
+            } else {
+                throw new BadRequestException("Invalid verification code");
+            }
+        } else {
+            throw new NotFoundException("Student not found");
+        }
     }
 
     public void forgotPassword(String email) {
@@ -193,6 +236,7 @@ public class AuthenticationService {
                     .findByEmail(request.email())
                     .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, request.email()));
             student.setPassword(passwordEncoder.encode(request.password()));
+            student.setUpdatedAt(LocalDateTime.now());
             studentRepository.save(student);
         } catch (Exception e) {
             // Log the exception to understand the issue
@@ -214,6 +258,12 @@ public class AuthenticationService {
         UserVm userVm = UserVm.fromModelStudent(student);
         AuthenticationVm authenticationVm = new AuthenticationVm(token, userVm);
         return authenticationVm ;
+    }
+
+    private String generateVerificationCode() {
+        Random random = new Random();
+        int code = random.nextInt(900000) + 100000;
+        return String.valueOf(code);
     }
 
 }

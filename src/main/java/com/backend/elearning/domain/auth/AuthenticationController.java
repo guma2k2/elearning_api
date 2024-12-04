@@ -72,15 +72,11 @@ public class AuthenticationController {
 
 
     @PostMapping("/verify")
-    public ResponseEntity<String> verfify (
-            @RequestParam String code
+    public ResponseEntity<Void> verify (
+            @RequestBody VerifyStudentVM request
     ) {
-        if (authenticationService.verify(code)) {
-            return ResponseEntity.ok()
-                    .body("Verify Success");
-        }
-        return ResponseEntity.badRequest()
-                .body("Verify Fail");
+        authenticationService.verify(request);
+        return ResponseEntity.noContent().build();
     }
 
 }

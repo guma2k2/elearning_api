@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -58,7 +59,8 @@ public class StudentServiceImpl implements StudentService {
         student.setEmail(studentPutVM.email());
         student.setFirstName(studentPutVM.firstName());
         student.setLastName(studentPutVM.lastName());
-
+        student.setCreatedAt(LocalDateTime.now());
+        student.setUpdatedAt(LocalDateTime.now());
         if (studentPutVM.gender() != null) {
             student.setGender(EGender.valueOf(studentPutVM.gender()));
         }
