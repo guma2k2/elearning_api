@@ -19,13 +19,16 @@ public class MailService {
         this.mailSender = javaMailSender;
     }
 
-    public void sendEmail(String recipient, String body, String subject) throws MessagingException {
+
+    public void sendEmail(String to, String subject, String text) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message,true, "UTF-8");
-        helper.setFrom(sender);
-        helper.setTo(recipient);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(body, true);
+        helper.setText(text, true);
+
         mailSender.send(message);
     }
+
 }
