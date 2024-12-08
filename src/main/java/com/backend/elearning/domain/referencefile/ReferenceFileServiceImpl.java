@@ -1,8 +1,7 @@
 package com.backend.elearning.domain.referencefile;
 
-import com.backend.elearning.reference.Reference;
-import com.backend.elearning.reference.ReferenceRepository;
-import com.backend.elearning.reference.ReferenceVM;
+import com.backend.elearning.domain.reference.Reference;
+import com.backend.elearning.domain.reference.ReferenceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

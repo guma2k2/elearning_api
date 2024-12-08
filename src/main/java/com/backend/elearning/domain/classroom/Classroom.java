@@ -1,11 +1,8 @@
 package com.backend.elearning.domain.classroom;
 
-import com.backend.elearning.domain.common.CustomAuditingEntityListener;
 import com.backend.elearning.domain.course.Course;
-import com.backend.elearning.domain.lecture.Lecture;
 import com.backend.elearning.domain.meeting.Meeting;
-import com.backend.elearning.domain.quiz.Quiz;
-import com.backend.elearning.reference.Reference;
+import com.backend.elearning.domain.reference.Reference;
 import jakarta.persistence.*;
 import lombok.*;
 

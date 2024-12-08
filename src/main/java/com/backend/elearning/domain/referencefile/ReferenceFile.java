@@ -1,7 +1,6 @@
 package com.backend.elearning.domain.referencefile;
 
-import com.backend.elearning.domain.classroom.Classroom;
-import com.backend.elearning.reference.Reference;
+import com.backend.elearning.domain.reference.Reference;
 import jakarta.persistence.*;
 import lombok.*;
 
