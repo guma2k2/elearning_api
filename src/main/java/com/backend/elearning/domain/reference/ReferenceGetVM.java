@@ -1,4 +1,4 @@
-package com.backend.elearning.reference;
+package com.backend.elearning.domain.reference;
 
 import com.backend.elearning.domain.common.Event;
 import com.backend.elearning.domain.common.EventType;

@@ -9,8 +9,8 @@ import com.backend.elearning.domain.meeting.MeetingGetVM;
 import com.backend.elearning.domain.referencefile.ReferenceFileService;
 import com.backend.elearning.domain.referencefile.ReferenceFileVM;
 import com.backend.elearning.exception.NotFoundException;
-import com.backend.elearning.reference.Reference;
-import com.backend.elearning.reference.ReferenceGetVM;
+import com.backend.elearning.domain.reference.Reference;
+import com.backend.elearning.domain.reference.ReferenceGetVM;
 import com.backend.elearning.utils.Constants;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.backend.elearning.utils.DateTimeUtils.convertLocalDateTimeToMonthYearText;
 import static com.backend.elearning.utils.DateTimeUtils.convertLocalDateTimeToString;
 
 @Service

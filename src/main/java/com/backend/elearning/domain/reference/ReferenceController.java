@@ -1,8 +1,5 @@
-package com.backend.elearning.reference;
+package com.backend.elearning.domain.reference;
 
-import com.backend.elearning.domain.meeting.MeetingPostVM;
-import com.backend.elearning.domain.meeting.MeetingService;
-import com.backend.elearning.domain.meeting.MeetingVM;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
