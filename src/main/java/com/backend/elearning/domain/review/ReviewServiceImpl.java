@@ -53,6 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = Review
                 .builder()
                 .student(student)
+                .status(ReviewStatus.UNDER_REVIEW)
                 .course(course)
                 .content(reviewPost.content())
                 .ratingStar(reviewPost.ratingStar())
@@ -146,9 +147,9 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
-    @Override
-    @Transactional
-    public void updateStatusReview(boolean status, Long reviewId) {
-        reviewRepository.updateStatusReview(status, reviewId);
-    }
+//    @Override
+//    @Transactional
+//    public void updateStatusReview(boolean status, Long reviewId) {
+//        reviewRepository.updateStatusReview(status, reviewId);
+//    }
 }

@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.course;
 
+import com.backend.elearning.domain.section.Section;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,6 +42,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             where c.id = :id
             """)
     Optional<Course> findByIdReturnSections(@Param("id") Long courseId);
+
+
+    @Query(value = """
+            select distinct c
+            from Course c
+            left join fetch c.promotions
+            where c = :course
+            """)
+    Optional<Course> findByIdWithPromotions(@Param("course") Course course);
 
     @Query(value = """
             select c

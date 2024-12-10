@@ -14,7 +14,7 @@ public record ReviewGetListVM(
         CourseGetVM course,
         String createdAt,
         String updatedAt,
-        boolean status
+        String status
 ) {
 
     public static ReviewGetListVM fromModel(Review review) {
@@ -26,6 +26,6 @@ public record ReviewGetListVM(
         String updatedAt = review.getUpdatedAt() != null ?
                 DateTimeUtils.convertLocalDateTimeToString(review.getUpdatedAt()) : "";
         return new ReviewGetListVM(review.getId(), review.getContent(), review.getRatingStar(),
-                UserGetVM.fromModelStudent(student),courseGetVM , createdAt, updatedAt, review.isStatus());
+                UserGetVM.fromModelStudent(student),courseGetVM , createdAt, updatedAt, review.getStatus().name());
     }
 }

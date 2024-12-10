@@ -33,6 +33,10 @@ public class CouponServiceImpl implements CouponService{
         }
         LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
         LocalDateTime endTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.endTime(), DateTimeUtils.NORMAL_TYPE);
+
+        if (startTime.isAfter(endTime)) {
+            throw new BadRequestException("");
+        }
         Coupon newCoupon = Coupon.builder()
                 .discountPercent(couponPostVM.discountPercent())
                 .code(couponPostVM.code())

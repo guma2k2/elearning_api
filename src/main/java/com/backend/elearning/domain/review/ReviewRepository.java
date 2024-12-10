@@ -48,7 +48,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             from Review r
             left join fetch r.course c
             left join fetch r.student u
-            where c.id = :courseId and r.status = true
+            where c.id = :courseId and r.status = 'PUBLISHED'
             """)
     Page<Review> findByCourseId(@Param("courseId") Long courseId, Pageable pageable);
 
@@ -92,13 +92,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 """)
     Optional<Review> findByStudentAndCourse(@Param("email") String email, @Param("courseId") Long courseId);
 
-    @Modifying
-    @Query("""
-        update 
-        Review s 
-        set s.status = :status
-        where s.id = :id
-    """)
-    void updateStatusReview(@Param("status") boolean status, @Param("id") Long reviewId);
+//    @Modifying
+//    @Query("""
+//        update
+//        Review s
+//        set s.status = :status
+//        where s.id = :id
+//    """)
+//    void updateStatusReview(@Param("status") boolean status, @Param("id") Long reviewId);
 
 }
