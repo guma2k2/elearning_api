@@ -60,7 +60,7 @@ public class CourseController {
 //        return ResponseEntity.ok().body(pageableCourses);
 //    }
 
-
+    // this
     @GetMapping("/courses/search")
     public ResponseEntity<List<CourseListGetVM>> getCoursesByMultiQuery (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
@@ -113,7 +113,7 @@ public class CourseController {
         CourseVM courseVM = courseService.update(coursePostVM, userId, courseId);
         return ResponseEntity.status(HttpStatus.OK).body(courseVM);
     }
-
+    // this
     @GetMapping("/courses/{id}")
     public ResponseEntity<CourseVM> getCourseById (
             @PathVariable("id") Long courseId

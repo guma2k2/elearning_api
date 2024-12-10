@@ -16,6 +16,7 @@ import com.backend.elearning.domain.lecture.Lecture;
 import com.backend.elearning.domain.lecture.LectureRepository;
 import com.backend.elearning.domain.order.OrderDetail;
 import com.backend.elearning.domain.order.OrderDetailRepository;
+import com.backend.elearning.domain.promotion.Promotion;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.quiz.QuizRepository;
 import com.backend.elearning.domain.review.Review;
@@ -99,7 +100,7 @@ public class CourseServiceImpl implements CourseService{
         Page<Course> coursePage = courseRepository.findAllCustomByRole(pageable, email, keyword);
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
-            courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>(),0, 0.0,0,"" , null, false));
+            courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>(),0, 0.0,0,"" , null, false, 0L));
 
         }
         return new PageableData(
@@ -138,7 +139,7 @@ public class CourseServiceImpl implements CourseService{
         }
         course.setCreatedAt(LocalDateTime.now());
         course.setUpdatedAt(LocalDateTime.now());
-        return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>(),0, 0.0,0,"", null, false);
+        return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>(),0, 0.0,0,"", null, false, 0L);
     }
 
     @Override
@@ -176,12 +177,13 @@ public class CourseServiceImpl implements CourseService{
         if (coursePutVM.level() != null && !coursePutVM.level().isBlank()) {
             oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
         }
-        return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>(),0, 0.0,0,"", null , false);
+        return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>(),0, 0.0,0,"", null , false, 0L);
     }
 
     @Override
     public CourseVM getCourseById(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
+        course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         Long courseId = course.getId();
         List<Review> reviews = reviewService.findByCourseId(courseId);
         int ratingCount = reviews.size();
@@ -221,12 +223,26 @@ public class CourseServiceImpl implements CourseService{
         if (email != null && !learningCourseRepository.findByStudentAndCourse(email, courseId).isPresent()) {
             learning = false;
         }
-        return CourseVM.fromModel(course, sections,ratingCount, roundedAverageRating, totalCurriculumCourse.get(),formattedHours, userProfileVM, learning);
+
+        Set<Promotion> promotions = course.getPromotions();
+        Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
+
+        return CourseVM.fromModel(course, sections,ratingCount, roundedAverageRating, totalCurriculumCourse.get(),formattedHours, userProfileVM, learning, discountedPrice);
+    }
+
+    private Long getDiscountedPriceByCourse(Set<Promotion> promotions, Course course)   {
+        LocalDateTime now = LocalDateTime.now();
+        Optional<Promotion> currentPromotion = promotions.stream()
+                .filter(promotion -> promotion.getStartTime().isBefore(now) && promotion.getEndTime().isAfter(now))
+                .findFirst();
+        Long discountedPrice = currentPromotion.isPresent() ? course.getPrice() - (currentPromotion.get().getDiscountPercent()*course.getPrice()/100) : course.getPrice();
+        return discountedPrice;
     }
 
     @Override
     public CourseListGetVM getCourseListGetVMById(Long id) {
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, id));
+        course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         Long courseId = course.getId();
         List<Review> reviews = reviewService.findByCourseId(courseId);
         int ratingCount = reviews.size();
@@ -251,7 +267,10 @@ public class CourseServiceImpl implements CourseService{
         });
         String formattedHours = convertSeconds(totalDurationCourse.get());
 
-        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
+        Set<Promotion> promotions = course.getPromotions();
+        Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
+
+        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount, discountedPrice);
     }
 
     @Override
@@ -270,7 +289,7 @@ public class CourseServiceImpl implements CourseService{
         });
         sections.sort(Comparator.comparing(SectionVM::number));
 
-        CourseVM courseVM = CourseVM.fromModel(course, sections ,0, 0.0, totalCurriculumCourse.get(),"", null, true );
+        CourseVM courseVM = CourseVM.fromModel(course, sections ,0, 0.0, totalCurriculumCourse.get(),"", null, true, 0L );
 
         Optional<LearningLecture> maxAccessTimeByEmailAndCourseSlugLecture = learningLectureRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
         Optional<LearningQuiz> maxAccessTimeByEmailAndCourseSlugQuiz = learningQuizRepository.findMaxAccessTimeByEmailAndCourseSlug(email, slug);
@@ -324,6 +343,7 @@ public class CourseServiceImpl implements CourseService{
 //        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
 //                courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
+            course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND));
             List<Review> reviews = course.getReviews();
             int ratingCount = reviews.size();
             Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
@@ -342,7 +362,11 @@ public class CourseServiceImpl implements CourseService{
                 totalDurationCourse.addAndGet(totalSeconds);
             });
             String formattedHours = convertSeconds(totalDurationCourse.get());
-            return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
+
+
+            Set<Promotion> promotions = course.getPromotions();
+            Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
+            return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount, discountedPrice);
         }).toList();
         return new PageableData(
                 pageNum,
@@ -358,25 +382,29 @@ public class CourseServiceImpl implements CourseService{
         List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
             courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
-        List<Review> reviews = course.getReviews();
-        int ratingCount = reviews.size();
-        Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
-        double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
-        AtomicInteger totalCurriculumCourse = new AtomicInteger();
-        AtomicInteger totalDurationCourse = new AtomicInteger();
-        List<Section> sections = sectionService.findByCourseId(course.getId());
-        sections.forEach(section -> {
-            List<Lecture> lectures = section.getLectures();
-            List<Quiz> quizzes = section.getQuizzes();
-            totalCurriculumCourse.addAndGet(lectures.size());
-            totalCurriculumCourse.addAndGet(quizzes.size());
-            int totalSeconds = lectures.stream()
-                    .mapToInt(lecture -> lecture.getDuration())
-                    .sum();
-            totalDurationCourse.addAndGet(totalSeconds);
-        });
+            course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND));
+            List<Review> reviews = course.getReviews();
+            int ratingCount = reviews.size();
+            Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
+            double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
+            AtomicInteger totalCurriculumCourse = new AtomicInteger();
+            AtomicInteger totalDurationCourse = new AtomicInteger();
+            List<Section> sections = sectionService.findByCourseId(course.getId());
+            sections.forEach(section -> {
+                List<Lecture> lectures = section.getLectures();
+                List<Quiz> quizzes = section.getQuizzes();
+                totalCurriculumCourse.addAndGet(lectures.size());
+                totalCurriculumCourse.addAndGet(quizzes.size());
+                int totalSeconds = lectures.stream()
+                        .mapToInt(lecture -> lecture.getDuration())
+                        .sum();
+                totalDurationCourse.addAndGet(totalSeconds);
+
+            });
+            Set<Promotion> promotions = course.getPromotions();
+            Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
         String formattedHours = convertSeconds(totalDurationCourse.get());
-        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount);
+        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount, discountedPrice);
         }).toList();
         return courseListGetVMS;
     }

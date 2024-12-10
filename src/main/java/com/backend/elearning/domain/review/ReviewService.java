@@ -18,5 +18,5 @@ public interface ReviewService {
 
     PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword);
 
-    void updateStatusReview(boolean status, Long reviewId);
+//    void updateStatusReview(boolean status, Long reviewId);
 }

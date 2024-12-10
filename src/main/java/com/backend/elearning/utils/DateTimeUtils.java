@@ -8,6 +8,7 @@ public class DateTimeUtils {
 
     public static final String PATTERN_PAYMENT = "yyyyMMddHHmmss";
 
+    // 2024-12-13 00:00:00
     public static final String PATTERN_NORMAL = "yyyy-MM-dd HH:mm:ss";
     public static final String PATTERN_STRING = "dd/MM/yyyy HH:mm:ss";
 

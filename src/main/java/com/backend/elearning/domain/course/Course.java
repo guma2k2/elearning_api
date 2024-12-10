@@ -4,6 +4,7 @@ import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.common.CustomAuditingEntityListener;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourse;
+import com.backend.elearning.domain.promotion.Promotion;
 import com.backend.elearning.domain.review.Review;
 import com.backend.elearning.domain.section.Section;
 import com.backend.elearning.domain.topic.Topic;
@@ -12,7 +13,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "course")
@@ -83,4 +86,13 @@ public class Course extends AbstractAuditEntity {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<LearningCourse> learningCourses = new ArrayList<>();
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "course_promotion",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "promotion_id")
+    )
+    private Set<Promotion> promotions = new HashSet<>();
 }
