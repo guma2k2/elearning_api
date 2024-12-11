@@ -235,6 +235,9 @@ public class CourseServiceImpl implements CourseService{
         Optional<Promotion> currentPromotion = promotions.stream()
                 .filter(promotion -> promotion.getStartTime().isBefore(now) && promotion.getEndTime().isAfter(now))
                 .findFirst();
+        if (course.isFree()) {
+            return null;
+        }
         Long discountedPrice = currentPromotion.isPresent() ? course.getPrice() - (currentPromotion.get().getDiscountPercent()*course.getPrice()/100) : course.getPrice();
         return discountedPrice;
     }

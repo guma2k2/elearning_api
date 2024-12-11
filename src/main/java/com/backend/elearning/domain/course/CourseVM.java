@@ -54,6 +54,8 @@ public record CourseVM(
         User user = course.getUser();
         String createdBy = user.getFirstName() + " " + user.getLastName();
         Long price = course.getPrice() != null ? course.getPrice() : 0L;
+        Long checkedDiscountedPrice = discountedPrice != null ? discountedPrice : 0L;
+
         String createdAt = course.getCreatedAt() != null ?
                 DateTimeUtils.convertLocalDateTimeToString(course.getCreatedAt()) : "";
         String updatedAt = course.getUpdatedAt() != null ?
@@ -66,7 +68,7 @@ public record CourseVM(
                 updatedAt,
                 course.isFree(),
                 price,
-                discountedPrice,
+                checkedDiscountedPrice,
                 course.getStatus().name(),
                 course.getCategory().getId(),
                 course.getTopic().getId(),
