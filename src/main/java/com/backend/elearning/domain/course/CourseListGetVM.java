@@ -30,7 +30,7 @@ public record CourseListGetVM(
         User user = course.getUser();
         String fullName = user.getFirstName() + " " + user.getLastName();
         Long price = course.getPrice() != null ? course.getPrice() : 0L;
-
+        Long checkedDiscountedPrice = discountedPrice != null ? discountedPrice : 0L;
         return new CourseListGetVM(course.getId(),
                 course.getTitle(),
                 course.getHeadline() ,
@@ -41,7 +41,7 @@ public record CourseListGetVM(
                 ratingCount,
                 course.getImageId(),
                 price,
-                discountedPrice,
+                checkedDiscountedPrice,
                 course.isFree(),
                 fullName);
     }
