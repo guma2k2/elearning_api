@@ -13,9 +13,14 @@ import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -156,5 +161,60 @@ public class StatisticService {
     private int extractNumber(String name) {
         String numberString = name.replaceAll("\\D+", ""); // Remove all non-digit characters
         return Integer.parseInt(numberString); // Convert the remaining string to an integer
+    }
+
+    public byte[] export(int year, Integer month) {
+        List<StatisticTime> datas = new ArrayList<>();
+        if (month != null) {
+            List<StatisticTime> statistics = findByMonth(month, year);
+            datas.addAll(statistics);
+        } else {
+            List<StatisticTime> statistics = findByYear(year);
+            datas.addAll(statistics);
+        }
+
+
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Statistics");
+
+        // Create Header Row
+        Row headerRow = sheet.createRow(0);
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        Cell headerCell = headerRow.createCell(0);
+        headerCell.setCellValue("Name");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = headerRow.createCell(1);
+        headerCell.setCellValue("Total");
+        headerCell.setCellStyle(headerStyle);
+
+        // Populate Data Rows
+        int rowIdx = 1;
+        for (StatisticTime stat : datas) {
+            Row row = sheet.createRow(rowIdx++);
+            row.createCell(0).setCellValue(stat.getName());
+            row.createCell(1).setCellValue(stat.getTotal());
+        }
+
+        // Auto-size Columns
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+
+        // Write to ByteArrayOutputStream
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            workbook.write(outputStream);
+            workbook.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return outputStream.toByteArray();
+
     }
 }
