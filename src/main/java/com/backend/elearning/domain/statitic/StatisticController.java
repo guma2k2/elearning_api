@@ -1,5 +1,7 @@
 package com.backend.elearning.domain.statitic;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +44,16 @@ public class StatisticController {
 
         List<StatisticCourse> statisticCourses = statisticService.getByTime(from, to);
         return ResponseEntity.ok().body(statisticCourses);
+    }
+
+    @PostMapping("/statistic/time/export")
+    public ResponseEntity<byte[]> exportData(@RequestParam("year") int year,
+                                             @RequestParam(value = "month", required = false) Integer month){
+        byte[] datas = statisticService.export(year, month);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=statistics.xlsx");
+        return new ResponseEntity<>(datas, headers, HttpStatus.OK);
     }
 
 }
