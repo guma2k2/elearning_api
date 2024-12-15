@@ -56,4 +56,15 @@ public class StatisticController {
         return new ResponseEntity<>(datas, headers, HttpStatus.OK);
     }
 
+    @PostMapping("/statistic/course/export")
+    public ResponseEntity<byte[]> exportData(@RequestParam("from") String from,
+                                             @RequestParam("to") String to){
+        byte[] datas = statisticService.exportByCourse(from, to);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=statistics.xlsx");
+        return new ResponseEntity<>(datas, headers, HttpStatus.OK);
+    }
+
+
+
 }

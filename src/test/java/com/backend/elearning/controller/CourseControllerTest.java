@@ -63,9 +63,9 @@ public class CourseControllerTest {
 
         List<CourseListGetVM> mockCourseList = Arrays.asList(
                 new CourseListGetVM(1L, "Course 1", "Headline 1", "Beginner", "course-1",
-                        "10 hours", 12, 4.5, 100, "image1.jpg", 1000L, true, "John Doe"),
+                        "10 hours", 12, 4.5, 100, "image1.jpg", 1000L,1999L, true, "John Doe"),
                 new CourseListGetVM(2L, "Course 2", "Headline 2", "Intermediate", "course-2",
-                        "15 hours", 20, 4.7, 200, "image2.jpg", 1500L, false, "Jane Doe")
+                        "15 hours", 20, 4.7, 200, "image2.jpg", 1500L,1999L, false, "Jane Doe")
         );
 
         // Mock the behavior of courseService
@@ -120,6 +120,7 @@ public class CourseControllerTest {
                 "2024-09-10",
                 true,
                 1000L,
+                1999L,
                 CourseStatus.PUBLISHED.name(),
                 1,
                 2,
@@ -181,6 +182,7 @@ public class CourseControllerTest {
                 "2024-09-10",
                 true,
                 1000L,
+                1999L,
                 CourseStatus.PUBLISHED.name(),
                 1,
                 2,

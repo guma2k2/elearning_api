@@ -65,7 +65,7 @@ public class PromotionController {
 
     @DeleteMapping("/admin/promotions/{promotionId}")
     public ResponseEntity<Void> remove(
-                                             @PathVariable("courseId") Long promotionId) {
+            @PathVariable("courseId") Long promotionId) {
 
         promotionService.deletePromotion(promotionId);
         return ResponseEntity.noContent().build();
