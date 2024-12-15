@@ -81,7 +81,7 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.student.photo").value("photoUrl"))
                 .andExpect(jsonPath("$.created_at").value("2024-08-29T10:00:00Z"))
                 .andExpect(jsonPath("$.updated_at").value("2024-08-29T10:00:00Z"))
-                .andExpect(jsonPath("$.status").value(true));
+                .andExpect(jsonPath("$.status").value(ReviewStatus.PUBLISHED.name()));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.student.photo").value("photoUrl"))
                 .andExpect(jsonPath("$.created_at").value("2024-08-30T10:00:00Z"))
                 .andExpect(jsonPath("$.updated_at").value("2024-08-30T10:00:00Z"))
-                .andExpect(jsonPath("$.status").value(true));
+                .andExpect(jsonPath("$.status").value(ReviewStatus.PUBLISHED.name()));
     }
 
     @Test
@@ -167,7 +167,7 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.content[0].course.image").value("imageUrl"))
                 .andExpect(jsonPath("$.content[0].createdAt").value("2024-08-29T10:00:00Z"))
                 .andExpect(jsonPath("$.content[0].updatedAt").value("2024-08-29T10:00:00Z"))
-                .andExpect(jsonPath("$.content[0].status").value(true));
+                .andExpect(jsonPath("$.content[0].status").value(ReviewStatus.PUBLISHED.name()));
     }
 
 //    @Test

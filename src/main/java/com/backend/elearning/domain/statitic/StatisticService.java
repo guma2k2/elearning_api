@@ -217,4 +217,55 @@ public class StatisticService {
         return outputStream.toByteArray();
 
     }
+
+    public byte[] exportByCourse(String from, String to) {
+        List<StatisticCourse> datas = getByTime(from, to);
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Statistics");
+
+        // Create Header Row
+        Row headerRow = sheet.createRow(0);
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        Cell headerCell = headerRow.createCell(0);
+        headerCell.setCellValue("Name course");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = headerRow.createCell(1);
+        headerCell.setCellValue("Quantity");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = headerRow.createCell(2);
+        headerCell.setCellValue("Total");
+        headerCell.setCellStyle(headerStyle);
+
+        // Populate Data Rows
+        int rowIdx = 1;
+        for (StatisticCourse stat : datas) {
+            Row row = sheet.createRow(rowIdx++);
+            row.createCell(0).setCellValue(stat.getCourse());
+            row.createCell(1).setCellValue(stat.getQuantity());
+            row.createCell(2).setCellValue(stat.getPrice());
+
+        }
+
+        // Auto-size Columns
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+        sheet.autoSizeColumn(2);
+
+        // Write to ByteArrayOutputStream
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            workbook.write(outputStream);
+            workbook.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return outputStream.toByteArray();
+    }
 }
