@@ -54,9 +54,9 @@ public class PromotionController {
     }
 
 
-    @DeleteMapping("/admin/add/course/{courseId}/to/promotion/{promotionId}")
+    @DeleteMapping("/admin/remove/course/{courseId}/from/promotion/{promotionId}")
     public ResponseEntity<Void> removeCourse(@PathVariable("courseId") Long courseId,
-                                          @PathVariable("courseId") Long promotionId) {
+                                          @PathVariable("promotionId") Long promotionId) {
 
         promotionService.removeCourseFromPromotion(promotionId, courseId);
         return ResponseEntity.noContent().build();

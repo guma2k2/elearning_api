@@ -44,4 +44,6 @@ public interface CourseService {
     void delete(Long id);
 
     void updateStatusCourse(CourseStatusPostVM courseStatusPostVM, Long courseId);
+
+    List<CourseAssignPromotion> getByPromotionId(Long promotionId);
 }

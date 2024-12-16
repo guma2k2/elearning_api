@@ -1,11 +1,9 @@
 package com.backend.elearning.domain.questionLecture.userAnswer;
 
 
+import com.backend.elearning.domain.questionLecture.AnswerLecture;
 import com.backend.elearning.domain.questionLecture.QuestionLecture;
 import com.backend.elearning.domain.questionLecture.QuestionLectureRepo;
-import com.backend.elearning.domain.questionLecture.studentAnswer.StudentAnswer;
-import com.backend.elearning.domain.questionLecture.studentAnswer.StudentAnswerVM;
-import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +25,7 @@ public class UserAnswerServiceImpl implements UserAnswerService {
     }
 
     @Override
-    public UserAnswerVM create(UserAnswerPostVM userAnswerPostVM) {
+    public AnswerLecture create(UserAnswerPostVM userAnswerPostVM) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         QuestionLecture questionLecture = questionLectureRepo.findById(userAnswerPostVM.questionLectureId()).orElseThrow();
         User user = userRepository.findByEmail(email).orElseThrow();
@@ -41,6 +39,6 @@ public class UserAnswerServiceImpl implements UserAnswerService {
         userAnswer.setUpdatedAt(LocalDateTime.now());
 
         UserAnswer savedUserAnswer = userAnswerRepo.saveAndFlush(userAnswer);
-        return UserAnswerVM.fromModel(savedUserAnswer);
+        return AnswerLecture.fromModelUser(savedUserAnswer);
     }
 }

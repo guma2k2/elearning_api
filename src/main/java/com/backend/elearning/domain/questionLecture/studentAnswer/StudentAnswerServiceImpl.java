@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.questionLecture.studentAnswer;
 
 
+import com.backend.elearning.domain.questionLecture.AnswerLecture;
 import com.backend.elearning.domain.questionLecture.QuestionLecture;
 import com.backend.elearning.domain.questionLecture.QuestionLectureRepo;
 import com.backend.elearning.domain.questionLecture.QuestionLectureVM;
@@ -26,7 +27,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
     }
 
     @Override
-    public StudentAnswerVM create(StudentAnswerPostVM studentAnswerPostVM) {
+    public AnswerLecture create(StudentAnswerPostVM studentAnswerPostVM) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         QuestionLecture questionLecture = questionLectureRepo.findById(studentAnswerPostVM.questionLectureId()).orElseThrow();
         Student student = studentRepository.findByEmail(email).orElseThrow();
@@ -40,6 +41,6 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
         studentAnswer.setUpdatedAt(LocalDateTime.now());
 
         StudentAnswer savedStudentAnswer = studentAnswerRepo.saveAndFlush(studentAnswer);
-        return StudentAnswerVM.fromModel(savedStudentAnswer);
+        return AnswerLecture.fromModelStudent(savedStudentAnswer);
     }
 }
