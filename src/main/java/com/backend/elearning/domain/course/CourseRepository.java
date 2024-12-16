@@ -254,4 +254,17 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         where s.id = :id
     """)
     void updateStatusCourse(@Param("status") CourseStatus status, @Param("reason") String reason ,@Param("id") Long courseId);
+
+
+
+    @Query(value = """
+        SELECT * FROM course c
+        WHERE c.id NOT IN (
+            SELECT cp.course_id FROM course_promotion cp
+            JOIN promotion p ON cp.promotion_id = p.id AND p.id != :promotionId
+            WHERE (NOW() AT TIME ZONE 'UTC' AT TIME ZONE '+07:00') BETWEEN p.start_time AND p.end_time
+        )
+    """, nativeQuery = true)
+    List<Course> findCoursesNotInPromotionToday(@Param("promotionId") Long promotionId);
+
 }

@@ -452,6 +452,19 @@ public class CourseServiceImpl implements CourseService{
         courseRepository.updateStatusCourse(courseStatusPostVM.status(), courseStatusPostVM.reason(), courseId);
     }
 
+    @Override
+    public List<CourseAssignPromotion> getByPromotionId(Long promotionId) {
+        List<Course> courses = courseRepository.findCoursesNotInPromotionToday(promotionId);
+        List<CourseAssignPromotion> courseAssignPromotions = courses.stream().map(course -> {
+            Set<Promotion> promotions = course.getPromotions();
+            boolean isNotInPromotions = promotions.stream()
+                    .noneMatch(promotion -> promotion.getId().equals(promotionId));
+
+            return CourseAssignPromotion.fromModel(course, !isNotInPromotions);
+        }).toList();
+        return courseAssignPromotions;
+    }
+
     private String convertSeconds(int seconds) {
         if (seconds < 3600) {
             int minutes = seconds / 60;

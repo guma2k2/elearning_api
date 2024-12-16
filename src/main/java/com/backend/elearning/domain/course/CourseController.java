@@ -138,4 +138,11 @@ public class CourseController {
     }
 
 
+    @GetMapping("/admin/courses/promotions/{promotionId}")
+    public ResponseEntity<List<CourseAssignPromotion>> getByPromotionId(@PathVariable("promotionId") Long promotionId){
+        List<CourseAssignPromotion> courses = courseService.getByPromotionId(promotionId);
+        return ResponseEntity.ok().body(courses);
+    }
+
+
 }

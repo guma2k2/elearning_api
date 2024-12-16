@@ -1,5 +1,7 @@
 package com.backend.elearning.domain.questionLecture.studentAnswer;
 
+import com.backend.elearning.domain.questionLecture.AnswerLecture;
+
 public interface StudentAnswerService {
-    StudentAnswerVM create(StudentAnswerPostVM studentAnswerPostVM);
+    AnswerLecture create(StudentAnswerPostVM studentAnswerPostVM);
 }

@@ -3,10 +3,16 @@ package com.backend.elearning.domain.questionLecture;
 
 import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.lecture.Lecture;
+import com.backend.elearning.domain.order.OrderDetail;
+import com.backend.elearning.domain.questionLecture.studentAnswer.StudentAnswer;
+import com.backend.elearning.domain.questionLecture.userAnswer.UserAnswer;
 import com.backend.elearning.domain.quiz.Quiz;
 import com.backend.elearning.domain.student.Student;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -36,4 +42,10 @@ public class QuestionLecture extends AbstractAuditEntity {
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @OneToMany(mappedBy = "question_lecture", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAnswer> userAnswers = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "question_lecture", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudentAnswer> studentAnswers = new ArrayList<>();
 }

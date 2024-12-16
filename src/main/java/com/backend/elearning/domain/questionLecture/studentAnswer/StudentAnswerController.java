@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.questionLecture.studentAnswer;
 
 import com.backend.elearning.domain.lecture.LectureVm;
+import com.backend.elearning.domain.questionLecture.AnswerLecture;
 import com.backend.elearning.domain.questionLecture.QuestionLecturePostVM;
 import com.backend.elearning.domain.questionLecture.QuestionLectureVM;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,12 +29,12 @@ public class StudentAnswerController {
     @PostMapping("/student-answer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Created", content =
-            @Content(schema = @Schema(implementation = StudentAnswerVM.class)))
+            @Content(schema = @Schema(implementation = AnswerLecture.class)))
     })
-    public ResponseEntity<StudentAnswerVM> create (
+    public ResponseEntity<AnswerLecture> create (
             @RequestBody StudentAnswerPostVM studentAnswerPostVM
     ) {
-        StudentAnswerVM studentAnswerVM = studentAnswerService.create(studentAnswerPostVM);
+        AnswerLecture studentAnswerVM = studentAnswerService.create(studentAnswerPostVM);
         return ResponseEntity.status(HttpStatus.OK).body(studentAnswerVM);
     }
 }
