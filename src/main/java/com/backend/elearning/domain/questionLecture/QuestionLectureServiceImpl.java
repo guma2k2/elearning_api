@@ -8,11 +8,14 @@ import com.backend.elearning.domain.questionLecture.userAnswer.UserAnswer;
 import com.backend.elearning.domain.questionLecture.userAnswer.UserAnswerRepo;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
+import com.backend.elearning.exception.BadRequestException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -53,6 +56,26 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
     }
 
     @Override
+    public QuestionLectureVM update(QuestionLecturePostVM questionLecturePostVM, Long questionLectureId) {
+        QuestionLecture questionLecture = questionLectureRepo.findById(questionLectureId).orElseThrow();
+        questionLecture.setTitle(questionLecturePostVM.title());
+        questionLecture.setDescription(questionLecturePostVM.description());
+        questionLecture.setUpdatedAt(LocalDateTime.now());
+        QuestionLecture savedQuestionLecture = questionLectureRepo.saveAndFlush(questionLecture);
+
+        return QuestionLectureVM.fromModel(savedQuestionLecture);
+    }
+
+    @Override
+    public void delete(Long questionLectureId) {
+        QuestionLecture questionLecture = questionLectureRepo.findById(questionLectureId).orElseThrow();
+        if (questionLecture.getStudentAnswers().size() > 0 || questionLecture.getUserAnswers().size() > 0) {
+            throw new BadRequestException("Câu hỏi này đã có câu trả lời");
+        }
+        questionLectureRepo.deleteById(questionLectureId);
+    }
+
+    @Override
     public List<QuestionLectureGetVM> getByLectureId(Long lectureId) {
 
         List<QuestionLecture> questionLectures = questionLectureRepo.getByLectureId(lectureId);
@@ -70,8 +93,7 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
             for (StudentAnswer studentAnswer : studentAnswers) {
                 answerLectures.add(AnswerLecture.fromModelStudent(studentAnswer));
             }
-
-
+            answerLectures.sort(Comparator.comparing(AnswerLecture::createdAt));
             return QuestionLectureGetVM.fromModel(questionLecture, answerLectures);
         }).toList();
         return questionLectureGetVMS;

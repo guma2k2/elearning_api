@@ -41,4 +41,18 @@ public class UserAnswerServiceImpl implements UserAnswerService {
         UserAnswer savedUserAnswer = userAnswerRepo.saveAndFlush(userAnswer);
         return AnswerLecture.fromModelUser(savedUserAnswer);
     }
+
+    @Override
+    public AnswerLecture update(UserAnswerPostVM userAnswerPostVM, Long userAnswerId) {
+        UserAnswer userAnswer = userAnswerRepo.findById(userAnswerId).orElseThrow();
+        userAnswer.setContent(userAnswerPostVM.content());
+        userAnswer.setUpdatedAt(LocalDateTime.now());
+        UserAnswer savedUserAnswer = userAnswerRepo.saveAndFlush(userAnswer);
+        return AnswerLecture.fromModelUser(savedUserAnswer);
+    }
+
+    @Override
+    public void delete(Long answerLectureId) {
+        userAnswerRepo.deleteById(answerLectureId);
+    }
 }

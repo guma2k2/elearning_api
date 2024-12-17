@@ -42,10 +42,10 @@ public class QuestionLecture extends AbstractAuditEntity {
     @JoinColumn(name = "student_id")
     private Student student;
 
-    @OneToMany(mappedBy = "question_lecture", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "questionLecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAnswer> userAnswers = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "question_lecture", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "questionLecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentAnswer> studentAnswers = new ArrayList<>();
 }
