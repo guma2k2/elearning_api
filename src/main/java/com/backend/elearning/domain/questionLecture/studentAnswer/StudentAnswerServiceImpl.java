@@ -43,4 +43,18 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
         StudentAnswer savedStudentAnswer = studentAnswerRepo.saveAndFlush(studentAnswer);
         return AnswerLecture.fromModelStudent(savedStudentAnswer);
     }
+
+    @Override
+    public AnswerLecture update(StudentAnswerPostVM studentAnswerPostVM, Long studentAnswerId) {
+        StudentAnswer studentAnswer = studentAnswerRepo.findById(studentAnswerId).orElseThrow() ;
+        studentAnswer.setContent(studentAnswerPostVM.content());
+        studentAnswer.setUpdatedAt(LocalDateTime.now());
+        StudentAnswer savedStudentAnswer = studentAnswerRepo.saveAndFlush(studentAnswer);
+        return AnswerLecture.fromModelStudent(savedStudentAnswer);
+    }
+
+    @Override
+    public void delete(Long answerLectureId) {
+        studentAnswerRepo.deleteById(answerLectureId);
+    }
 }
