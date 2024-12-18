@@ -98,4 +98,50 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
         }).toList();
         return questionLectureGetVMS;
     }
+
+    @Override
+    public List<QuestionLectureGetVM> getByCourse(Long courseId) {
+        List<QuestionLecture> questionLectures = questionLectureRepo.getByCourse(courseId);
+
+        List<QuestionLectureGetVM> questionLectureGetVMS = questionLectures.stream().map(questionLecture -> {
+
+            List<AnswerLecture> answerLectures = new ArrayList<>();
+
+
+            List<UserAnswer> userAnswers = userAnswerRepo.getByQuestionLectureId(questionLecture.getId());
+            for (UserAnswer userAnswer : userAnswers) {
+                answerLectures.add(AnswerLecture.fromModelUser(userAnswer));
+            }
+            List<StudentAnswer> studentAnswers = studentAnswerRepo.getByQuestionLectureId(questionLecture.getId());
+            for (StudentAnswer studentAnswer : studentAnswers) {
+                answerLectures.add(AnswerLecture.fromModelStudent(studentAnswer));
+            }
+            answerLectures.sort(Comparator.comparing(AnswerLecture::createdAt));
+            return QuestionLectureGetVM.fromModel(questionLecture, answerLectures);
+        }).toList();
+        return questionLectureGetVMS;
+    }
+
+    @Override
+    public List<QuestionLectureGetVM> getBySection(Long sectionId) {
+        List<QuestionLecture> questionLectures = questionLectureRepo.getBySection(sectionId);
+
+        List<QuestionLectureGetVM> questionLectureGetVMS = questionLectures.stream().map(questionLecture -> {
+
+            List<AnswerLecture> answerLectures = new ArrayList<>();
+
+
+            List<UserAnswer> userAnswers = userAnswerRepo.getByQuestionLectureId(questionLecture.getId());
+            for (UserAnswer userAnswer : userAnswers) {
+                answerLectures.add(AnswerLecture.fromModelUser(userAnswer));
+            }
+            List<StudentAnswer> studentAnswers = studentAnswerRepo.getByQuestionLectureId(questionLecture.getId());
+            for (StudentAnswer studentAnswer : studentAnswers) {
+                answerLectures.add(AnswerLecture.fromModelStudent(studentAnswer));
+            }
+            answerLectures.sort(Comparator.comparing(AnswerLecture::createdAt));
+            return QuestionLectureGetVM.fromModel(questionLecture, answerLectures);
+        }).toList();
+        return questionLectureGetVMS;
+    }
 }

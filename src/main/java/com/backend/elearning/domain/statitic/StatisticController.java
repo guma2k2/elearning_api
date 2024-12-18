@@ -47,19 +47,18 @@ public class StatisticController {
     }
 
     @PostMapping("/statistic/time/export")
-    public ResponseEntity<byte[]> exportData(@RequestParam("year") int year,
-                                             @RequestParam(value = "month", required = false) Integer month){
-        byte[] datas = statisticService.export(year, month);
-
+    public ResponseEntity<byte[]> exportByTime(
+            @RequestBody List<StatisticTime> request
+    ){
+        byte[] datas = statisticService.export(request);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=statistics.xlsx");
         return new ResponseEntity<>(datas, headers, HttpStatus.OK);
     }
 
     @PostMapping("/statistic/course/export")
-    public ResponseEntity<byte[]> exportData(@RequestParam("from") String from,
-                                             @RequestParam("to") String to){
-        byte[] datas = statisticService.exportByCourse(from, to);
+    public ResponseEntity<byte[]> exportByCourse(@RequestBody List<StatisticCourse> request){
+        byte[] datas = statisticService.exportByCourse(request);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=statistics.xlsx");
         return new ResponseEntity<>(datas, headers, HttpStatus.OK);

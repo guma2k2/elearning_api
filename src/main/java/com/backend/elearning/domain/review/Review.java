@@ -24,6 +24,8 @@ public class Review {
 
     private int ratingStar;
 
+    private String reasonRefused;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;

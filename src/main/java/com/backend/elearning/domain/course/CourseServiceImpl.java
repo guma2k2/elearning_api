@@ -447,9 +447,13 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    @Transactional
     public void updateStatusCourse(CourseStatusPostVM courseStatusPostVM, Long courseId) {
-        courseRepository.updateStatusCourse(courseStatusPostVM.status(), courseStatusPostVM.reason(), courseId);
+        Course course = courseRepository.findById(courseId).orElseThrow();
+        if (courseStatusPostVM.status().equals(CourseStatus.UNPUBLISHED) && courseStatusPostVM.reason() != null) {
+            course.setReasonRefused(courseStatusPostVM.reason());
+        }
+        course.setStatus(courseStatusPostVM.status());
+        courseRepository.saveAndFlush(course);
     }
 
     @Override

@@ -57,11 +57,26 @@ public class QuestionLectureController {
     }
 
     @GetMapping("/question-lecture/lectures/{lectureId}")
-
     public ResponseEntity<List<QuestionLectureGetVM>> getByLectureId (
             @PathVariable("lectureId") Long lectureId
     ) {
         List<QuestionLectureGetVM> response = questionLectureService.getByLectureId(lectureId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/question-lecture/course/{courseId}")
+    public ResponseEntity<List<QuestionLectureGetVM>> getByCourseId (
+            @PathVariable("courseId") Long courseId
+    ) {
+        List<QuestionLectureGetVM> response = questionLectureService.getByCourse(courseId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/question-lecture/section/{sectionId}")
+    public ResponseEntity<List<QuestionLectureGetVM>> getBySection (
+            @PathVariable("sectionId") Long sectionId
+    ) {
+        List<QuestionLectureGetVM> response = questionLectureService.getBySection(sectionId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

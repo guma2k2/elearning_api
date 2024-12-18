@@ -20,4 +20,27 @@ public interface QuestionLectureRepo extends JpaRepository<QuestionLecture, Long
         where l.id = :lectureId
     """)
     List<QuestionLecture> getByLectureId(@Param("lectureId") Long lectureId);
+
+
+    @Query("""
+        select ql 
+        from QuestionLecture ql 
+        join ql.lecture l 
+        join ql.student s 
+        join l.section se
+        join se.course c
+        where c.id = :courseId
+    """)
+    List<QuestionLecture> getByCourse(@Param("courseId") Long courseId);
+
+
+    @Query("""
+        select ql 
+        from QuestionLecture ql 
+        join ql.lecture l 
+        join ql.student s 
+        join l.section se
+        where se.id = :sectionId
+    """)
+    List<QuestionLecture> getBySection(@Param("sectionId") Long sectionId);
 }

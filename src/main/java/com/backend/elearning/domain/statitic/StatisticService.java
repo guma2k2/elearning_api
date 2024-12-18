@@ -163,17 +163,7 @@ public class StatisticService {
         return Integer.parseInt(numberString); // Convert the remaining string to an integer
     }
 
-    public byte[] export(int year, Integer month) {
-        List<StatisticTime> datas = new ArrayList<>();
-        if (month != null) {
-            List<StatisticTime> statistics = findByMonth(month, year);
-            datas.addAll(statistics);
-        } else {
-            List<StatisticTime> statistics = findByYear(year);
-            datas.addAll(statistics);
-        }
-
-
+    public byte[] export(List<StatisticTime> datas) {
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Statistics");
@@ -186,19 +176,25 @@ public class StatisticService {
         headerStyle.setFont(headerFont);
 
         Cell headerCell = headerRow.createCell(0);
-        headerCell.setCellValue("Name");
+        headerCell.setCellValue("Stt");
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(1);
+        headerCell.setCellValue("Name");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = headerRow.createCell(2);
         headerCell.setCellValue("Total");
         headerCell.setCellStyle(headerStyle);
 
         // Populate Data Rows
         int rowIdx = 1;
         for (StatisticTime stat : datas) {
-            Row row = sheet.createRow(rowIdx++);
-            row.createCell(0).setCellValue(stat.getName());
-            row.createCell(1).setCellValue(stat.getTotal());
+            Row row = sheet.createRow(rowIdx);
+            row.createCell(0).setCellValue(rowIdx);
+            row.createCell(1).setCellValue(stat.getName());
+            row.createCell(2).setCellValue(stat.getTotal());
+            rowIdx++;
         }
 
         // Auto-size Columns
@@ -218,8 +214,7 @@ public class StatisticService {
 
     }
 
-    public byte[] exportByCourse(String from, String to) {
-        List<StatisticCourse> datas = getByTime(from, to);
+    public byte[] exportByCourse(List<StatisticCourse> datas) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Statistics");
 
@@ -231,25 +226,30 @@ public class StatisticService {
         headerStyle.setFont(headerFont);
 
         Cell headerCell = headerRow.createCell(0);
-        headerCell.setCellValue("Name course");
+        headerCell.setCellValue("Stt");
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(1);
-        headerCell.setCellValue("Quantity");
+        headerCell.setCellValue("Name course");
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(2);
+        headerCell.setCellValue("Quantity");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = headerRow.createCell(3);
         headerCell.setCellValue("Total");
         headerCell.setCellStyle(headerStyle);
 
         // Populate Data Rows
         int rowIdx = 1;
         for (StatisticCourse stat : datas) {
-            Row row = sheet.createRow(rowIdx++);
-            row.createCell(0).setCellValue(stat.getCourse());
-            row.createCell(1).setCellValue(stat.getQuantity());
-            row.createCell(2).setCellValue(stat.getPrice());
-
+            Row row = sheet.createRow(rowIdx);
+            row.createCell(0).setCellValue(rowIdx);
+            row.createCell(1).setCellValue(stat.getCourse());
+            row.createCell(2).setCellValue(stat.getQuantity());
+            row.createCell(3).setCellValue(stat.getPrice());
+            rowIdx++;
         }
 
         // Auto-size Columns

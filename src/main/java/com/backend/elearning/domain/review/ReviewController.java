@@ -42,11 +42,12 @@ public class ReviewController {
     }
 
 
-//    @PutMapping("/admin/reviews/{id}/status/{status}")
-//    public ResponseEntity<Void> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long reviewId){
-//        reviewService.updateStatusReview(status, reviewId);
-//        return ResponseEntity.noContent().build();
-//    }
+    @PutMapping("/admin/reviews/{id}/status")
+    public ResponseEntity<Void> updateReview(@RequestBody ReviewStatusPostVM reviewStatusPostVM, @PathVariable("id") Long reviewId){
+        reviewService.updateStatusReview(reviewStatusPostVM, reviewId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 
