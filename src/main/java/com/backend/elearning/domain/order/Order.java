@@ -36,6 +36,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private EOrderStatus status;
 
+    private String reasonFailed;
+
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails = new ArrayList<>();

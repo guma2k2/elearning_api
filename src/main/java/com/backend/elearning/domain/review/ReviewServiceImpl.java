@@ -3,6 +3,7 @@ package com.backend.elearning.domain.review;
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.course.CourseStatus;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.User;
@@ -147,9 +148,14 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
-//    @Override
-//    @Transactional
-//    public void updateStatusReview(boolean status, Long reviewId) {
-//        reviewRepository.updateStatusReview(status, reviewId);
-//    }
+    @Override
+    public void updateStatusReview(ReviewStatusPostVM statusPostVM, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow();
+        if (statusPostVM.status().equals(ReviewStatus.UNPUBLISHED) && statusPostVM.reason() != null) {
+            review.setReasonRefused(statusPostVM.reason());
+        }
+        review.setStatus(statusPostVM.status());
+        reviewRepository.saveAndFlush(review);
+    }
+
 }

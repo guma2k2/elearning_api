@@ -8,7 +8,9 @@ import com.backend.elearning.domain.coupon.CouponRepository;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseGetVM;
 import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.course.CourseStatus;
 import com.backend.elearning.domain.order.*;
+import com.backend.elearning.domain.review.Review;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.UserRepository;
@@ -134,11 +136,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public void updateOrderStatus(Long orderId, String orderStatus) {
-        EOrderStatus status = EOrderStatus.valueOf(orderStatus);
-        orderRepository.updateOrderStatus(orderId, status);
+    public void updateOrderStatus(Long orderId, OrderStatusPostVM orderStatusPostVM) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        if (orderStatusPostVM.status().equals(EOrderStatus.FAILURE) && orderStatusPostVM.reason() != null) {
+            order.setReasonFailed(orderStatusPostVM.reason());
+        }
+        order.setStatus(orderStatusPostVM.status());
+        orderRepository.saveAndFlush(order);
     }
+
 
 
 

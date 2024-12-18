@@ -12,4 +12,8 @@ public interface QuestionLectureService {
 
     List<QuestionLectureGetVM> getByLectureId(Long lectureId);
 
+    List<QuestionLectureGetVM> getByCourse(Long courseId);
+
+    List<QuestionLectureGetVM> getBySection(Long sectionId);
+
 }

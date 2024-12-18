@@ -246,14 +246,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                                              @Param("categoryName") String categoryName,
                                              @Param("topicId") Integer topicId
     );
-    @Modifying
-    @Query("""
-        update 
-        Course s 
-        set s.status = :status, s.reasonRefused = :reason
-        where s.id = :id
-    """)
-    void updateStatusCourse(@Param("status") CourseStatus status, @Param("reason") String reason ,@Param("id") Long courseId);
+
 
 
 

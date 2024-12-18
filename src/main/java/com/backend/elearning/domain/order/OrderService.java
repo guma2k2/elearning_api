@@ -10,6 +10,6 @@ public interface OrderService {
 
     List<OrderVM> findAllByUserIdAndStatus(EOrderStatus status);
 
-    void updateOrderStatus(Long orderId, String orderStatus);
+    void updateOrderStatus(Long orderId, OrderStatusPostVM orderStatusPostVM);
     PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long orderId);
 }

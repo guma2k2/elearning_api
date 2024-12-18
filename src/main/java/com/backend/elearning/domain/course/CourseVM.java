@@ -36,7 +36,8 @@ public record CourseVM(
         List<SectionVM> sections,
         UserProfileVM user,
         boolean learning,
-        String breadcrumb
+        String breadcrumb,
+        String reason
 ) {
 
     public static CourseVM fromModel (Course course, List<SectionVM> sections, int ratingCount,
@@ -60,6 +61,8 @@ public record CourseVM(
                 DateTimeUtils.convertLocalDateTimeToString(course.getCreatedAt()) : "";
         String updatedAt = course.getUpdatedAt() != null ?
                 DateTimeUtils.convertLocalDateTimeToString(course.getUpdatedAt()) : "";
+        String reason = course.getReasonRefused() != null ?
+                course.getReasonRefused() : "";
         return new CourseVM(course.getId(), course.getTitle(), course.getHeadline(), course.getSlug(), course.getObjectives(), course.getRequirements(),
                 course.getTargetAudiences(),
                 course.getDescription(),level,
@@ -79,6 +82,7 @@ public record CourseVM(
                 createdBy,
                 sections, userProfileVM,
                 learning,
-                breadcrumb);
+                breadcrumb,
+                reason);
     }
 }

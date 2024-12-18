@@ -32,10 +32,10 @@ public class OrderController {
         return ResponseEntity.ok().body(orderId);
     }
 
-    @PutMapping("/orders/{orderId}/status/{orderStatus}")
+    @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<Void> createOrder(
             @PathVariable("orderId") Long orderId,
-            @PathVariable("orderStatus") String status
+            @PathVariable("orderStatus") OrderStatusPostVM status
     ) {
         orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.noContent().build();
