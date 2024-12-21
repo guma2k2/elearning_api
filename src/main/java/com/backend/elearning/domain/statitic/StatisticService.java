@@ -180,11 +180,11 @@ public class StatisticService {
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(1);
-        headerCell.setCellValue("Name");
+        headerCell.setCellValue("Thời gian");
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(2);
-        headerCell.setCellValue("Total");
+        headerCell.setCellValue("Tổng tiền (đồng)");
         headerCell.setCellStyle(headerStyle);
 
         // Populate Data Rows
@@ -230,15 +230,15 @@ public class StatisticService {
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(1);
-        headerCell.setCellValue("Name course");
+        headerCell.setCellValue("Tên khóa học");
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(2);
-        headerCell.setCellValue("Quantity");
+        headerCell.setCellValue("Số lượng");
         headerCell.setCellStyle(headerStyle);
 
         headerCell = headerRow.createCell(3);
-        headerCell.setCellValue("Total");
+        headerCell.setCellValue("Tổng tiền (đồng)");
         headerCell.setCellStyle(headerStyle);
 
         // Populate Data Rows

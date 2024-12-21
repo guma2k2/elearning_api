@@ -3,6 +3,7 @@ package com.backend.elearning.domain.order;
 
 import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.CourseListGetVM;
+import com.backend.elearning.domain.course.CourseStatus;
 import com.backend.elearning.domain.order.impl.OrderDetailServiceImpl;
 import com.backend.elearning.domain.review.ReviewVM;
 import com.backend.elearning.utils.Constants;
@@ -45,9 +46,11 @@ public class OrderController {
     public ResponseEntity<PageableData<OrderVM>> getPageableCategory (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
-            @RequestParam(value = "orderId", required = false) Long orderId
-    ) {
-        PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize, orderId);
+            @RequestParam(value = "orderId", required = false) Long orderId,
+            @RequestParam(value = "status", required = false) EOrderStatus status
+
+            ) {
+        PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize, orderId, status);
         return ResponseEntity.ok().body(pageableData);
     }
     @GetMapping("/orders/user")

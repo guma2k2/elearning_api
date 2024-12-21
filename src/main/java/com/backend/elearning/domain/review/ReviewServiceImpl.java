@@ -4,6 +4,7 @@ import com.backend.elearning.domain.common.PageableData;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
 import com.backend.elearning.domain.course.CourseStatus;
+import com.backend.elearning.domain.order.Order;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.User;
@@ -130,11 +131,23 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword) {
+    public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword, ReviewStatus status) {
         List<ReviewGetListVM> reviewVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Review> reviewPage = keyword != null ? reviewRepository.findAllCustomWithKeyword(pageable, keyword) :
-                reviewRepository.findAllCustom(pageable);
+        Page<Review> reviewPage = null;
+        if (keyword != null && status != null) {
+            reviewPage = reviewRepository.findAllCustomWithStatusAndId(pageable, status, keyword);
+        } else {
+            if (keyword != null) {
+                reviewPage = reviewRepository.findAllCustomWithKeyword(pageable, keyword);
+            } else if (status !=null) {
+                reviewPage = reviewRepository.findAllCustomWithStatus(pageable, status);
+            } else {
+                reviewPage = reviewRepository.findAllCustom(pageable);
+            }
+        }
+
+
         List<Review> reviews = reviewPage.getContent();
         for (Review review : reviews) {
             reviewVMS.add(ReviewGetListVM.fromModel(review));

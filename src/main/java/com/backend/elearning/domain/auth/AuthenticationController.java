@@ -72,11 +72,18 @@ public class AuthenticationController {
 
 
     @PostMapping("/verify")
-    public ResponseEntity<Void> verify (
+    public ResponseEntity<String> verify (
             @RequestBody VerifyStudentVM request
     ) {
-        authenticationService.verify(request);
-        return ResponseEntity.noContent().build();
+        String response = authenticationService.verify(request);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendVerificationCode(@RequestParam String email) {
+        authenticationService.resendVerificationCode(email);
+        return ResponseEntity.ok("Verification code sent");
     }
 
 }

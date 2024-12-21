@@ -92,6 +92,26 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 """)
     Optional<Review> findByStudentAndCourse(@Param("email") String email, @Param("courseId") Long courseId);
 
+
+    @Query("""
+            select r
+            from Review r
+            left join fetch r.course c
+            left join fetch r.student u
+            where LOWER(r.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            and r.status = :status
+            """)
+    Page<Review> findAllCustomWithStatusAndId(Pageable pageable, @Param("status") ReviewStatus status, @Param("keyword") String keyword);
+
+    @Query("""
+            select r
+            from Review r
+            left join fetch r.course c
+            left join fetch r.student u
+            where r.status = :status
+            """)
+    Page<Review> findAllCustomWithStatus(Pageable pageable, @Param("status") ReviewStatus status);
+
 //    @Modifying
 //    @Query("""
 //        update

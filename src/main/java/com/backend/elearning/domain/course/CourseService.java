@@ -5,7 +5,7 @@ import com.backend.elearning.domain.common.PageableData;
 import java.util.List;
 
 public interface CourseService {
-    PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword);
+    PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword, CourseStatus status);
     CourseVM create(CoursePostVM coursePostVM);
 
     CourseVM update(CoursePostVM coursePostVM, Long userId, Long courseId);

@@ -59,14 +59,16 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<NoteVM> getBySectionStudent(Long sectionId) {
-        List<Note> notes = noteRepository.findBySection(sectionId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Note> notes = noteRepository.findBySection(sectionId, email);
         List<NoteVM> noteVMS = notes.stream().map(note -> NoteVM.fromModel(note, null)).toList();
         return noteVMS;
     }
 
     @Override
     public List<NoteVM> getAllByCourse(Long courseId) {
-        List<Note> notes = noteRepository.findByCourse(courseId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Note> notes = noteRepository.findByCourse(courseId, email);
         List<NoteVM> noteVMS = notes.stream().map(note -> NoteVM.fromModel(note, null)).toList();
         return noteVMS;
     }

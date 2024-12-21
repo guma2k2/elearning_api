@@ -4,10 +4,7 @@ import com.backend.elearning.configuration.VNPayConfig;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourse;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
-import com.backend.elearning.domain.order.Order;
-import com.backend.elearning.domain.order.OrderDetail;
-import com.backend.elearning.domain.order.OrderDetailRepository;
-import com.backend.elearning.domain.order.OrderRepository;
+import com.backend.elearning.domain.order.*;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.exception.NotFoundException;
@@ -81,6 +78,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void savePayment(PaymentPostVM request) {
         Order order = orderRepository.findById(request.orderId()).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.ORDER_NOT_FOUND, request.orderId()));
+        order.setStatus(EOrderStatus.SUCCESS);
+        orderRepository.save(order);
         Payment payment = Payment.builder()
                 .bankTranNo(request.bankTranNo())
                 .payDate(DateTimeUtils.convertStringToLocalDateTime(request.payDate(), DateTimeUtils.PAYMENT_TYPE))

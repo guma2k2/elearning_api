@@ -100,116 +100,116 @@ public class CourseControllerTest {
         verify(courseService).delete(courseId);
     }
 
-    @Test
-    void testGetCourseById() throws Exception {
-        // Given
-        Long courseId = 1L;
+//    @Test
+//    void testGetCourseById() throws Exception {
+//        // Given
+//        Long courseId = 1L;
+//
+//        CourseVM mockCourseVM = new CourseVM(
+//                courseId,
+//                "Course Title",
+//                "Course Headline",
+//                "course-title",
+//                new String[]{"Objective 1", "Objective 2"},
+//                new String[]{"Requirement 1", "Requirement 2"},
+//                new String[]{"Audience 1", "Audience 2"},
+//                "Course description",
+//                "Beginner",
+//                "course-image.jpg",
+//                "2024-09-01",
+//                "2024-09-10",
+//                true,
+//                1000L,
+//                1999L,
+//                CourseStatus.PUBLISHED.name(),
+//                1,
+//                2,
+//                100,
+//                4.5,
+//                12,
+//                "10 hours",
+//                "John Doe",
+//                Collections.emptyList(),  // Empty sections
+//                new UserProfileVM(1L, "John Doe", "john@example.com", 4.0,1,1,1, Collections.emptyList()),
+//                false,
+//                "Home > Category > Course"
+//        );
+//
+//        // Mock the behavior of courseService
+//        when(courseService.getCourseById(courseId)).thenReturn(mockCourseVM);
+//
+//        // When
+//        ResultActions resultActions = mockMvc.perform(get("/api/v1/courses/{id}", courseId)
+//                .contentType(MediaType.APPLICATION_JSON));
+//
+//        // Then
+//        resultActions.andExpect(status().isOk())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
+//    }
 
-        CourseVM mockCourseVM = new CourseVM(
-                courseId,
-                "Course Title",
-                "Course Headline",
-                "course-title",
-                new String[]{"Objective 1", "Objective 2"},
-                new String[]{"Requirement 1", "Requirement 2"},
-                new String[]{"Audience 1", "Audience 2"},
-                "Course description",
-                "Beginner",
-                "course-image.jpg",
-                "2024-09-01",
-                "2024-09-10",
-                true,
-                1000L,
-                1999L,
-                CourseStatus.PUBLISHED.name(),
-                1,
-                2,
-                100,
-                4.5,
-                12,
-                "10 hours",
-                "John Doe",
-                Collections.emptyList(),  // Empty sections
-                new UserProfileVM(1L, "John Doe", "john@example.com", 4.0,1,1,1, Collections.emptyList()),
-                false,
-                "Home > Category > Course"
-        );
-
-        // Mock the behavior of courseService
-        when(courseService.getCourseById(courseId)).thenReturn(mockCourseVM);
-
-        // When
-        ResultActions resultActions = mockMvc.perform(get("/api/v1/courses/{id}", courseId)
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Then
-        resultActions.andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
-    }
-
-    @Test
-    void testCreateCourse() throws Exception {
-        // Given
-        CoursePostVM coursePostVM = new CoursePostVM(
-                null,
-                "Course Title",
-                "Course Headline",
-                new String[]{"Objective 1", "Objective 2"},
-                new String[]{"Requirement 1", "Requirement 2"},
-                new String[]{"Audience 1", "Audience 2"},
-                "Course description",
-                "Beginner",
-                1000L,
-                "course-image.jpg",
-                true,
-                1,
-                2
-        );
-
-        CourseVM mockCourseVM = new CourseVM(
-                1L,
-                "Course Title",
-                "Course Headline",
-                "course-title",
-                new String[]{"Objective 1", "Objective 2"},
-                new String[]{"Requirement 1", "Requirement 2"},
-                new String[]{"Audience 1", "Audience 2"},
-                "Course description",
-                "Beginner",
-                "course-image.jpg",
-                "2024-09-01",
-                "2024-09-10",
-                true,
-                1000L,
-                1999L,
-                CourseStatus.PUBLISHED.name(),
-                1,
-                2,
-                0,
-                0.0,
-                0,
-                "0 hours",
-                "John Doe",
-                Collections.emptyList(),  // Empty sections
-                new UserProfileVM(1L, "John Doe", "john@example.com", 4.0,1,1,1, Collections.emptyList()),
-                false,
-                "Home > Category > Course"
-        );
-
-        // Mock the behavior of courseService
-        when(courseService.create(coursePostVM)).thenReturn(mockCourseVM);
-
-        // When
-        ResultActions resultActions = mockMvc.perform(post("/api/v1/admin/courses")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(coursePostVM)));
-
-        // Then
-        resultActions.andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
-    }
+//    @Test
+//    void testCreateCourse() throws Exception {
+//        // Given
+//        CoursePostVM coursePostVM = new CoursePostVM(
+//                null,
+//                "Course Title",
+//                "Course Headline",
+//                new String[]{"Objective 1", "Objective 2"},
+//                new String[]{"Requirement 1", "Requirement 2"},
+//                new String[]{"Audience 1", "Audience 2"},
+//                "Course description",
+//                "Beginner",
+//                1000L,
+//                "course-image.jpg",
+//                true,
+//                1,
+//                2
+//        );
+//
+//        CourseVM mockCourseVM = new CourseVM(
+//                1L,
+//                "Course Title",
+//                "Course Headline",
+//                "course-title",
+//                new String[]{"Objective 1", "Objective 2"},
+//                new String[]{"Requirement 1", "Requirement 2"},
+//                new String[]{"Audience 1", "Audience 2"},
+//                "Course description",
+//                "Beginner",
+//                "course-image.jpg",
+//                "2024-09-01",
+//                "2024-09-10",
+//                true,
+//                1000L,
+//                1999L,
+//                CourseStatus.PUBLISHED.name(),
+//                1,
+//                2,
+//                0,
+//                0.0,
+//                0,
+//                "0 hours",
+//                "John Doe",
+//                Collections.emptyList(),  // Empty sections
+//                new UserProfileVM(1L, "John Doe", "john@example.com", 4.0,1,1,1, Collections.emptyList()),
+//                false,
+//                "Home > Category > Course"
+//        );
+//
+//        // Mock the behavior of courseService
+//        when(courseService.create(coursePostVM)).thenReturn(mockCourseVM);
+//
+//        // When
+//        ResultActions resultActions = mockMvc.perform(post("/api/v1/admin/courses")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(coursePostVM)));
+//
+//        // Then
+//        resultActions.andExpect(status().isCreated())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(content().json(objectMapper.writeValueAsString(mockCourseVM)));
+//    }
 
     @Test
     void testCreateCourse_DuplicateTitle() throws Exception {

@@ -13,6 +13,7 @@ import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.utils.Constants;
+import com.backend.elearning.utils.EmailEncryptionUtil;
 import com.backend.elearning.utils.RandomString;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
@@ -141,6 +142,14 @@ public class AuthenticationService {
     public AuthenticationVm register(RegistrationPostVm request) {
         Long checkExisted = studentRepository.countByExistedEmail(request.email(), null);
         if (checkExisted > 0) {
+            Student student = studentRepository.findByEmail(request.email()).orElseThrow();
+            if (student.getVerificationCode() != null) {
+                student.setVerificationCode(generateVerificationCode());
+                student.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+                sendVerificationEmail(student);
+                studentRepository.saveAndFlush(student);
+                throw new BadRequestException("Your account is registered but you have to verify account by checking email");
+            }
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, request.email());
         }
         Student student = Student.builder()
@@ -166,7 +175,7 @@ public class AuthenticationService {
 
     private void sendVerificationEmail(Student student) {
         String subject = "Account Verification";
-        String verificationCode = "VERIFICATION CODE " + student.getVerificationCode();
+        String verificationCode = student.getVerificationCode();
         String htmlMessage = "<html>"
                 + "<body style=\"font-family: Arial, sans-serif;\">"
                 + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
@@ -189,7 +198,7 @@ public class AuthenticationService {
     }
 
 
-    public void verify(VerifyStudentVM request) {
+    public String verify(VerifyStudentVM request) {
         Optional<Student> studentOptional = studentRepository.findByEmail(request.email());
         if (studentOptional.isPresent()) {
             Student student = studentOptional.get();
@@ -201,12 +210,20 @@ public class AuthenticationService {
                 student.setVerificationCode(null);
                 student.setVerificationCodeExpiresAt(null);
                 studentRepository.save(student);
+                if (request.type().equals("forgot")) {
+                    try {
+                        return EmailEncryptionUtil.encrypt(student.getEmail());
+                    } catch (Exception e) {
+                        throw new BadRequestException(e.getMessage());
+                    }
+                }
             } else {
                 throw new BadRequestException("Invalid verification code");
             }
         } else {
             throw new NotFoundException("Student not found");
         }
+        return "Success";
     }
 
     public void forgotPassword(String email) {
@@ -214,34 +231,25 @@ public class AuthenticationService {
         if (!studentOptional.isPresent()) {
             throw new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND, email);
         }
-        String toAddress = email;
-        String url = FORGOTPASSWORD_LINK + "?email=" + email;
-        String subject = "Confirm and change password" ;
-        String content = "<p>Hi,</p>" +
-                "<p> You requested to change your password successful </p>" +
-                "Please click the link below to change your password:" +
-                "<p> <a href =\"" + url + "\">Change password</a> </p>" +
-                "<br>" +
-                "<p>Delete this email if you want, after you change your password successful</p>";
-        try {
-            mailService.sendEmail(toAddress, content, subject);
-        } catch (MessagingException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        Student student = studentOptional.get();
+        student.setVerificationCode(generateVerificationCode());
+        student.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+
+        sendVerificationEmail(studentOptional.get());
+        studentRepository.save(student);
     }
 
     public void updatePassword(AuthenticationPostVm request) {
         try {
+            String email = EmailEncryptionUtil.decrypt(request.email());
             Student student = studentRepository
-                    .findByEmail(request.email())
+                    .findByEmail(email)
                     .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, request.email()));
             student.setPassword(passwordEncoder.encode(request.password()));
             student.setUpdatedAt(LocalDateTime.now());
             studentRepository.save(student);
         } catch (Exception e) {
-            // Log the exception to understand the issue
-            log.error("Error updating password", e);
-            throw e; // Rethrow the exception if needed
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -264,6 +272,22 @@ public class AuthenticationService {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
+    }
+
+    public void resendVerificationCode(String email) {
+        Optional<Student> studentOptional = studentRepository.findByEmail(email);
+        if (studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+            if (student.isActive()) {
+                throw new BadRequestException("Account is already verified");
+            }
+            student.setVerificationCode(generateVerificationCode());
+            student.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            sendVerificationEmail(student);
+            studentRepository.save(student);
+        } else {
+            throw new NotFoundException("Student not found");
+        }
     }
 
 }

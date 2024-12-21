@@ -120,6 +120,25 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             """)
     Page<Course> findAllCustomByRole(Pageable pageable, @Param("email") String email, @Param("keyword")String keyword);
 
+
+
+    @Query(value = """
+            select c
+            from Course c
+            join fetch c.category cat
+            left join fetch cat.parent
+            join fetch c.topic t
+            join fetch c.user u
+            where (:email is null or u.email = :email)
+            and c.status = :status
+            and COALESCE(:keyword, '') = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            """)
+    Page<Course> findAllCustomByRoleAndStatus(Pageable pageable, @Param("email") String email,
+                                              @Param("keyword")String keyword,
+                                              @Param("status") CourseStatus status
+    );
+
+
     @Query(value = """
             select c
             from Course c
