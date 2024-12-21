@@ -30,9 +30,11 @@ public class CourseController {
     public ResponseEntity<PageableData<CourseVM>> getPageableCourse (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
-            @RequestParam(value = "keyword", required = false) String keyword
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "status", required = false) CourseStatus status
+
     ) {
-        PageableData<CourseVM> pageableCourses = courseService.getPageableCourses(pageNum, pageSize, keyword);
+        PageableData<CourseVM> pageableCourses = courseService.getPageableCourses(pageNum, pageSize, keyword, status);
         return ResponseEntity.ok().body(pageableCourses);
     }
 

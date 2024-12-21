@@ -17,6 +17,7 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
         select c 
         from Classroom c 
         join c.course co 
+        join co.user 
         where co.id = :courseId
 """)
     List<Classroom> findByCourseId(@Param("courseId") Long courseId);
@@ -26,6 +27,8 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
             select s
             from Classroom s
             left join fetch s.meetings
+            join s.course c
+            join c.user
             where s.id = :id
             """)
     Optional<Classroom> findByIdMeetings(@Param("id") Long id);

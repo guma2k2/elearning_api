@@ -76,6 +76,29 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 
 
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.coupon 
+            left join fetch o.orderDetails 
+            where o.status = :status
+        """)
+    Page<Order> findAllCustomWithStatus(Pageable pageable, @Param("status") EOrderStatus status);
+
+
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.coupon 
+            left join fetch o.orderDetails 
+            where o.status = :status and o.id = :orderId
+        """)
+    Page<Order> findAllCustomWithStatusAndId(Pageable pageable,
+                                             @Param("status") EOrderStatus status,
+                                             @Param("orderId") Long orderId
+    );
 
 
     @Query("""

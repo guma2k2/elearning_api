@@ -17,19 +17,21 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
         from Note n 
         join fetch n.lecture l 
         join fetch l.section s 
-        where s.id = :sectionId
+        join n.student st
+        where s.id = :sectionId and st.email = :email
     """)
-    List<Note> findBySection(@Param("sectionId") Long sectionId);
+    List<Note> findBySection(@Param("sectionId") Long sectionId, @Param("email") String email);
 
     @Query("""
         select n
         from Note n 
         join fetch n.lecture l 
+        join n.student st
         join fetch l.section s 
         join fetch s.course c
-        where c.id = :courseId
+        where c.id = :courseId and st.email = :email
     """)
-    List<Note> findByCourse(@Param("courseId") Long courseId);
+    List<Note> findByCourse(@Param("courseId") Long courseId, @Param("email") String email);
 
     @Query("""
         select n

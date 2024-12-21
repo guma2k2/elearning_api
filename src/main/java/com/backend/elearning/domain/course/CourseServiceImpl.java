@@ -33,10 +33,7 @@ import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.ConvertTitleToSlug;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,7 +82,7 @@ public class CourseServiceImpl implements CourseService{
 
 
     @Override
-    public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword) {
+    public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword, CourseStatus status) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Sort sort = Sort.by(sortBy);
         sort.descending();
@@ -97,7 +94,12 @@ public class CourseServiceImpl implements CourseService{
         }
         List<CourseVM> courseVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
-        Page<Course> coursePage = courseRepository.findAllCustomByRole(pageable, email, keyword);
+        Page<Course> coursePage = null;
+        if (status != null) {
+            coursePage = courseRepository.findAllCustomByRoleAndStatus(pageable, email, keyword, status);
+        }else {
+            coursePage = courseRepository.findAllCustomByRole(pageable, email, keyword);
+        }
         List<Course> courses = coursePage.getContent();
         for (Course course : courses) {
             courseVMS.add(CourseVM.fromModel(course ,new ArrayList<>(),0, 0.0,0,"" , null, false, 0L));
@@ -132,6 +134,8 @@ public class CourseServiceImpl implements CourseService{
                 .category(category)
                 .topic(topic)
                 .user(user)
+                .free(true)
+                .status(CourseStatus.UNPUBLISHED)
                 .slug(slug)
                 .build();
         if (!course.isFree()) {
@@ -167,6 +171,7 @@ public class CourseServiceImpl implements CourseService{
         oldCourse.setDescription(coursePutVM.description());
         oldCourse.setTargetAudiences(coursePutVM.targetAudiences());
         oldCourse.setFree(coursePutVM.free());
+        oldCourse.setStatus(CourseStatus.UNPUBLISHED);
         oldCourse.setUpdatedAt(LocalDateTime.now());
         if (!coursePutVM.free()) {
             oldCourse.setPrice(coursePutVM.price());

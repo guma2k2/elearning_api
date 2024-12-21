@@ -149,11 +149,20 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword) {
+    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword, EOrderStatus status) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Order> orderPage = keyword != null ?
-                orderRepository.findAllCustomWithId(pageable, keyword) :
-                orderRepository.findAllCustom(pageable);
+        Page<Order> orderPage = null;
+        if (keyword != null && status != null) {
+            orderPage = orderRepository.findAllCustomWithStatusAndId(pageable, status, keyword);
+        } else {
+            if (keyword != null) {
+                orderPage = orderRepository.findAllCustomWithId(pageable, keyword);
+            } else if (status !=null) {
+                orderPage = orderRepository.findAllCustomWithStatus(pageable, status);
+            } else {
+                orderPage = orderRepository.findAllCustom(pageable);
+            }
+        }
         List<Order> orders = orderPage.getContent();
         List<OrderVM> orderVMS = orders.stream().map(order -> {
             Long orderId = order.getId();
