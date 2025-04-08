@@ -7,8 +7,8 @@
 - [Demo](#demo)
 - [User interfaces](#user-interfaces)
 - [Technologies Used](#technologies-used)
-    - [Backend (#backend)]
-    - [Frontend (#frontend)]
+    - [Backend](#backend)
+    - [Frontend](#frontend)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Contributors](#contributors)
