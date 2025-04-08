@@ -7,8 +7,8 @@
 - [Demo](#demo)
 - [User interfaces](#user-interfaces)
 - [Technologies Used](#technologies-used)
-    - [Backend (elearning-api)]
-    - [Frontend (elearning-ui)]
+    - [Backend (#backend)]
+    - [Frontend (#frontend)]
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Contributors](#contributors)
@@ -29,7 +29,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 
 ## Technologies Used
 
-### Backend (Elearning-be)
+### Backend 
 
 - Spring Boot 3
 - Spring Security 6
@@ -40,7 +40,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 - Docker
 - GitHub Action
 
-### Frontend (Elearning-fe)
+### Frontend 
 
 - ReactJs
 - Component-Based Architecture
