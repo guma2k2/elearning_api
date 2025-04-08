@@ -47,7 +47,7 @@ The Elearning website is a comprehensive full-stack application designed to faci
 - Antd design
 - Link github: https://github.com/guma2k2/elearning_ui
 ## Demo
-- Link: https://youtu.be/WFKv-xi0yaU
+- Link: https://youtu.be
 ## User interfaces
 - Ideas from https://www.udemy.com and https://fullstack.edu.vn .
 ### For Guest
