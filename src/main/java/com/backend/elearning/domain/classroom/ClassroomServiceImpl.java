@@ -4,6 +4,10 @@ import com.backend.elearning.domain.common.Event;
 import com.backend.elearning.domain.common.EventType;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.course.CourseRepository;
+import com.backend.elearning.domain.excercise.Exercise;
+import com.backend.elearning.domain.excercise.ExerciseGetVM;
+import com.backend.elearning.domain.exerciseFile.ExerciseFileService;
+import com.backend.elearning.domain.exerciseFile.ExerciseFileVM;
 import com.backend.elearning.domain.meeting.Meeting;
 import com.backend.elearning.domain.meeting.MeetingGetVM;
 import com.backend.elearning.domain.referencefile.ReferenceFileService;
@@ -27,10 +31,13 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     private final ReferenceFileService referenceFileService;
 
-    public ClassroomServiceImpl(ClassroomRepository classroomRepository, CourseRepository courseRepository, ReferenceFileService referenceFileService) {
+    private final ExerciseFileService exerciseFileService;
+
+    public ClassroomServiceImpl(ClassroomRepository classroomRepository, CourseRepository courseRepository, ReferenceFileService referenceFileService, ExerciseFileService exerciseFileService) {
         this.classroomRepository = classroomRepository;
         this.courseRepository = courseRepository;
         this.referenceFileService = referenceFileService;
+        this.exerciseFileService = exerciseFileService;
     }
 
     @Override
@@ -70,6 +77,8 @@ public class ClassroomServiceImpl implements ClassroomService {
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, id));
         classroom = classroomRepository.findByIdReferences(classroom).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, id));
+        classroom = classroomRepository.findByIdExercises(classroom).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, id));
         List<Event> events = getByClassroom(classroom);
         return ClassroomGetVM.fromModel(classroom, events);
     }
@@ -102,6 +111,21 @@ public class ClassroomServiceImpl implements ClassroomService {
             List<ReferenceFileVM> files = referenceFileService.getByReferenceId(reference.getId());
             referenceGetVM.setFiles(files);
             events.add(referenceGetVM);
+        }
+
+        List<Exercise> exercises = classroom.getExercises();
+
+        for (Exercise exercise : exercises) {
+            ExerciseGetVM exerciseGetVM = new ExerciseGetVM();
+            exerciseGetVM.setId(exercise.getId());
+            exerciseGetVM.setTitle(exercise.getTitle());
+            exerciseGetVM.setDescription(exercise.getDescription());
+            exerciseGetVM.setDeadline(convertLocalDateTimeToString(exercise.getSubmission_deadline()));
+            exerciseGetVM.setType(EventType.exercise);
+            exerciseGetVM.setCreatedAt(exercise.getCreatedAt());
+            List<ExerciseFileVM> files = exerciseFileService.getByExerciseId(exercise.getId());
+            exerciseGetVM.setFiles(files);
+            events.add(exerciseGetVM);
         }
 
         events.sort(Comparator.comparing(Event::getCreatedAt).reversed());

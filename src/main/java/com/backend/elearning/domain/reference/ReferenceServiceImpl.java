@@ -2,6 +2,8 @@ package com.backend.elearning.domain.reference;
 
 import com.backend.elearning.domain.classroom.Classroom;
 import com.backend.elearning.domain.classroom.ClassroomRepository;
+import com.backend.elearning.domain.excercise.Exercise;
+import com.backend.elearning.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,6 +45,10 @@ public class ReferenceServiceImpl implements ReferenceService{
 
     @Override
     public void delete(Long referenceId) {
+        Reference reference = referenceRepository.findById(referenceId).orElseThrow();
+        if (reference.getReferenceFiles().size() > 0) {
+            throw new BadRequestException("Tài liệu này có thư mục tải xuống");
+        }
         referenceRepository.deleteById(referenceId);
     }
 }

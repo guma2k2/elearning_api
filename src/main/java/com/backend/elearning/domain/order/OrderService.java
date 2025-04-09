@@ -11,5 +11,5 @@ public interface OrderService {
     List<OrderVM> findAllByUserIdAndStatus(EOrderStatus status);
 
     void updateOrderStatus(Long orderId, OrderStatusPostVM orderStatusPostVM);
-    PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long orderId, EOrderStatus status);
+    PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long orderId, EOrderStatus status, String date);
 }

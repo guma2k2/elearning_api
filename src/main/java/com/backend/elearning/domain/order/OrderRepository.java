@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -71,8 +72,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.coupon 
             left join fetch o.orderDetails 
             where o.id = :orderId
+            and (:date IS NULL or DATE(o.createdAt) = DATE(:date))
         """)
-    Page<Order> findAllCustomWithId(Pageable pageable, @Param("orderId") Long orderId);
+    Page<Order> findAllCustomWithId(Pageable pageable, @Param("orderId") Long orderId,
+                                    @Param("date")String date);
 
 
 
@@ -82,9 +85,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.student s 
             left join fetch o.coupon 
             left join fetch o.orderDetails 
-            where o.status = :status
+            where o.status = :status 
+            and (:date IS NULL or DATE(o.createdAt) = DATE(:date))
         """)
-    Page<Order> findAllCustomWithStatus(Pageable pageable, @Param("status") EOrderStatus status);
+    Page<Order> findAllCustomWithStatus(Pageable pageable, @Param("status") EOrderStatus status,
+                                        @Param("date")String date);
 
 
     @Query("""
@@ -94,10 +99,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.coupon 
             left join fetch o.orderDetails 
             where o.status = :status and o.id = :orderId
+            and (:date IS NULL or DATE(o.createdAt) = DATE(:date))
         """)
     Page<Order> findAllCustomWithStatusAndId(Pageable pageable,
                                              @Param("status") EOrderStatus status,
-                                             @Param("orderId") Long orderId
+                                             @Param("orderId") Long orderId,
+                                             @Param("date")String date
+
     );
 
 
@@ -107,6 +115,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     """)
     long findTotalOrders();
 
-
-
+    @Query("""
+            select o
+            from Order o 
+            left join fetch o.student s 
+            left join fetch o.coupon 
+            left join fetch o.orderDetails 
+            where (:date IS NULL or DATE(o.createdAt) = DATE(:date))
+        """)
+    Page<Order> findAllCustomAndDate(Pageable pageable, @Param("date")String date);
 }

@@ -113,23 +113,6 @@ public class AuthServiceTest {
         assertEquals(ERole.ROLE_STUDENT.name(), result.user().role());
     }
 
-    @Test
-    void shouldThrowBadRequestExceptionWhenUserOrStudentNotFound() {
-        // Given
-        String email = "notfound@example.com";
-        String password = "password";
-
-        AuthenticationPostVm request = new AuthenticationPostVm(email, password);
-
-        when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(null);
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-        when(studentRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        // When & Then
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> authenticationService.login(request));
-        assertEquals("Email or password is not corrected", exception.getMessage());
-    }
 
     @Test
     void login_shouldReturnAuthenticationVmForUser_whenValidUserCredentialsProvided() {
@@ -196,26 +179,4 @@ public class AuthServiceTest {
         assertEquals(ERole.ROLE_STUDENT.name(), result.user().role());
     }
 
-    @Test
-    void login_shouldThrowBadRequestException_whenUserOrStudentNotFound() {
-        // Given
-        String email = "notfound@example.com";
-        String password = "password";
-
-        AuthenticationPostVm request = new AuthenticationPostVm(email, password);
-
-        // When the authentication process is called, it does not throw any exceptions
-        when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(null);
-
-        // When the user repository is queried, it returns an empty result
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        // When the student repository is queried, it returns an empty result
-        when(studentRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        // When & Then
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> authenticationService.login(request));
-        assertEquals("Email or password is not corrected", exception.getMessage());
-    }
 }

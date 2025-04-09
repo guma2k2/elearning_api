@@ -1,5 +1,7 @@
 package com.backend.elearning.utils;
 
+import javax.swing.text.DateFormatter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -28,6 +30,14 @@ public class DateTimeUtils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         LocalDateTime localDateTime = LocalDateTime.parse(localDateTimeString, formatter);
         return localDateTime;
+    }
+
+    public static LocalDate convertToLocalDateByString (String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Convert String to LocalDate
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        return localDate;
     }
 
     public static String convertLocalDateTimeToMonthYearText(LocalDateTime localDateTime) {

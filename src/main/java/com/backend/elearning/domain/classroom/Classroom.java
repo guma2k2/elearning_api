@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.classroom;
 
 import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.excercise.Exercise;
 import com.backend.elearning.domain.meeting.Meeting;
 import com.backend.elearning.domain.reference.Reference;
 import jakarta.persistence.*;
@@ -38,4 +39,8 @@ public class Classroom {
     @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Meeting> meetings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Exercise> exercises = new ArrayList<>();
 }

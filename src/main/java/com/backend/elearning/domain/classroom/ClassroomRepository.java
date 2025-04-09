@@ -40,4 +40,12 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
             where s = :classroom
             """)
     Optional<Classroom> findByIdReferences(@Param("classroom") Classroom classroom);
+
+    @Query(value = """
+            select distinct s
+            from Classroom s
+            left join fetch s.exercises
+            where s = :classroom
+            """)
+    Optional<Classroom> findByIdExercises(@Param("classroom") Classroom classroom);
 }

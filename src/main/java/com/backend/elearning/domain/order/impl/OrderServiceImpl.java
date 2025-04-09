@@ -16,6 +16,7 @@ import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
+import com.backend.elearning.utils.DateTimeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,18 +151,25 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword, EOrderStatus status) {
+    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword, EOrderStatus status,
+                                                   String date
+                                                  ) {
+
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Order> orderPage = null;
         if (keyword != null && status != null) {
-            orderPage = orderRepository.findAllCustomWithStatusAndId(pageable, status, keyword);
+            orderPage = orderRepository.findAllCustomWithStatusAndId(pageable, status, keyword, date);
         } else {
             if (keyword != null) {
-                orderPage = orderRepository.findAllCustomWithId(pageable, keyword);
+                orderPage = orderRepository.findAllCustomWithId(pageable, keyword, date);
             } else if (status !=null) {
-                orderPage = orderRepository.findAllCustomWithStatus(pageable, status);
+                orderPage = orderRepository.findAllCustomWithStatus(pageable, status, date);
             } else {
-                orderPage = orderRepository.findAllCustom(pageable);
+                if (date != null) {
+                    orderPage = orderRepository.findAllCustomAndDate(pageable, date);
+                } else {
+                    orderPage = orderRepository.findAllCustom(pageable);
+                }
             }
         }
         List<Order> orders = orderPage.getContent();
