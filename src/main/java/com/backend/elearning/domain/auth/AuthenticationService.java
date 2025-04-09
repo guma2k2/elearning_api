@@ -76,17 +76,17 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
+        Optional<User> user = userRepository.findByEmail(request.email());
+        Optional<Student> student = studentRepository.findByEmail(request.email());
+        if (!user.isPresent() && !student.isPresent()) {
+            throw new BadRequestException("Email or password is not corrected");
+        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
                         request.password()
                 )
         );
-        Optional<User> user = userRepository.findByEmail(request.email());
-        Optional<Student> student = studentRepository.findByEmail(request.email());
-        if (!user.isPresent() && !student.isPresent()) {
-            throw new BadRequestException("Email or password is not corrected");
-        }
         if (user.isPresent()) {
             String token = jwtUtil.issueToken(request.email(), user.get().getRole().name());
             UserVm userVm = UserVm.fromModel(user.get());
@@ -140,6 +140,10 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm register(RegistrationPostVm request) {
+        Optional<User> userOptional = userRepository.findByEmail(request.email());
+        if (userOptional.isPresent()) {
+            throw new DuplicateException("Email is existed");
+        }
         Long checkExisted = studentRepository.countByExistedEmail(request.email(), null);
         if (checkExisted > 0) {
             Student student = studentRepository.findByEmail(request.email()).orElseThrow();

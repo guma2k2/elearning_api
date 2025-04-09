@@ -47,10 +47,10 @@ public class OrderController {
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
             @RequestParam(value = "orderId", required = false) Long orderId,
-            @RequestParam(value = "status", required = false) EOrderStatus status
-
+            @RequestParam(value = "status", required = false) EOrderStatus status,
+            @RequestParam(value = "date", required = false) String date
             ) {
-        PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize, orderId, status);
+        PageableData<OrderVM> pageableData = orderService.getPageableOrders(pageNum, pageSize, orderId, status, date);
         return ResponseEntity.ok().body(pageableData);
     }
     @GetMapping("/orders/user")
