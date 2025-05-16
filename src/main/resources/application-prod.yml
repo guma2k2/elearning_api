@@ -46,7 +46,7 @@ payment:
     url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
     tmnCode: "EDT2E52Y"
     secretKey: "VGC6H4EJ834TXE5USIHM20W3FH4469VW"
-    returnUrl: "http://localhost:5173/vn-pay-callback"
+    returnUrl: "http://localhost:80/vn-pay-callback"
     version: "2.1.0"
     command: "pay"
     orderType: "bill"

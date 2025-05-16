@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: elearning
     volumes:
       - db_data:/data/postgres
+      - ./elearning_data.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
