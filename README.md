@@ -114,10 +114,14 @@ If you have any improvement or weird things about my project, please send an ema
 ## Getting Started
 
 To get started with the Elearning project, follow the setup instructions in the respective directories:
-- Clone this project
+- Clone this project or download compose.yml file
+- Run Docker
 - Run cmd : docker compose up -d --build
 - Access link:  http://localhost
-
+When success(dont login with Google because google need a domain link to redirect):
+Account Admin(username: thuanngo3072006@gmail.com, password: 123456)
+Account Instructor(username: emily.davis@example.com, password: 123456)
+Account Student(username: thuanngo3072002@gmail.com, password: 123456) 
 ## Contributors
 
 - [NGO DUC THUAN](https://github.com/guma2k2)
