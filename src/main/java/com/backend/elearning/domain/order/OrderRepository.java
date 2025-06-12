@@ -32,6 +32,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.coupon c
             left join fetch o.orderDetails 
             where s.email =:email
+            order by o.createdAt desc 
         """)
     List<Order> findAllByStudent(@Param("email")String email);
 
