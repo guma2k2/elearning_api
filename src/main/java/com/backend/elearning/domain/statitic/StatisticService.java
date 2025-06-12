@@ -97,7 +97,7 @@ public class StatisticService {
                 paymentRepository.findByYear(year);
         for (Statistic statistic: statistics) {
             String name = String.format(MONTH_PATTERN, statistic.getTime());
-            Long total = statistic.getTotal();
+            Long total = statistic.getTotal() / 100;
             StatisticTime statisticTime = new StatisticTime(name, total);
             statisticTimes.add(statisticTime);
         }
@@ -131,7 +131,7 @@ public class StatisticService {
                 paymentRepository.findByMonthAndYear(month, year);
         for (Statistic statistic: statistics) {
             String name = String.format(DAY_PATTERN, statistic.getTime());
-            Long total = statistic.getTotal();
+            Long total = statistic.getTotal() / 100;
             StatisticTime statisticTime = new StatisticTime(name, total);
             statisticTimes.add(statisticTime);
         }
@@ -193,7 +193,7 @@ public class StatisticService {
             Row row = sheet.createRow(rowIdx);
             row.createCell(0).setCellValue(rowIdx);
             row.createCell(1).setCellValue(stat.getName());
-            row.createCell(2).setCellValue(stat.getTotal());
+            row.createCell(2).setCellValue(stat.getTotal() / 100);
             rowIdx++;
         }
 
