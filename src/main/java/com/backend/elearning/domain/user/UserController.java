@@ -10,14 +10,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -58,7 +61,7 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "Duplicated email", content =
                 @Content(schema = @Schema(implementation = ErrorVm.class))),
     })
-    public ResponseEntity<UserVm> create (@RequestBody UserPostVm userPostVm) {
+    public ResponseEntity<UserVm> create (@Valid @RequestBody UserPostVm userPostVm) {
         UserVm savedUser = userService.create(userPostVm);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
@@ -71,7 +74,7 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "Duplicated email", content =
                 @Content(schema = @Schema(implementation = ErrorVm.class)))
     })
-    public ResponseEntity<UserVm> update (@RequestBody UserPutVm userPostVm,
+    public ResponseEntity<UserVm> update (@Valid @RequestBody UserPutVm userPostVm,
                                           @PathVariable("id") Long id
     ) {
         UserVm userVm = userService.update(userPostVm, id);

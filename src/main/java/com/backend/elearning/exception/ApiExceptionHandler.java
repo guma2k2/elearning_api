@@ -1,10 +1,12 @@
 package com.backend.elearning.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -84,5 +86,45 @@ public class ApiExceptionHandler {
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
         return servletRequest.getRequest().getServletPath();
+    }
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorVm> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+
+        // Handle Enum Deserialization specifically
+        if (cause instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
+            String field = ife.getPath().isEmpty() ? "unknown" : ife.getPath().get(0).getFieldName();
+            String rejectedValue = String.valueOf(ife.getValue());
+            String enumName = ife.getTargetType().getSimpleName();
+            Object[] allowed = ife.getTargetType().getEnumConstants();
+
+            List<String> fieldErrors = new ArrayList<>();
+            fieldErrors.add(
+                    String.format("Field '%s': invalid value '%s'. Expected one of: %s",
+                            field,
+                            rejectedValue,
+                            String.join(", ", java.util.Arrays.stream(allowed).map(Object::toString).toList()))
+            );
+
+            ErrorVm error = new ErrorVm(
+                    String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Invalid enum value for field '" + field + "'",
+                    fieldErrors
+            );
+
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        // Fallback for other bad JSON structures
+        ErrorVm fallbackError = new ErrorVm(
+                String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Invalid request body: " + ex.getMostSpecificCause().getMessage()
+        );
+
+        return ResponseEntity.badRequest().body(fallbackError);
     }
 }

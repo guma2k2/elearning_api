@@ -95,8 +95,8 @@ public class UserServiceImpl implements UserService{
                 .password(passwordEncoder.encode(userPostVm.password()))
                 .dateOfBirth(LocalDate.of(userPostVm.year(), userPostVm.month(), userPostVm.day()))
                 .photo(userPostVm.photo())
-                .role(ERole.valueOf(userPostVm.role()))
-                .gender(EGender.valueOf(userPostVm.gender()))
+                .role(userPostVm.role())
+                .gender(userPostVm.gender())
                 .build();
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -110,14 +110,13 @@ public class UserServiceImpl implements UserService{
         if (userRepository.countByExistedEmail(userPutVm.email(), userId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userPutVm.email());
         }
-
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, userId));
         user.setEmail(userPutVm.email());
         user.setFirstName(userPutVm.firstName());
         user.setLastName(userPutVm.lastName());
         user.setActive(userPutVm.active());
-        user.setGender(EGender.valueOf(userPutVm.gender()));
-        user.setRole(ERole.valueOf(userPutVm.role()));
+        user.setGender(userPutVm.gender());
+        user.setRole(userPutVm.role());
         user.setDateOfBirth(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()));
         user.setUpdatedAt(LocalDateTime.now());
         Optional.ofNullable(userPutVm.photo())
