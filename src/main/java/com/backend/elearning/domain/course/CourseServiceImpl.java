@@ -249,7 +249,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseListGetVM getCourseListGetVMById(Long id) {
-        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, id));
+        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         Long courseId = course.getId();
         List<Review> reviews = reviewService.findByCourseId(courseId);

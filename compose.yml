@@ -1,21 +1,18 @@
 services:
   postgres:
     container_name: elearning-db
-    image: postgres
+    image: postgres:15
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      PGDATA: /data/postgres
       POSTGRES_DB: elearning
     volumes:
-      - db_data:/data/postgres
-      - ./elearning_data.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - postgres
     restart: unless-stopped
-
   pgadmin:
     container_name: elearning-pgui
     image: dpage/pgadmin4
