@@ -179,8 +179,8 @@ public class CourseServiceImpl implements CourseService{
         if (!Objects.equals(coursePutVM.image(), "")) {
             oldCourse.setImageId(coursePutVM.image());
         }
-        if (coursePutVM.level() != null && !coursePutVM.level().isBlank()) {
-            oldCourse.setLevel(ELevel.valueOf(coursePutVM.level()));
+        if (coursePutVM.level() != null) {
+            oldCourse.setLevel(coursePutVM.level());
         }
         return CourseVM.fromModel(courseRepository.save(oldCourse), new ArrayList<>(),0, 0.0,0,"", null , false, 0L);
     }

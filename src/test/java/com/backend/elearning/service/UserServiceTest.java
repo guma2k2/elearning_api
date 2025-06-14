@@ -54,13 +54,13 @@ public class UserServiceTest {
                 "John",
                 "Doe",
                 "password123",
-                EGender.MALE.name(),
+                EGender.MALE,
                 true ,
                 "ADMIN",
                 15,
                 5,
                 1990,
-                "ROLE_ADMIN"
+                ERole.ROLE_ADMIN
         );
 
         User newUser = User.builder()
@@ -70,9 +70,9 @@ public class UserServiceTest {
                 .active(userPostVm.active())
                 .password("encodedPassword")  // Assuming the password is encoded
                 .photo(userPostVm.photo())
-                .role(ERole.valueOf(userPostVm.role()))
+                .role(userPostVm.role())
                 .dateOfBirth(LocalDate.of(userPostVm.year(), userPostVm.month(), userPostVm.day()))
-                .gender(EGender.valueOf(userPostVm.gender()))
+                .gender(userPostVm.gender())
                 .build();
         User savedUser = User.builder()
                 .id(1L)  // Assuming the user is saved with an ID of 1
@@ -111,13 +111,13 @@ public class UserServiceTest {
                 "John",
                 "Doe",
                 "password123",
-                EGender.MALE.name(),
+                EGender.MALE,
                 true ,
                 "ADMIN",
                 15,
                 5,
                 1990,
-                "ROLE_ADMIN"
+                ERole.ROLE_ADMIN
         );
 
         when(userRepository.countByExistedEmail(userPostVm.email(), null)).thenReturn(1L);
@@ -135,7 +135,7 @@ public class UserServiceTest {
 
     @Test
     void shouldThrowDuplicateException_whenEmailAlreadyExists() {
-        UserPutVm userPutVm = new UserPutVm(1L, "duplicate@example.com", "John", "Doe", null, "Male", true, null, 1, 1, 1990, "USER");
+        UserPutVm userPutVm = new UserPutVm(1L, "duplicate@example.com", "John", "Doe", null, EGender.MALE, true, null, 1, 1, 1990, ERole.ROLE_STUDENT);
         Long userId = 1L;
         when(userRepository.countByExistedEmail(userPutVm.email(), userId)).thenReturn(1L);
 
@@ -144,7 +144,7 @@ public class UserServiceTest {
 
     @Test
     void shouldThrowNotFoundException_whenUserIdNotFound() {
-        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", null, "Male", true, null, 1, 1, 1990, "USER");
+        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", null, EGender.MALE, true, null, 1, 1, 1990, ERole.ROLE_STUDENT);
         Long userId = 999L;
         when(userRepository.countByExistedEmail(userPutVm.email(), userId)).thenReturn(0L);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -154,7 +154,7 @@ public class UserServiceTest {
 
     @Test
     void shouldUpdateUserDetails_whenValidUserPutVmAndUserIdProvided() {
-        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", null, EGender.FEMALE.name(), true, null, 1, 1, 1990, "ROLE_ADMIN");
+        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", null, EGender.FEMALE, true, null, 1, 1, 1990, ERole.ROLE_ADMIN);
         Long userId = 1L;
         User user = new User();
         when(userRepository.countByExistedEmail(userPutVm.email(), userId)).thenReturn(0L);
@@ -166,7 +166,7 @@ public class UserServiceTest {
         assertEquals(userPutVm.firstName(), user.getFirstName());
         assertEquals(userPutVm.lastName(), user.getLastName());
         assertEquals(userPutVm.active(), user.isActive());
-        assertEquals(ERole.valueOf(userPutVm.role()), user.getRole());
+        assertEquals(userPutVm.role(), user.getRole());
         assertEquals(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()), user.getDateOfBirth());
         assertNotNull(user.getUpdatedAt());
         verify(userRepository).save(user);
@@ -174,7 +174,7 @@ public class UserServiceTest {
 
     @Test
     void shouldUpdatePassword_whenPasswordProvided() {
-        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", "newpassword", EGender.MALE.name(), true, null, 1, 1, 1990, "ROLE_ADMIN");
+        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", "newpassword", EGender.MALE, true, null, 1, 1, 1990, ERole.ROLE_ADMIN);
         Long userId = 1L;
         User user = new User();
         when(userRepository.countByExistedEmail(userPutVm.email(), userId)).thenReturn(0L);
@@ -189,7 +189,7 @@ public class UserServiceTest {
 
     @Test
     void shouldUpdatePhoto_whenPhotoProvided() {
-        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", null, EGender.MALE.name(), true, "newphoto.png", 1, 1, 1990, "ROLE_ADMIN");
+        UserPutVm userPutVm = new UserPutVm(1L, "newemail@example.com", "John", "Doe", null, EGender.MALE, true, "newphoto.png", 1, 1, 1990, ERole.ROLE_ADMIN);
         Long userId = 1L;
         User user = new User();
         when(userRepository.countByExistedEmail(userPutVm.email(), userId)).thenReturn(0L);
