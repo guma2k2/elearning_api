@@ -102,7 +102,7 @@ import static org.mockito.Mockito.when;
               new String[]{"Objective 1", "Objective 2"},
               new String[]{"Requirement 1"},
               new String[]{"Target Audience 1"},
-              "Course Description", ELevel.AllLevel.name(),
+              "Course Description", ELevel.AllLevel,
               100000L, "image.png", false,
               1, 1
       );
@@ -159,7 +159,7 @@ import static org.mockito.Mockito.when;
               new String[]{"Objective 1", "Objective 2"},
               new String[]{"Requirement 1"},
               new String[]{"Target Audience 1"},
-              "Course Description", "Beginner",
+              "Course Description", ELevel.Beginner,
               100L, "image.png", false,
               1, 1
       );
@@ -215,7 +215,7 @@ import static org.mockito.Mockito.when;
                 new String[]{"Requirement 1"},
                 new String[]{"Target Audience 1"},
                 "New Description",
-                ELevel.AllLevel.name(),
+                ELevel.AllLevel,
                 300L,
                 "new-image.png",
                 false,
@@ -223,9 +223,6 @@ import static org.mockito.Mockito.when;
                 3
         );
 
-        // When
-//        when(securityContext.getAuthentication()).thenReturn(authentication);
-//        when(authentication.getName()).thenReturn(email);
         when(courseRepository.findByIdReturnSections(courseId)).thenReturn(Optional.of(oldCourse));
         when(courseRepository.countExistByTitle(coursePutVM.title(), courseId)).thenReturn(0L);
         when(categoryRepository.findById(coursePutVM.categoryId())).thenReturn(Optional.of(category));

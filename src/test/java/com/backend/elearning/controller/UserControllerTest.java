@@ -94,13 +94,13 @@ public class UserControllerTest {
                 "Jane",
                 "Doe",
                 "password123",
-                "Female",
+                EGender.FEMALE,
                 true,
                 "photoURL",
                 2,
                 2,
                 1992,
-                "USER"
+                ERole.ROLE_STUDENT
         );
         UserVm createdUser = new UserVm(1L, "new@example.com", "Jane", "Doe", "Female", true, "photoURL", "02/02/1992", "USER");
 
@@ -133,15 +133,15 @@ public class UserControllerTest {
                 "Janet",
                 "Doe",
                 "newpassword123",
-                "Female",
+                EGender.FEMALE,
                 true,
                 "newPhotoURL",
                 3,
                 3,
                 1993,
-                "USER"
+                ERole.ROLE_STUDENT
         );
-        UserVm updatedUser = new UserVm(userId, "updated@example.com", "Janet", "Doe", "Female", true, "newPhotoURL", "03/03/1993", "USER");
+        UserVm updatedUser = new UserVm(userId, "updated@example.com", "Janet", "Doe", "FEMALE", true, "newPhotoURL", "03/03/1993", "ROLE_STUDENT");
 
         when(userService.update(userPutVm, userId)).thenReturn(updatedUser);
 
@@ -154,11 +154,11 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("updated@example.com"))
                 .andExpect(jsonPath("$.firstName").value("Janet"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
-                .andExpect(jsonPath("$.gender").value("Female"))
+                .andExpect(jsonPath("$.gender").value("FEMALE"))
                 .andExpect(jsonPath("$.active").value(true))
                 .andExpect(jsonPath("$.photoURL").value("newPhotoURL"))
                 .andExpect(jsonPath("$.dateOfBirth").value("03/03/1993"))
-                .andExpect(jsonPath("$.role").value("USER"));
+                .andExpect(jsonPath("$.role").value("ROLE_STUDENT"));
     }
 
     @Test
