@@ -16,7 +16,6 @@ public record UserPutVm(
 
     @NotBlank(message = "last name must not be blank")
     String lastName,
-    @NotNull(message = "password must not be null")
     String password,
     @EnumPattern(name = "gender", regexp = "MALE|FEMALE")
     EGender gender,

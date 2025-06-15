@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 public record UserPostVm(
-        @Email(message = "email invalid format")
+        @Email(message = "invalid format")
         String email,
         @NotBlank(message = "first name must not be blank")
         String firstName,
@@ -16,7 +16,6 @@ public record UserPostVm(
         String lastName,
         @NotNull(message = "password must not be null")
         String password,
-
         @EnumPattern(name = "gender", regexp = "MALE|FEMALE")
         EGender gender,
         boolean active,

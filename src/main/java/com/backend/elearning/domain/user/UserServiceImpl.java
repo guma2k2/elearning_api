@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public PageableData<UserVm> getUsers(int pageNum, int pageSize, String keyword) {
+        log.info("received pageNum: {}, pageSize: {}, keyword: {}", pageNum, pageSize, keyword);
         Sort sort = Sort.by(sortBy);
         sort.descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
@@ -66,6 +67,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserGetDetailVm getUser(Long userId) {
+        log.info("received userId: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userId));
         return new UserGetDetailVm(
@@ -84,6 +86,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public UserVm create(UserPostVm userPostVm) {
+        log.info("received user request: {}", userPostVm);
         if (userRepository.countByExistedEmail(userPostVm.email(), null) > 0L) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userPostVm.email());
         }
@@ -107,6 +110,8 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public UserVm update(UserPutVm userPutVm, Long userId) {
+        log.info("received user request: {}", userPutVm);
+        log.info("received userId: {}", userId);
         if (userRepository.countByExistedEmail(userPutVm.email(), userId) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.USER_EMAIL_DUPLICATED, userPutVm.email());
         }
@@ -133,6 +138,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void delete(Long userId) {
+        log.info("received userId: {}", userId);
         User user = userRepository.findByIdCustom(userId).orElseThrow( () -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, userId));
         if (user.getCourses().size() > 0) {
             throw new BadRequestException("User had course");
@@ -142,6 +148,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserProfileVM getById(Long userId) {
+        log.info("received userId: {}", userId);
         User user = userRepository.findByIdCustom(userId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, userId));
         List<Course> coursesOfUser = user.getCourses();
         int numberOfCourses = coursesOfUser.size();
@@ -165,12 +172,13 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, email));
     }
 
     @Override
     public UserGetDetailVm getUserProfile(Long id) {
-        User user = userRepository.findByIdCustom(id).orElseThrow();
+        log.info("received userId: {}", id);
+        User user = userRepository.findByIdCustom(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, id));
         List<Course> coursesOfUser = user.getCourses();
         AtomicInteger numberOfReviews = new AtomicInteger();
         AtomicInteger numberOfStudent = new AtomicInteger();
@@ -191,6 +199,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void updateStatus(boolean status, Long userId) {
+        log.info("received status: {}, userId: {}", status, userId);
         userRepository.updateStatusUser(status, userId);
     }
 
