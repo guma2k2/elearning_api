@@ -18,12 +18,9 @@ import org.springframework.web.bind.annotation.*;
 public class CouponController {
 
     private final CouponService couponService;
-
-
     public CouponController(CouponService couponService) {
         this.couponService = couponService;
     }
-
 
     @PostMapping("/admin/coupons")
     @ApiResponses(value = {

@@ -43,6 +43,7 @@ public class TopicServiceImpl implements TopicService{
 
     @Override
     public PageableData<TopicVM> getPageableTopics(int pageNum, int pageSize, String keyword) {
+        log.info("received pageNum: {}, pageSize: {}, keyword: {}", pageNum, pageSize, keyword);
         List<TopicVM> topicVMS = new ArrayList<>();
         Sort sort = Sort.by(sortBy);
         sort.descending();
@@ -63,6 +64,7 @@ public class TopicServiceImpl implements TopicService{
 
     @Override
     public TopicVM create(TopicPostVM topicPostVM) {
+        log.info("received topicPostVM: {}", topicPostVM);
         if (topicRepository.countByNameAndId(topicPostVM.name(), null) > 0){
             throw new DuplicateException(Constants.ERROR_CODE.TOPIC_NAME_DUPLICATED, topicPostVM.name());
         }
@@ -86,6 +88,7 @@ public class TopicServiceImpl implements TopicService{
 
     @Override
     public TopicVM getTopicById(Integer topicId) {
+        log.info("receive topicId: {}", topicId);
         Topic topic = topicRepository.findByIdReturnCategories(topicId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.TOPIC_NOT_FOUND));
         return TopicVM.fromModel(topic);
@@ -93,6 +96,7 @@ public class TopicServiceImpl implements TopicService{
 
     @Override
     public List<TopicVM> getTopicsByCategoryId(Integer categoryId) {
+        log.info("received categoryId: {}", categoryId);
         Category category = categoryRepository.findByIdTopics(categoryId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryId));
         List<TopicVM> topics = category.getTopics().stream().map(TopicVM::fromModel).toList();
         return topics;
@@ -100,6 +104,7 @@ public class TopicServiceImpl implements TopicService{
 
     @Override
     public void update(TopicPostVM topicPostVM, Integer topicId) {
+        log.info("received topicPostVM :{}, topicId: {}", topicPostVM, topicId);
         if (topicRepository.countByNameAndId(topicPostVM.name(), topicId) > 0){
             throw new DuplicateException(Constants.ERROR_CODE.TOPIC_NAME_DUPLICATED, topicPostVM.name());
         }

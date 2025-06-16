@@ -8,6 +8,7 @@ import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.DateTimeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class CouponServiceImpl implements CouponService{
 
     private final CouponRepository couponRepository;
@@ -31,11 +33,12 @@ public class CouponServiceImpl implements CouponService{
         if (couponRepository.findByCodeAndId(couponPostVM.code(), null) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
+        log.info("received couponPostVM: {}", couponPostVM);
         LocalDateTime startTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.startTime(), DateTimeUtils.NORMAL_TYPE);
         LocalDateTime endTime = DateTimeUtils.convertStringToLocalDateTime(couponPostVM.endTime(), DateTimeUtils.NORMAL_TYPE);
 
         if (startTime.isAfter(endTime)) {
-            throw new BadRequestException("");
+            throw new BadRequestException("Start time must be before end time.");
         }
         Coupon newCoupon = Coupon.builder()
                 .discountPercent(couponPostVM.discountPercent())
@@ -49,6 +52,7 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM getByCode(String code) {
+        log.info("received code of coupon service: {}", code);
         Coupon coupon = couponRepository.findByCode(code).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, code));
         if (LocalDateTime.now().isBefore(coupon.getStartTime()) || LocalDateTime.now().isAfter(coupon.getEndTime())) {
@@ -77,12 +81,10 @@ public class CouponServiceImpl implements CouponService{
     }
 
 
-    public boolean checkExistCoupon (Long id, String code) {
-        return couponRepository.findByCodeAndId(code, id) > 0l;
-    }
 
     @Override
     public CouponVM updateCoupon(CouponPostVM couponPostVM, Long couponId) {
+        log.info("received couponPostVM: {}", couponPostVM);
         if (couponRepository.findByCodeAndId(couponPostVM.code(), couponId) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
@@ -99,10 +101,11 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public void deleteById(Long couponId) {
+        log.info("received couponId: {}", couponId);
         Coupon coupon = couponRepository.findByIdCustom(couponId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.COUPON_NOT_FOUND, couponId));
         if (coupon.getOrders().size() > 0) {
-            throw new BadRequestException("Coupon had order");
+            throw new BadRequestException("Coupon had orders");
         }
         couponRepository.delete(coupon);
     }
