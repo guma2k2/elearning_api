@@ -30,6 +30,7 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public CouponVM createCoupon(CouponPostVM couponPostVM) {
+        log.info("received couponPostVM: {}", couponPostVM);
         if (couponRepository.findByCodeAndId(couponPostVM.code(), null) > 0l) {
             throw new DuplicateException(Constants.ERROR_CODE.COUPON_CODE_DUPLICATED, couponPostVM.code());
         }
@@ -63,6 +64,7 @@ public class CouponServiceImpl implements CouponService{
 
     @Override
     public PageableData<CouponVM> getPageableCoupons(int pageNum, int pageSize) {
+        log.info("received pageNum: {}, pageSize: {}", pageNum, pageSize);
         List<CouponVM> couponVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
