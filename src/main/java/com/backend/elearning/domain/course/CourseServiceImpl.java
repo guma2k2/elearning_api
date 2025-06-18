@@ -83,10 +83,12 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public PageableData<CourseVM> getPageableCourses(int pageNum, int pageSize, String keyword, CourseStatus status) {
+        log.info("received pageNum: {}, pageSize: {}, keyword: {}, status: {}", pageNum, pageSize, keyword, status);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Sort sort = Sort.by(sortBy);
         sort.descending();
         if (email != null) {
+            log.info("email from token: {}", email);
             User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND));
             if (user.getRole().equals(ERole.ROLE_ADMIN)) {
                 email = null;
@@ -116,7 +118,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM create(CoursePostVM coursePostVM) {
-        log.info(coursePostVM.toString());
+        log.info("received coursePostVM: {}", coursePostVM);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         if (courseRepository.countExistByTitle(coursePostVM.title(), null) > 0) {
             throw new DuplicateException(Constants.ERROR_CODE.COURSE_TITLE_DUPLICATED);
@@ -148,6 +150,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseVM update(CoursePostVM coursePutVM, Long userId, Long courseId) {
+        log.info("received coursePutVM: {}", coursePutVM);
         Course oldCourse = courseRepository.findByIdReturnSections(courseId).orElseThrow(() -> new NotFoundException(
                 Constants.ERROR_CODE.COURSE_NOT_FOUND, courseId
         ));
@@ -249,6 +252,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseListGetVM getCourseListGetVMById(Long id) {
+        log.info("received id: {}", id);
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         Long courseId = course.getId();
@@ -283,6 +287,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseLearningVm getCourseBySlug(String slug) {
+        log.info("Received slug: {}", slug);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Course course = courseRepository.findBySlugReturnSections(slug).orElseThrow(
                 () -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, slug)
@@ -330,6 +335,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public List<CourseListGetVM> getByUserId(Long userId) {
+        log.info("received userId: {}", userId);
         List<Course> courses = courseRepository.findByUserIdReturnSections(userId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
         return courseListGetVMS;
@@ -344,6 +350,9 @@ public class CourseServiceImpl implements CourseService{
                                                          Boolean[] free,
                                                          String categoryName, Integer topicId
     ) {
+
+        log.info("received pageNum: {}, pageSize: {}, title: {}, rating: {}, level: {}, free: {}, categoryName: {}, " +
+                        "topicId: {}", pageNum, pageSize, title, rating, level, free, categoryName, topicId);
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
                 courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
@@ -387,6 +396,8 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public List<CourseListGetVM> getCoursesByMultiQueryReturnList(int pageNum, int pageSize, String title, Float rating, String[] level, Boolean[] free, String categoryName, Integer topicId) {
+        log.info("received pageNum: {}, pageSize: {}, title: {}, rating: {}, level: {}, free: {}, categoryName: {}, " +
+                "topicId: {}", pageNum, pageSize, title, rating, level, free, categoryName, topicId);
         List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
             courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
@@ -419,6 +430,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId) {
+        log.info("received categoryId: {}", categoryId);
         List<Course> courses = courseRepository.findByCategoryIdWithStatus(categoryId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
         return courseListGetVMS;
@@ -426,6 +438,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public void delete(Long id) {
+        log.info("received courseId: {}", id);
         Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
         if (course.getSections().size() > 0 ) {
             throw new BadRequestException(Constants.ERROR_CODE.COURSE_HAD_SECTION, id);
@@ -453,6 +466,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public void updateStatusCourse(CourseStatusPostVM courseStatusPostVM, Long courseId) {
+        log.info("received status: {}, courseId: {}", courseStatusPostVM, courseId);
         Course course = courseRepository.findById(courseId).orElseThrow();
         if (courseStatusPostVM.status().equals(CourseStatus.UNPUBLISHED) && courseStatusPostVM.reason() != null) {
             course.setReasonRefused(courseStatusPostVM.reason());
