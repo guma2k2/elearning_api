@@ -35,6 +35,7 @@ public class CartServiceImpl implements CartService{
     @Override
     public CartListGetVM addCourseToCart(Long courseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("received email from token: {}", email);
         Student student = studentRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND));
         Course course = courseRepository.findById(courseId).orElseThrow();
         Optional<Cart> cartOptional = cartRepository.findByEmailAndCourseId(courseId, email);

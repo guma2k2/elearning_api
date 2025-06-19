@@ -17,6 +17,7 @@ import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.DateTimeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -54,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Long createOrder(OrderPostDto orderPostDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("received orderPostDto: {}", orderPostDto);
+        log.info("received email from token: {}", email);
         Coupon coupon = orderPostDto.couponCode() != null ? couponRepository.findByCode(orderPostDto.couponCode()).orElseThrow() : null;
         Student student = studentRepository.findByEmail( email).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.STUDENT_NOT_FOUND, email));
         Order order = Order.builder()
@@ -139,6 +143,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void updateOrderStatus(Long orderId, OrderStatusPostVM orderStatusPostVM) {
+        log.info("received orderStatusPostVM: {}", orderStatusPostVM);
         Order order = orderRepository.findById(orderId).orElseThrow();
         if (orderStatusPostVM.status().equals(EOrderStatus.FAILURE) && orderStatusPostVM.reason() != null) {
             order.setReasonFailed(orderStatusPostVM.reason());
@@ -151,9 +156,12 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public PageableData<OrderVM> getPageableOrders(int pageNum, int pageSize, Long keyword, EOrderStatus status,
+    public PageableData<OrderVM> getPageableOrders(int pageNum,
+                                                   int pageSize,
+                                                   Long keyword,
+                                                   EOrderStatus status,
                                                    String date
-                                                  ) {
+    ) {
 
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Order> orderPage = null;
