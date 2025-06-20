@@ -5,12 +5,14 @@ import com.backend.elearning.domain.section.SectionRepository;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class QuizServiceImpl implements QuizService{
     private final QuizRepository quizRepository;
     private final SectionRepository sectionRepository;
@@ -22,6 +24,7 @@ public class QuizServiceImpl implements QuizService{
 
     @Override
     public QuizVM create(QuizPostVM quizPostVM) {
+        log.info("received quizPostVM: {}", quizPostVM);
         Section section = sectionRepository.findById(quizPostVM.sectionId()).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.LECTURE_NOT_FOUND, quizPostVM.sectionId()))  ;
         Quiz quiz = Quiz.builder()
@@ -38,6 +41,7 @@ public class QuizServiceImpl implements QuizService{
 
     @Override
     public QuizVM update(QuizPostVM quizPutVM, Long quizId) {
+        log.info("received quizPutVM: {}", quizPutVM);
         Quiz quiz = quizRepository.findByIdReturnSection(quizId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.LECTURE_NOT_FOUND, quizId));
         if (!Objects.equals(quiz.getSection().getId(), quizPutVM.sectionId())) {
