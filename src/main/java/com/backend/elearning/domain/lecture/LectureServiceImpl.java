@@ -6,6 +6,7 @@ import com.backend.elearning.domain.section.SectionRepository;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
@@ -27,6 +29,7 @@ public class LectureServiceImpl implements LectureService {
 
     @Override
     public LectureVm create(LecturePostVM lecturePostVM) {
+        log.info("received lecturePostVM : {}", lecturePostVM);
         Section section = sectionRepository.findById(lecturePostVM.sectionId()).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, lecturePostVM.sectionId()));
         Lecture lecture = Lecture.builder()
@@ -43,6 +46,7 @@ public class LectureServiceImpl implements LectureService {
 
     @Override
     public LectureVm update(LecturePostVM lecturePutVM, Long lectureId) {
+        log.info("received lecturePutVM : {}", lecturePutVM);
         Lecture lecture = lectureRepository.findByIdSection(lectureId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.LECTURE_NOT_FOUND, lectureId));
         if (!Objects.equals(lecture.getSection().getId(), lecturePutVM.sectionId())) {

@@ -42,6 +42,7 @@ public class SectionServiceImpl implements SectionService{
 
     @Override
     public SectionVM create(SectionPostVM sectionPostVM) {
+        log.info("received sectionPostVM: {}", sectionPostVM);
         Course course = courseRepository.findById(sectionPostVM.courseId()).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, sectionPostVM.courseId()));
         Section section = Section.builder()
@@ -68,6 +69,7 @@ public class SectionServiceImpl implements SectionService{
 
     @Override
     public SectionVM update(SectionPostVM sectionPutVM, Long sectionId) {
+        log.info("received sectionPutVM: {}", sectionPutVM);
         Section section = sectionRepository.findByIdReturnCourse(sectionId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.SECTION_NOT_FOUND, sectionId));
         if (sectionPutVM.courseId() != section.getCourse().getId()) {
@@ -109,7 +111,6 @@ public class SectionServiceImpl implements SectionService{
 
     private List<Curriculum> getBySectionAndEmail(Section section, String email) {
         List<Curriculum> curriculumList = new ArrayList<>();
-
         List<Lecture> lectures = section.getLectures();
         for (Lecture lecture : lectures) {
             LectureVm lectureVm = new LectureVm();
