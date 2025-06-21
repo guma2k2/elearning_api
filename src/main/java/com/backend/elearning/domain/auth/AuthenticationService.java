@@ -76,6 +76,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm login(AuthenticationPostVm request) {
+        log.info("received authenticationPostVM: {}", request);
         Optional<User> user = userRepository.findByEmail(request.email());
         Optional<Student> student = studentRepository.findByEmail(request.email());
         if (!user.isPresent() && !student.isPresent()) {
@@ -98,9 +99,9 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm outboundAuthenticate(String code) {
+        log.info("received code: {}", code);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("code", code);
         map.add("client_id", CLIENT_ID);
@@ -140,6 +141,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm register(RegistrationPostVm request) {
+        log.info("received registrationPostVm: {}", request);
         Optional<User> userOptional = userRepository.findByEmail(request.email());
         if (userOptional.isPresent()) {
             throw new DuplicateException("Email is existed");
@@ -203,6 +205,7 @@ public class AuthenticationService {
 
 
     public String verify(VerifyStudentVM request) {
+        log.info("received verifyStudentVM: {}", request);
         Optional<Student> studentOptional = studentRepository.findByEmail(request.email());
         if (studentOptional.isPresent()) {
             Student student = studentOptional.get();
@@ -258,6 +261,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationVm outboundAuthenticateForMobile(OutboundUserRequest userInfo) {
+        log.info("received userInfo: {}", userInfo);
         Student student = studentRepository.findByEmail(userInfo.email()).orElseGet(
                 () -> studentRepository.saveAndFlush(Student.builder()
                         .active(true)
