@@ -9,6 +9,7 @@ import com.backend.elearning.domain.questionLecture.userAnswer.UserAnswerRepo;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.exception.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Slf4j
 public class QuestionLectureServiceImpl implements QuestionLectureService {
 
     private final QuestionLectureRepo questionLectureRepo;
@@ -38,6 +40,7 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
 
     @Override
     public QuestionLectureVM create(QuestionLecturePostVM questionLecturePostVM) {
+        log.info("received questionLecturePostVM: {}", questionLecturePostVM);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Lecture lecture = lectureRepository.findById(questionLecturePostVM.lectureId()).orElseThrow();
         Student student = studentRepository.findByEmail(email).orElseThrow();
@@ -57,6 +60,7 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
 
     @Override
     public QuestionLectureVM update(QuestionLecturePostVM questionLecturePostVM, Long questionLectureId) {
+        log.info("update questionLecturePostVM: {} with id: {}", questionLecturePostVM, questionLectureId);
         QuestionLecture questionLecture = questionLectureRepo.findById(questionLectureId).orElseThrow();
         questionLecture.setTitle(questionLecturePostVM.title());
         questionLecture.setDescription(questionLecturePostVM.description());
@@ -68,6 +72,7 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
 
     @Override
     public void delete(Long questionLectureId) {
+        log.info("deleting question with id: {}", questionLectureId);
         QuestionLecture questionLecture = questionLectureRepo.findById(questionLectureId).orElseThrow();
         if (questionLecture.getStudentAnswers().size() > 0 || questionLecture.getUserAnswers().size() > 0) {
             throw new BadRequestException("Câu hỏi này đã có câu trả lời");
