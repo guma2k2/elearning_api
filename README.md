@@ -4,7 +4,6 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Demo](#demo)
 - [User interfaces](#user-interfaces)
 - [Technologies Used](#technologies-used)
     - [Backend](#backend)
@@ -46,8 +45,6 @@ The Elearning website is a comprehensive full-stack application designed to faci
 - Component-Based Architecture
 - Antd design
 - Link github: https://github.com/guma2k2/elearning_ui
-## Demo
-- Link: https://youtu.be
 ## User interfaces
 - Ideas from https://www.udemy.com and https://fullstack.edu.vn .
 ### For Guest
