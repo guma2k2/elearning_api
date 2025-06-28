@@ -6,6 +6,7 @@ import com.backend.elearning.domain.course.CourseService;
 import com.backend.elearning.domain.review.ReviewVM;
 import com.backend.elearning.exception.ErrorVm;
 import com.backend.elearning.utils.Constants;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,11 +34,13 @@ public class UserController {
     }
 
     @GetMapping("/admin/users/{id}")
+    @Operation(method = "GET", summary = "Get information of user by id", description ="Send a request via API with role ADMIN to get information of user" )
     public ResponseEntity<UserGetDetailVm> getUser (@PathVariable("id") Long id) {
         return ResponseEntity.ok().body(userService.getUser(id));
     }
 
     @GetMapping("/users/{id}")
+    @Operation(method = "GET", summary = "Get information of user by id", description ="Send a request via API to get information of user" )
     public ResponseEntity<UserGetDetailVm> getUserProfile (@PathVariable("id") Long id) {
         UserGetDetailVm userProfile = userService.getUserProfile(id);
         List<CourseListGetVM> courseListGetVMS = courseService.getByUserId(id);
@@ -46,6 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/admin/users/paging")
+    @Operation(method = "GET", summary = "Get list information of user by pageNum, pageSize, keyword", description ="Send a request via API to get information of user" )
     public ResponseEntity<PageableData<UserVm>> getUser (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
@@ -54,7 +58,8 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUsers(pageNum, pageSize, keyword));
     }
 
-    @PostMapping({"/admin/users"})
+    @PostMapping("/admin/users")
+    @Operation(method = "POST", summary = "Save information of user", description ="Send a request via API to save user" )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content =
                 @Content(schema = @Schema(implementation = UserVm.class))),
@@ -67,6 +72,7 @@ public class UserController {
     }
 
     @PutMapping("/admin/users/{id}")
+    @Operation(method = "PUT", summary = "Update information of user by id", description ="Send a request via API to update user" )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No content"),
             @ApiResponse(responseCode = "404", description = "Not found", content =
@@ -82,6 +88,7 @@ public class UserController {
     }
 
     @DeleteMapping("/admin/users/{id}")
+    @Operation(method = "DELETE", summary = "Delete information of user by id", description ="Send a request via API by ROLE ADMIN to delete user" )
     public ResponseEntity<Void> delete (
             @PathVariable("id") Long id
     ) {
@@ -90,6 +97,7 @@ public class UserController {
     }
 
     @PutMapping("/admin/users/{id}/status/{status}")
+    @Operation(method = "PUT", summary = "Update status of user by id", description ="Send a request via API to update status of user" )
     public ResponseEntity<ReviewVM> updateReview(@PathVariable("status") boolean status, @PathVariable("id") Long userId){
         userService.updateStatus(status, userId);
         return ResponseEntity.noContent().build();
