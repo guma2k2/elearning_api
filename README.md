@@ -111,7 +111,7 @@ If you have any improvement or weird things about my project, please send an ema
 ## Getting Started
 
 To get started with the Elearning project, follow the setup instructions in the respective directories:
-- Clone this project or download compose.yml file
+- Clone this project 
 - Run Docker desktop
 - Run cmd : docker compose up -d --build
 - Access link:  http://localhost
