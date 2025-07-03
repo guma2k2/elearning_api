@@ -152,25 +152,42 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
 
     @Query(value = """
-        select c
-        from Course c
-        join fetch c.category cat
-        left join fetch cat.parent p
-        join fetch c.topic t
-        join fetch c.user u
-        left join fetch c.reviews
-        where (:level IS NULL or c.level in :level)
-        and (:free IS NULL or c.free in :free)
-        and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
-        and (:topicId IS NULL or t.id = :topicId)
-        and (:ratingStar IS NULL or
-             (select avg(r.ratingStar)
-              from Review r
-              join r.course rc 
-              where rc.id = c.id 
-              group by rc.id) >= :ratingStar)
-        and c.status = 'PUBLISHED'
-    """)
+    select c
+    from Course c
+    join fetch c.category cat
+    left join fetch cat.parent p
+    join fetch c.topic t
+    join fetch c.user u
+    where (:level IS NULL or c.level in :level)
+      and (:free IS NULL or c.free in :free)
+      and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
+      and (:topicId IS NULL or t.id = :topicId)
+      and (:ratingStar IS NULL or coalesce((
+           select avg(r.ratingStar)
+           from Review r 
+           where r.course.id = c.id
+      ), 0) >= :ratingStar)
+      and c.status = 'PUBLISHED'
+    """,
+            countQuery = """
+    select count(c)
+    from Course c
+    join c.category cat
+    left join cat.parent p
+    join c.topic t
+    join c.user u
+    where (:level IS NULL or c.level in :level)
+      and (:free IS NULL or c.free in :free)
+      and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
+      and (:topicId IS NULL or t.id = :topicId)
+      and (:ratingStar IS NULL or coalesce((
+           select avg(r.ratingStar)
+           from Review r 
+           where r.course.id = c.id
+      ), 0) >= :ratingStar)
+      and c.status = 'PUBLISHED'
+    """
+    )
     Page<Course> findByMultiQuery(Pageable pageable,
                                   @Param("ratingStar") Float ratingStar,
                                   @Param("level") String[] level,
