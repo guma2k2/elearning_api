@@ -1,6 +1,5 @@
 package com.backend.elearning.service;
 
-import com.backend.elearning.domain.auth.AuthenticationService;
 import com.backend.elearning.domain.cart.Cart;
 import com.backend.elearning.domain.cart.CartRepository;
 import com.backend.elearning.domain.category.Category;
@@ -22,10 +21,8 @@ import com.backend.elearning.domain.topic.TopicRepository;
 import com.backend.elearning.domain.user.User;
 import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserService;
-import com.backend.elearning.domain.user.UserVm;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
-import com.backend.elearning.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,12 +80,15 @@ import static org.mockito.Mockito.when;
    @Mock
    private SecurityContext securityContext;
 
+    @Mock
+    private CourseRepositoryCustomImpl courseRepositoryCustom;
+
    @Mock
    private Authentication authentication;
     @BeforeEach
     void beforeEach() {
         courseService = new CourseServiceImpl(courseRepository, categoryRepository, topicRepository, sectionService,
-                quizRepository, lectureRepository, reviewService, learningLectureRepository, learningQuizRepository, learningCourseRepository, orderDetailRepository, cartRepository
+                quizRepository, lectureRepository, reviewService, learningLectureRepository, learningQuizRepository, learningCourseRepository, orderDetailRepository, courseRepositoryCustom, cartRepository
         ,userService, userRepository);
        SecurityContextHolder.setContext(securityContext);
 
