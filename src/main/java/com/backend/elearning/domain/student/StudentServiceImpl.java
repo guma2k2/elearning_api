@@ -70,7 +70,7 @@ public class StudentServiceImpl implements StudentService {
         if (studentPutVM.photo() != null && !studentPutVM.photo().isEmpty() && !studentPutVM.photo().isBlank()) {
             student.setPhoto(studentPutVM.photo());
         }
-        if (studentPutVM.photo() != null && !studentPutVM.password().isEmpty() && !studentPutVM.password().isBlank() ) {
+        if (studentPutVM.password() != null && !studentPutVM.password().isEmpty() && !studentPutVM.password().isBlank()) {
             student.setPassword(passwordEncoder.encode(studentPutVM.password()));
         }
         // update

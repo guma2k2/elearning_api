@@ -36,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,13 +56,16 @@ public class CourseServiceImpl implements CourseService{
     private final LearningQuizRepository learningQuizRepository;
     private final LearningCourseRepository learningCourseRepository;
     private final OrderDetailRepository orderDetailRepository;
+
+    private final CourseRepositoryCustomImpl courseRepositoryCustom;
     private final CartRepository cartRepository;
     private final UserService userService;
     private final UserRepository userRepository;
     private static final  String LECTURE_TYPE = "lecture";
     private static final String QUIZ_TYPE = "quiz";
     private static final String sortBy = "updatedAt";
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
+
+    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CourseRepositoryCustomImpl courseRepositoryCustom, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
@@ -75,6 +77,7 @@ public class CourseServiceImpl implements CourseService{
         this.learningQuizRepository = learningQuizRepository;
         this.learningCourseRepository = learningCourseRepository;
         this.orderDetailRepository = orderDetailRepository;
+        this.courseRepositoryCustom = courseRepositoryCustom;
         this.cartRepository = cartRepository;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -354,11 +357,8 @@ public class CourseServiceImpl implements CourseService{
         log.info("received pageNum: {}, pageSize: {}, title: {}, rating: {}, level: {}, free: {}, categoryName: {}, " +
                         "topicId: {}", pageNum, pageSize, title, rating, level, free, categoryName, topicId);
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Course> coursePage = title != null ? courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) :
-                courseRepository.findByMultiQuery(pageable, rating, level, free, categoryName, topicId);
+        Page<Course> coursePage = courseRepositoryCustom.findByMultiFilter(title, rating, level, free, categoryName, topicId, pageable);
         List<Course> courses = coursePage.getContent();
-//        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
-//                courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
             course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND));
             List<Review> reviews = course.getReviews();
