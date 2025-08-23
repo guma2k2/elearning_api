@@ -20,13 +20,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "student")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
+@Table(name = "student")
 public class Student extends AbstractAuditEntity implements UserDetails {
 
     @Id

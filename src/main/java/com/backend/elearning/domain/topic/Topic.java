@@ -16,7 +16,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class Topic extends AbstractAuditEntity {
 
     @Id

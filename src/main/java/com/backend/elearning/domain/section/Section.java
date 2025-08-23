@@ -19,7 +19,6 @@ import java.util.List;
 @Setter
 @ToString
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class Section extends AbstractAuditEntity {
 
     @Id

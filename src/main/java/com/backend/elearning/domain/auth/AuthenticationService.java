@@ -169,8 +169,6 @@ public class AuthenticationService {
                 .build();
         student.setVerificationCode(generateVerificationCode());
         student.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-        student.setCreatedAt(LocalDateTime.now());
-        student.setUpdatedAt(LocalDateTime.now());
         studentRepository.saveAndFlush(student);
         sendVerificationEmail(student);
         String token = jwtUtil.issueToken(student.getEmail(), ERole.ROLE_STUDENT.name());
@@ -253,7 +251,6 @@ public class AuthenticationService {
                     .findByEmail(email)
                     .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.USER_NOT_FOUND, request.email()));
             student.setPassword(passwordEncoder.encode(request.password()));
-            student.setUpdatedAt(LocalDateTime.now());
             studentRepository.save(student);
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());

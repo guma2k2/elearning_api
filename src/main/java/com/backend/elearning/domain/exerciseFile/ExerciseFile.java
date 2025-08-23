@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.exerciseFile;
 
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.excercise.Exercise;
 import com.backend.elearning.domain.reference.Reference;
 import com.backend.elearning.domain.student.Student;

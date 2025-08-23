@@ -1,4 +1,4 @@
-package com.backend.elearning.domain.review_classroom;
+package com.backend.elearning.domain.reviewClassroom;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

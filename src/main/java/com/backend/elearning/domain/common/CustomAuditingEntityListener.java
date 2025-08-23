@@ -15,6 +15,4 @@ public class CustomAuditingEntityListener extends AuditingEntityListener {
     public CustomAuditingEntityListener() {
 
     }
-
-
 }

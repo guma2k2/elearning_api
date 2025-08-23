@@ -2,6 +2,13 @@ package com.backend.elearning.utils;
 
 public final class Constants {
 
+
+    public final class AUTH {
+        public static final String AUTHORIZATION_HEADER = "Authorization";
+        public static final String BEARER_TOKEN = "Bearer ";
+        public static final String SCOPES = "scopes";
+    }
+
     public final class ERROR_CODE {
 
         public static final String USER_NOT_FOUND = "USER_NOT_FOUND";

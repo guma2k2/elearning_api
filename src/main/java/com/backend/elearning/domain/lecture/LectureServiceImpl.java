@@ -37,8 +37,6 @@ public class LectureServiceImpl implements LectureService {
                 .number(lecturePostVM.number())
                 .section(section)
                 .build();
-        lecture.setCreatedAt(LocalDateTime.now());
-        lecture.setUpdatedAt(LocalDateTime.now());
         Lecture savedLecture = lectureRepository.save(lecture);
         LectureVm lectureVm = new LectureVm(savedLecture);
         return lectureVm;
@@ -58,7 +56,6 @@ public class LectureServiceImpl implements LectureService {
         lecture.setLectureDetails(lecturePutVM.lectureDetails());
         lecture.setDuration(lecturePutVM.duration());
         Lecture savedLecture = lectureRepository.saveAndFlush(lecture);
-        lecture.setUpdatedAt(LocalDateTime.now());
         LectureVm lectureVm = new LectureVm(savedLecture);
         return lectureVm;
     }

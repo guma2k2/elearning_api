@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class Answer extends AbstractAuditEntity {
 
     @Id

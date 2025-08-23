@@ -71,8 +71,6 @@ public class ReviewServiceTest {
                 .content(reviewPostVM.content())
                 .ratingStar(reviewPostVM.ratingStar())
                 .status(ReviewStatus.UNDER_REVIEW)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
 
         Review savedReview = Review.builder()
@@ -82,8 +80,6 @@ public class ReviewServiceTest {
                 .status(ReviewStatus.UNDER_REVIEW)
                 .content(reviewPostVM.content())
                 .ratingStar(reviewPostVM.ratingStar())
-                .createdAt(reviewToSave.getCreatedAt())
-                .updatedAt(reviewToSave.getUpdatedAt())
                 .build();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -124,8 +120,6 @@ public class ReviewServiceTest {
                 .status(ReviewStatus.UNDER_REVIEW)
                 .course(course)
                 .ratingStar(5)
-                .createdAt(LocalDateTime.now().minusDays(1))
-                .updatedAt(LocalDateTime.now().minusDays(1))
                 .build();
 
         Review updatedReview = Review.builder()
@@ -135,8 +129,6 @@ public class ReviewServiceTest {
                 .status(ReviewStatus.UNDER_REVIEW)
                 .content(reviewPostVM.content())
                 .ratingStar(reviewPostVM.ratingStar())
-                .createdAt(existingReview.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
                 .build();
 
         when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(existingReview));

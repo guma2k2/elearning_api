@@ -15,6 +15,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.backend.elearning.utils.Constants.AUTH.AUTHORIZATION_HEADER;
+import static com.backend.elearning.utils.Constants.AUTH.BEARER_TOKEN;
+
 @Component
 @Slf4j
 public class JWTAuthenticationFilter  extends OncePerRequestFilter {
@@ -30,9 +33,9 @@ public class JWTAuthenticationFilter  extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(BEARER_TOKEN)) {
             filterChain.doFilter(request, response);
             return;
         }

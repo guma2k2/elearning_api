@@ -14,7 +14,6 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class Lecture extends AbstractAuditEntity {
 
     @Id

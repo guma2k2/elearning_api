@@ -1,4 +1,5 @@
 package com.backend.elearning.domain.coupon;
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
-public class Coupon {
+public class Coupon extends AbstractAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

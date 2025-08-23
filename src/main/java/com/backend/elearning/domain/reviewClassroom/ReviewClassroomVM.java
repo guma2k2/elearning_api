@@ -1,7 +1,5 @@
-package com.backend.elearning.domain.review_classroom;
+package com.backend.elearning.domain.reviewClassroom;
 
-import com.backend.elearning.domain.review.Review;
-import com.backend.elearning.domain.review.ReviewVM;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.user.UserGetVM;
 import com.backend.elearning.utils.DateTimeUtils;

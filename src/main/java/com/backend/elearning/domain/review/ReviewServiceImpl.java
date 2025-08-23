@@ -59,8 +59,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .course(course)
                 .content(reviewPost.content())
                 .ratingStar(reviewPost.ratingStar())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
 
         Review savedReview = reviewRepository.save(review);

@@ -64,8 +64,6 @@ public class CategoryServiceImpl implements CategoryService{
                 .description(categoryPostVM.description())
                 .publish(categoryPostVM.isPublish())
                 .build();
-        category.setCreatedAt(LocalDateTime.now());
-        category.setUpdatedAt(LocalDateTime.now());
         if (categoryPostVM.parentId() != null) {
             Category parent = categoryRepository.findById(categoryPostVM.parentId()).orElseThrow(() ->
                     new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryPostVM.parentId()));
@@ -103,7 +101,6 @@ public class CategoryServiceImpl implements CategoryService{
         category.setName(categoryPutVM.name());
         category.setDescription(categoryPutVM.description());
         category.setPublish(categoryPutVM.isPublish());
-        category.setUpdatedAt(LocalDateTime.now());
         if (categoryPutVM.parentId() == null) {
             category.setParent(null);
         } else {

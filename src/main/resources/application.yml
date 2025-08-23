@@ -50,3 +50,6 @@ payment:
     version: "2.1.0"
     command: "pay"
     orderType: "bill"
+
+jwt:
+  secret: ${JWT_SECRET}

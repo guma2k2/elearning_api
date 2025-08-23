@@ -37,8 +37,6 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
                 .student(student)
                 .questionLecture(questionLecture)
                 .build();
-        studentAnswer.setCreatedAt(LocalDateTime.now());
-        studentAnswer.setUpdatedAt(LocalDateTime.now());
 
         StudentAnswer savedStudentAnswer = studentAnswerRepo.saveAndFlush(studentAnswer);
         return AnswerLecture.fromModelStudent(savedStudentAnswer);
@@ -48,7 +46,6 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
     public AnswerLecture update(StudentAnswerPostVM studentAnswerPostVM, Long studentAnswerId) {
         StudentAnswer studentAnswer = studentAnswerRepo.findById(studentAnswerId).orElseThrow() ;
         studentAnswer.setContent(studentAnswerPostVM.content());
-        studentAnswer.setUpdatedAt(LocalDateTime.now());
         StudentAnswer savedStudentAnswer = studentAnswerRepo.saveAndFlush(studentAnswer);
         return AnswerLecture.fromModelStudent(savedStudentAnswer);
     }

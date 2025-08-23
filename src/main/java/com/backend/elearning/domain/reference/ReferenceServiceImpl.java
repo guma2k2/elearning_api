@@ -28,8 +28,6 @@ public class ReferenceServiceImpl implements ReferenceService{
                 .classroom(classroom)
                 .build();
 
-        reference.setCreatedAt(LocalDateTime.now());
-        reference.setUpdatedAt(LocalDateTime.now());
         Reference savedReference = referenceRepository.saveAndFlush(reference);
         return ReferenceVM.fromModel(savedReference);
     }
@@ -38,7 +36,6 @@ public class ReferenceServiceImpl implements ReferenceService{
     public ReferenceVM update(ReferencePostVM referencePostVM, Long referenceId) {
         Reference reference = referenceRepository.findById(referenceId).orElseThrow();
         reference.setDescription(referencePostVM.description());
-        reference.setUpdatedAt(LocalDateTime.now());
         Reference savedReference = referenceRepository.saveAndFlush(reference);
         return ReferenceVM.fromModel(savedReference);
     }

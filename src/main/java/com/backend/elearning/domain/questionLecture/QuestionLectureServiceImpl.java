@@ -51,8 +51,6 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
                 .lecture(lecture)
                 .student(student)
                 .build();
-        questionLecture.setCreatedAt(LocalDateTime.now());
-        questionLecture.setUpdatedAt(LocalDateTime.now());
 
         QuestionLecture savedQuestionLecture = questionLectureRepo.saveAndFlush(questionLecture);
         return QuestionLectureVM.fromModel(savedQuestionLecture);
@@ -64,7 +62,6 @@ public class QuestionLectureServiceImpl implements QuestionLectureService {
         QuestionLecture questionLecture = questionLectureRepo.findById(questionLectureId).orElseThrow();
         questionLecture.setTitle(questionLecturePostVM.title());
         questionLecture.setDescription(questionLecturePostVM.description());
-        questionLecture.setUpdatedAt(LocalDateTime.now());
         QuestionLecture savedQuestionLecture = questionLectureRepo.saveAndFlush(questionLecture);
 
         return QuestionLectureVM.fromModel(savedQuestionLecture);
