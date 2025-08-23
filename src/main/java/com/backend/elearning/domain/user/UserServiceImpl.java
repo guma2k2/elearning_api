@@ -101,8 +101,6 @@ public class UserServiceImpl implements UserService{
                 .role(userPostVm.role())
                 .gender(userPostVm.gender())
                 .build();
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
         User savedUser = userRepository.saveAndFlush(user);
         return UserVm.fromModel(savedUser);
     }
@@ -123,7 +121,6 @@ public class UserServiceImpl implements UserService{
         user.setGender(userPutVm.gender());
         user.setRole(userPutVm.role());
         user.setDateOfBirth(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()));
-        user.setUpdatedAt(LocalDateTime.now());
         Optional.ofNullable(userPutVm.photo())
                 .filter(photo -> !photo.isEmpty() && !photo.isBlank())
                 .ifPresent(user::setPhoto);

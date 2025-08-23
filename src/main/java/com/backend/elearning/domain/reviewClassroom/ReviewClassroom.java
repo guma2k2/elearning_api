@@ -1,7 +1,7 @@
-package com.backend.elearning.domain.review_classroom;
+package com.backend.elearning.domain.reviewClassroom;
 
 import com.backend.elearning.domain.classroom.Classroom;
-import com.backend.elearning.domain.course.Course;
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.student.Student;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ReviewClassroom {
+public class ReviewClassroom extends AbstractAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,11 +35,4 @@ public class ReviewClassroom {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
-
-    @Column(name = "created_at")
-    protected LocalDateTime createdAt;
-
-
-    @Column(name = "updated_at")
-    protected LocalDateTime updatedAt;
 }

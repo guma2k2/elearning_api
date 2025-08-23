@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.promotion;
 
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.course.Course;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class Promotion {
+public class Promotion extends AbstractAuditEntity {
 
 
     @Id

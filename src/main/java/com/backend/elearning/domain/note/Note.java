@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.note;
 
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.lecture.Lecture;
 import com.backend.elearning.domain.student.Student;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class Note {
+public class Note extends AbstractAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

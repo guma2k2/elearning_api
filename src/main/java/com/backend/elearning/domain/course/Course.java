@@ -24,7 +24,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class Course extends AbstractAuditEntity {
 
     @Id
@@ -44,7 +43,7 @@ public class Course extends AbstractAuditEntity {
 
     private String[] targetAudiences;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String imageId;

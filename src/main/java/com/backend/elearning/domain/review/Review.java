@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.review;
 
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.course.Course;
 import com.backend.elearning.domain.student.Student;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Review {
+public class Review extends AbstractAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +38,4 @@ public class Review {
     @JoinColumn(name = "student_id")
     private Student student;
 
-    @Column(name = "created_at")
-    protected LocalDateTime createdAt;
-
-
-    @Column(name = "updated_at")
-    protected LocalDateTime updatedAt;
 }

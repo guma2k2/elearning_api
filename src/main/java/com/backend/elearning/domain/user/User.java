@@ -22,7 +22,6 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@EntityListeners(value = CustomAuditingEntityListener.class)
 public class User extends AbstractAuditEntity implements UserDetails {
 
     @Id

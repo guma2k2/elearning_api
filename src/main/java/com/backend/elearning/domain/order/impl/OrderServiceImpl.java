@@ -63,7 +63,6 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .status(EOrderStatus.PENDING)
                 .student(student)
-                .createdAt(LocalDateTime.now())
                 .build();
         if (coupon != null) {
             order.setCoupon(coupon);

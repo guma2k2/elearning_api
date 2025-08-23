@@ -107,7 +107,6 @@ public class ClassroomServiceImpl implements ClassroomService {
             referenceGetVM.setId(reference.getId());
             referenceGetVM.setType(EventType.reference);
             referenceGetVM.setDescription(reference.getDescription());
-            referenceGetVM.setCreatedAt(reference.getCreatedAt());
             List<ReferenceFileVM> files = referenceFileService.getByReferenceId(reference.getId());
             referenceGetVM.setFiles(files);
             events.add(referenceGetVM);
@@ -122,7 +121,6 @@ public class ClassroomServiceImpl implements ClassroomService {
             exerciseGetVM.setDescription(exercise.getDescription());
             exerciseGetVM.setDeadline(convertLocalDateTimeToString(exercise.getSubmission_deadline()));
             exerciseGetVM.setType(EventType.exercise);
-            exerciseGetVM.setCreatedAt(exercise.getCreatedAt());
             List<ExerciseFileVM> files = exerciseFileService.getByExerciseId(exercise.getId());
             exerciseGetVM.setFiles(files);
             events.add(exerciseGetVM);

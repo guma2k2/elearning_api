@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @WebMvcTest(
         controllers = CategoryController.class,
         excludeAutoConfiguration = {
@@ -37,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         }
 )
 public class CategoryControllerTest {
+
+
     @MockBean
     private JWTUtil jwtUtil;
 

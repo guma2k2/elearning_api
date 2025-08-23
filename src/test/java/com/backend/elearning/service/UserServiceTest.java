@@ -168,7 +168,6 @@ public class UserServiceTest {
         assertEquals(userPutVm.active(), user.isActive());
         assertEquals(userPutVm.role(), user.getRole());
         assertEquals(LocalDate.of(userPutVm.year(), userPutVm.month(), userPutVm.day()), user.getDateOfBirth());
-        assertNotNull(user.getUpdatedAt());
         verify(userRepository).save(user);
     }
 

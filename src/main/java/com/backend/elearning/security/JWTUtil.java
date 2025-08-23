@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.time.Instant;
@@ -11,23 +12,24 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import static com.backend.elearning.utils.Constants.AUTH.SCOPES;
 
 @Service
 public class JWTUtil {
-    private static final String SECRET_KEY =
-            "foobar_123456789_foobar_123456789_foobar_123456789_foobar_123456789";
 
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     public String issueToken(String subject) {
         return issueToken(subject, Map.of());
     }
 
     public String issueToken(String subject, String ...scopes) {
-        return issueToken(subject, Map.of("scopes", scopes));
+        return issueToken(subject, Map.of(SCOPES, scopes));
     }
 
     public String issueToken(String subject, List<String> scopes) {
-        return issueToken(subject, Map.of("scopes", scopes));
+        return issueToken(subject, Map.of(SCOPES, scopes));
     }
 
 

@@ -1,9 +1,7 @@
-package com.backend.elearning.domain.review_classroom;
+package com.backend.elearning.domain.reviewClassroom;
 
 import com.backend.elearning.domain.classroom.Classroom;
 import com.backend.elearning.domain.classroom.ClassroomRepository;
-import com.backend.elearning.domain.review.Review;
-import com.backend.elearning.domain.review.ReviewVM;
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.exception.NotFoundException;
@@ -40,8 +38,6 @@ public class ReviewClassroomServiceImpl implements ReviewClassroomService{
                 .classroom(classroom)
                 .content(reviewPost.content())
                 .ratingStar(reviewPost.ratingStar())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
         ReviewClassroom savedReview = reviewClassroomRepo.save(review);
         return ReviewClassroomVM.fromModel(savedReview);

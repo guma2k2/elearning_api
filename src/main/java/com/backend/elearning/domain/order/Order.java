@@ -1,5 +1,6 @@
 package com.backend.elearning.domain.order;
 
+import com.backend.elearning.domain.common.AbstractAuditEntity;
 import com.backend.elearning.domain.coupon.Coupon;
 import com.backend.elearning.domain.student.Student;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
-public class Order {
+public class Order extends AbstractAuditEntity {
 
 
     @Id
@@ -31,7 +32,6 @@ public class Order {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private EOrderStatus status;

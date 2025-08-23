@@ -35,8 +35,6 @@ public class UserAnswerServiceImpl implements UserAnswerService {
                 .user(user)
                 .questionLecture(questionLecture)
                 .build();
-        userAnswer.setCreatedAt(LocalDateTime.now());
-        userAnswer.setUpdatedAt(LocalDateTime.now());
 
         UserAnswer savedUserAnswer = userAnswerRepo.saveAndFlush(userAnswer);
         return AnswerLecture.fromModelUser(savedUserAnswer);
@@ -46,7 +44,6 @@ public class UserAnswerServiceImpl implements UserAnswerService {
     public AnswerLecture update(UserAnswerPostVM userAnswerPostVM, Long userAnswerId) {
         UserAnswer userAnswer = userAnswerRepo.findById(userAnswerId).orElseThrow();
         userAnswer.setContent(userAnswerPostVM.content());
-        userAnswer.setUpdatedAt(LocalDateTime.now());
         UserAnswer savedUserAnswer = userAnswerRepo.saveAndFlush(userAnswer);
         return AnswerLecture.fromModelUser(savedUserAnswer);
     }

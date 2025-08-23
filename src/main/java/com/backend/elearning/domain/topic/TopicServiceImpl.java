@@ -73,8 +73,6 @@ public class TopicServiceImpl implements TopicService{
                 .description(topicPostVM.description())
                 .publish(topicPostVM.isPublish())
                 .build();
-        topic.setCreatedAt(LocalDateTime.now());
-        topic.setUpdatedAt(LocalDateTime.now());
         topicRepository.saveAndFlush(topic);
         if (!topicPostVM.categories().isEmpty()) {
             for (String catName: topicPostVM.categories()) {
@@ -112,7 +110,6 @@ public class TopicServiceImpl implements TopicService{
         topic.setName(topicPostVM.name());
         topic.setPublish(topicPostVM.isPublish());
         topic.setDescription(topicPostVM.description());
-        topic.setUpdatedAt(LocalDateTime.now());
         Set<Category> newCategories = new HashSet<>(categoryRepository.findAllByNameIn(topicPostVM.categories()));
         topic.setCategories(newCategories);
         log.info(String.valueOf(newCategories.size()));

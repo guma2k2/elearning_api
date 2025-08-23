@@ -38,8 +38,6 @@ public class ExerciseServiceImpl implements ExerciseService {
                 .classroom(classroom)
                 .build();
 
-        exercise.setCreatedAt(LocalDateTime.now());
-        exercise.setUpdatedAt(LocalDateTime.now());
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
         return ExerciseVM.fromModel(savedExercise);
     }
@@ -50,7 +48,6 @@ public class ExerciseServiceImpl implements ExerciseService {
         Exercise exercise = exerciseRepository.findById(referenceId).orElseThrow();
         exercise.setTitle(exercisePostVM.title());
         exercise.setDescription(exercisePostVM.description());
-        exercise.setUpdatedAt(LocalDateTime.now());
         exercise.setSubmission_deadline(deadline);
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
         return ExerciseVM.fromModel(savedExercise);

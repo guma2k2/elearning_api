@@ -146,8 +146,6 @@ public class CourseServiceImpl implements CourseService{
         if (!course.isFree()) {
             course.setPrice(coursePostVM.price());
         }
-        course.setCreatedAt(LocalDateTime.now());
-        course.setUpdatedAt(LocalDateTime.now());
         return CourseVM.fromModel(courseRepository.save(course), new ArrayList<>(),0, 0.0,0,"", null, false, 0L);
     }
 
@@ -178,7 +176,6 @@ public class CourseServiceImpl implements CourseService{
         oldCourse.setTargetAudiences(coursePutVM.targetAudiences());
         oldCourse.setFree(coursePutVM.free());
         oldCourse.setStatus(CourseStatus.UNPUBLISHED);
-        oldCourse.setUpdatedAt(LocalDateTime.now());
         if (!coursePutVM.free()) {
             oldCourse.setPrice(coursePutVM.price());
         }

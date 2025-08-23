@@ -30,8 +30,6 @@ public class MeetingServiceImpl implements MeetingService{
                 .endTime(endTime)
                 .classroom(classroom)
                 .build();
-        meeting.setCreatedAt(LocalDateTime.now());
-        meeting.setUpdatedAt(LocalDateTime.now());
         Meeting savedMeeting = meetingRepository.saveAndFlush(meeting);
         return MeetingVM.fromModel(savedMeeting);
     }
@@ -44,7 +42,6 @@ public class MeetingServiceImpl implements MeetingService{
         meeting.setCode(meetingPostVM.code());
         meeting.setStartTime(startTime);
         meeting.setEndTime(endTime);
-        meeting.setUpdatedAt(LocalDateTime.now());
         Meeting updatedMeeting = meetingRepository.saveAndFlush(meeting);
         return MeetingVM.fromModel(updatedMeeting);
     }
