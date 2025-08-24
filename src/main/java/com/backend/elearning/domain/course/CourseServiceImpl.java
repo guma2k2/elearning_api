@@ -346,15 +346,15 @@ public class CourseServiceImpl implements CourseService{
                                                          int pageSize,
                                                          String title,
                                                          Float rating,
-                                                         String[] level,
-                                                         Boolean[] free,
+                                                         List<String> level,
+                                                         List<Boolean> free,
                                                          String categoryName, Integer topicId
     ) {
 
         log.info("received pageNum: {}, pageSize: {}, title: {}, rating: {}, level: {}, free: {}, categoryName: {}, " +
                         "topicId: {}", pageNum, pageSize, title, rating, level, free, categoryName, topicId);
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Course> coursePage = courseRepositoryCustom.findByMultiFilter(title, rating, level, free, categoryName, topicId, pageable);
+        Page<Course> coursePage = courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) ;
         List<Course> courses = coursePage.getContent();
         List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
             course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND));

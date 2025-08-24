@@ -47,8 +47,23 @@ public class CourseController {
     }
 
 
+    @GetMapping("/courses/search")
+    public ResponseEntity<PageableData<CourseListGetVM>> getCoursesByMultiQueryWithPageable (
+            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "ratingStar", required = false) Float rating,
+            @RequestParam(value = "level", required = false) List<String> level,
+            @RequestParam(value = "free", required = false) List<Boolean> free,
+            @RequestParam(value = "categoryName", required = false) String categoryName,
+            @RequestParam(value = "topicId", required = false) Integer topicId
+            ) {
+        PageableData<CourseListGetVM> pageableCourses = courseService.getCoursesByMultiQuery(pageNum, pageSize, keyword, rating, level, free, categoryName, topicId);
+        return ResponseEntity.ok().body(pageableCourses);
+    }
+
 //    @GetMapping("/courses/search")
-//    public ResponseEntity<PageableData<CourseListGetVM>> getCoursesByMultiQueryWithPageable (
+//    public ResponseEntity<List<CourseListGetVM>> getCoursesByMultiQuery (
 //            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
 //            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
 //            @RequestParam(value = "keyword", required = false) String keyword,
@@ -57,26 +72,10 @@ public class CourseController {
 //            @RequestParam(value = "free", required = false) Boolean[] free,
 //            @RequestParam(value = "categoryName", required = false) String categoryName,
 //            @RequestParam(value = "topicId", required = false) Integer topicId
-//            ) {
-//        PageableData<CourseListGetVM> pageableCourses = courseService.getCoursesByMultiQuery(pageNum, pageSize, keyword, rating, level, free, categoryName, topicId);
-//        return ResponseEntity.ok().body(pageableCourses);
+//    ) {
+//        List<CourseListGetVM> coursesByMultiQueryReturnList = courseService.getCoursesByMultiQueryReturnList(pageNum, pageSize, keyword, rating, level, free, categoryName, topicId);
+//        return ResponseEntity.ok().body(coursesByMultiQueryReturnList);
 //    }
-
-    // this
-    @GetMapping("/courses/search")
-    public ResponseEntity<List<CourseListGetVM>> getCoursesByMultiQuery (
-            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "ratingStar", required = false) Float rating,
-            @RequestParam(value = "level", required = false) String[] level,
-            @RequestParam(value = "free", required = false) Boolean[] free,
-            @RequestParam(value = "categoryName", required = false) String categoryName,
-            @RequestParam(value = "topicId", required = false) Integer topicId
-    ) {
-        List<CourseListGetVM> coursesByMultiQueryReturnList = courseService.getCoursesByMultiQueryReturnList(pageNum, pageSize, keyword, rating, level, free, categoryName, topicId);
-        return ResponseEntity.ok().body(coursesByMultiQueryReturnList);
-    }
 
     @PostMapping("/admin/courses")
     @ApiResponses(value = {

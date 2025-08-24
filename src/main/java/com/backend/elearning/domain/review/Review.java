@@ -9,12 +9,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "review")
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "review")
 public class Review extends AbstractAuditEntity {
 
     @Id

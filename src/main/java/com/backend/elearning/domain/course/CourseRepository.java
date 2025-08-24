@@ -3,12 +3,14 @@ package com.backend.elearning.domain.course;
 import com.backend.elearning.domain.section.Section;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -222,35 +224,93 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                                   @Param("categoryName") String categoryName,
                                   @Param("topicId") Integer topicId
     );
-    @Query(value = """
-        select c
-        from Course c
-        join fetch c.category cat
-        left join fetch cat.parent p
-        join fetch c.topic t
-        join fetch c.user u
-        left join fetch c.reviews
-        where LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))
-        and (:level IS NULL or c.level in :level)
-        and (:free IS NULL or c.free in :free)
-        and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
-        and (:topicId IS NULL or t.id = :topicId)
-        and (:ratingStar IS NULL or
-             (select avg(r.ratingStar)
-              from Review r
-              join r.course rc 
-              where rc.id = c.id 
-              group by rc.id) >= :ratingStar)
-        and c.status = 'PUBLISHED'
-    """)
-    Page<Course> findByMultiQueryWithKeyword(Pageable pageable,
-                                  @Param("title") String title,
-                                  @Param("ratingStar") Float ratingStar,
-                                  @Param("level") String[] level,
-                                  @Param("free") Boolean[] free,
-                                  @Param("categoryName") String categoryName,
-                                  @Param("topicId") Integer topicId
+
+
+//    @Query(value = """
+//        select c
+//        from Course c
+//        join fetch c.category cat
+//        left join fetch cat.parent p
+//        join fetch c.topic t
+//        join fetch c.user u
+//        left join fetch c.reviews
+//        where LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))
+//        and (:level IS NULL or c.level in :level)
+//        and (:free IS NULL or c.free in :free)
+//        and (:categoryName IS NULL or cat.name = :categoryName or p.name = :categoryName)
+//        and (:topicId IS NULL or t.id = :topicId)
+//        and (:ratingStar IS NULL or
+//             (select avg(r.ratingStar)
+//              from Review r
+//              join r.course rc
+//              where rc.id = c.id
+//              group by rc.id) >= :ratingStar)
+//        and c.status = 'PUBLISHED'
+//    """)
+//    Page<Course> findByMultiQueryWithKeyword(Pageable pageable,
+//                                  @Param("title") String title,
+//                                  @Param("ratingStar") Float ratingStar,
+//                                  @Param("level") String[] level,
+//                                  @Param("free") Boolean[] free,
+//                                  @Param("categoryName") String categoryName,
+//                                  @Param("topicId") Integer topicId
+//    );
+
+    @EntityGraph(attributePaths = {"category","category.parent","topic","user"})
+    @Query(
+            value = """
+            SELECT c
+            FROM Course c
+            JOIN c.category cat
+            LEFT JOIN cat.parent p
+            JOIN c.topic t
+            JOIN c.user u
+            WHERE
+              (:title IS NULL OR :title = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')))
+              AND (:levels IS NULL OR c.level IN :levels)
+              AND (:freeFlags IS NULL OR c.free IN :freeFlags)
+              AND (:categoryName IS NULL OR cat.name = :categoryName OR p.name = :categoryName)
+              AND (:topicId IS NULL OR t.id = :topicId)
+              AND c.status = 'PUBLISHED'
+              AND (
+                :ratingStar IS NULL OR
+                (SELECT COALESCE(AVG(r.ratingStar), 0)
+                 FROM Review r
+                 WHERE r.course = c) >= :ratingStar
+              )
+            ORDER BY c.createdAt DESC, c.id DESC
+            """,
+                    countQuery = """    
+            SELECT COUNT(c)
+            FROM Course c
+            JOIN c.category cat
+            LEFT JOIN cat.parent p
+            JOIN c.topic t
+            WHERE
+              (:title IS NULL OR :title = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')))
+              AND (:levels IS NULL OR c.level IN :levels)
+              AND (:freeFlags IS NULL OR c.free IN :freeFlags)
+              AND (:categoryName IS NULL OR cat.name = :categoryName OR p.name = :categoryName)
+              AND (:topicId IS NULL OR t.id = :topicId)
+              AND c.status = 'PUBLISHED'
+              AND (
+                :ratingStar IS NULL OR
+                (SELECT COALESCE(AVG(r.ratingStar), 0)
+                 FROM Review r
+                 WHERE r.course = c) >= :ratingStar
+              )
+            """
+    )
+    Page<Course> findByMultiQueryWithKeyword(
+            Pageable pageable,
+            @Param("title") String title,
+            @Param("ratingStar") Float ratingStar,
+            @Param("levels") Collection<String> levels,
+            @Param("freeFlags") Collection<Boolean> freeFlags,
+            @Param("categoryName") String categoryName,
+            @Param("topicId") Integer topicId
     );
+
 
 
     @Query(value = """
@@ -295,5 +355,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         )
     """, nativeQuery = true)
     List<Course> findCoursesNotInPromotionToday(@Param("promotionId") Long promotionId);
+
+
+
+    Optional<Course> findByTitle(String title);
+
+
 
 }

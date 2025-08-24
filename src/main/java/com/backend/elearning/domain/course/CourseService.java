@@ -22,8 +22,8 @@ public interface CourseService {
                                                   int pageSize,
                                                   String title,
                                                   Float rating,
-                                                  String[] level,
-                                                  Boolean[] free,
+                                                  List<String> level,
+                                                  List<Boolean> free,
                                                   String categoryName,
                                                   Integer topicId
     );
