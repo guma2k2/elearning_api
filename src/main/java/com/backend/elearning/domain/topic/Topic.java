@@ -10,12 +10,12 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "topic")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
+@Table(name = "topic")
 public class Topic extends AbstractAuditEntity {
 
     @Id

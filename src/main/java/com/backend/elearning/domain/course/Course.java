@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "course")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
+@Table(name = "course")
 public class Course extends AbstractAuditEntity {
 
     @Id
@@ -52,7 +52,6 @@ public class Course extends AbstractAuditEntity {
     private ELevel level;
 
     private boolean free;
-
 
     @Enumerated(EnumType.STRING)
     private CourseStatus status;
