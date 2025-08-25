@@ -14,7 +14,6 @@ import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.security.JWTUtil;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.EmailEncryptionUtil;
-import com.backend.elearning.utils.RandomString;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -80,7 +78,7 @@ public class AuthenticationService {
         Optional<User> user = userRepository.findByEmail(request.email());
         Optional<Student> student = studentRepository.findByEmail(request.email());
         if (!user.isPresent() && !student.isPresent()) {
-            throw new BadRequestException("Email or password is not corrected");
+            throw new BadRequestException(Constants.ERROR_CODE.AUTH_ERROR);
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

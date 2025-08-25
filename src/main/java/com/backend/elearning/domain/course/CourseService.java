@@ -28,22 +28,11 @@ public interface CourseService {
                                                   Integer topicId
     );
 
-
-    List<CourseListGetVM> getCoursesByMultiQueryReturnList(int pageNum,
-                                                         int pageSize,
-                                                         String title,
-                                                         Float rating,
-                                                         String[] level,
-                                                         Boolean[] free,
-                                                         String categoryName,
-                                                         Integer topicId
-    );
-
-    List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId);
-
     void delete(Long id);
 
     void updateStatusCourse(CourseStatusPostVM courseStatusPostVM, Long courseId);
 
     List<CourseAssignPromotion> getByPromotionId(Long promotionId);
+
+    List<CourseListGetVM> getCoursesByCategory(String categoryName, int pageNum, int pageSize);
 }

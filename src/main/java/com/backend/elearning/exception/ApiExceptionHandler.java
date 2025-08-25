@@ -1,5 +1,7 @@
 package com.backend.elearning.exception;
 
+import com.backend.elearning.utils.Constants;
+import com.backend.elearning.utils.MessageUtil;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -40,7 +42,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorVm> handleBadRequestException(BadCredentialsException ex, WebRequest request) {
-        String message = "Email hoặc mật khẩu không chính xác";
+        String message = Constants.ERROR_CODE.AUTH_ERROR;
         ErrorVm errorVm = new ErrorVm(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST.getReasonPhrase(), message);
         return ResponseEntity.badRequest().body(errorVm);
     }
@@ -67,8 +69,8 @@ public class ApiExceptionHandler {
                 .stream()
                 .map(error -> error.getField() + " " + error.getDefaultMessage())
                 .toList();
-
-        ErrorVm errorVm = new ErrorVm(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Request information is not valid", errors);
+        String detail = Constants.ERROR_CODE.REQUEST_NOT_VALID;
+        ErrorVm errorVm = new ErrorVm(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST.getReasonPhrase(), detail, errors);
         return ResponseEntity.badRequest().body(errorVm);
     }
 
@@ -79,7 +81,8 @@ public class ApiExceptionHandler {
             errors.add(violation.getRootBeanClass().getName() + " " +
                     violation.getPropertyPath() + ": " + violation.getMessage());
         }
-        ErrorVm errorVm = new ErrorVm(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Request information is not valid", errors);
+        String detail = Constants.ERROR_CODE.REQUEST_NOT_VALID;
+        ErrorVm errorVm = new ErrorVm(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST.getReasonPhrase(), detail, errors);
         return ResponseEntity.badRequest().body(errorVm);
     }
 
@@ -93,7 +96,6 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorVm> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         Throwable cause = ex.getCause();
 
-        // Handle Enum Deserialization specifically
         if (cause instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
             String field = ife.getPath().isEmpty() ? "unknown" : ife.getPath().get(0).getFieldName();
             String rejectedValue = String.valueOf(ife.getValue());
@@ -101,17 +103,16 @@ public class ApiExceptionHandler {
             Object[] allowed = ife.getTargetType().getEnumConstants();
 
             List<String> fieldErrors = new ArrayList<>();
-            fieldErrors.add(
-                    String.format("Field '%s': invalid value '%s'. Expected one of: %s",
-                            field,
-                            rejectedValue,
-                            String.join(", ", java.util.Arrays.stream(allowed).map(Object::toString).toList()))
-            );
+            String message = MessageUtil.getMessage(Constants.ERROR_CODE.FIELD_INVALID_VALUE,field,
+                    rejectedValue,
+                    String.join(", ", java.util.Arrays.stream(allowed).map(Object::toString).toList()));
+            fieldErrors.add(message);
 
+            String detail = MessageUtil.getMessage(Constants.ERROR_CODE.ENUM_VALUE_NOT_VALID,field);
             ErrorVm error = new ErrorVm(
                     String.valueOf(HttpStatus.BAD_REQUEST.value()),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Invalid enum value for field '" + field + "'",
+                    detail,
                     fieldErrors
             );
 

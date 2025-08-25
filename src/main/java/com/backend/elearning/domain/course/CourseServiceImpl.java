@@ -356,81 +356,13 @@ public class CourseServiceImpl implements CourseService{
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Course> coursePage = courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) ;
         List<Course> courses = coursePage.getContent();
-        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
-            course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND));
-            List<Review> reviews = course.getReviews();
-            int ratingCount = reviews.size();
-            Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
-            double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
-            AtomicInteger totalCurriculumCourse = new AtomicInteger();
-            AtomicInteger totalDurationCourse = new AtomicInteger();
-            List<Section> sections = sectionService.findByCourseId(course.getId());
-            sections.forEach(section -> {
-                List<Lecture> lectures = section.getLectures();
-                List<Quiz> quizzes = section.getQuizzes();
-                totalCurriculumCourse.addAndGet(lectures.size());
-                totalCurriculumCourse.addAndGet(quizzes.size());
-                int totalSeconds = lectures.stream()
-                        .mapToInt(lecture -> lecture.getDuration())
-                        .sum();
-                totalDurationCourse.addAndGet(totalSeconds);
-            });
-            String formattedHours = convertSeconds(totalDurationCourse.get());
-
-
-            Set<Promotion> promotions = course.getPromotions();
-            Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
-            return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount, discountedPrice);
-        }).toList();
+        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
         return new PageableData(
                 pageNum,
                 pageSize,
-                coursePage.getTotalElements(),coursePage.getTotalPages()
-                ,
+                coursePage.getTotalElements(),coursePage.getTotalPages(),
                 courseListGetVMS
         );
-    }
-
-    @Override
-    public List<CourseListGetVM> getCoursesByMultiQueryReturnList(int pageNum, int pageSize, String title, Float rating, String[] level, Boolean[] free, String categoryName, Integer topicId) {
-        log.info("received pageNum: {}, pageSize: {}, title: {}, rating: {}, level: {}, free: {}, categoryName: {}, " +
-                "topicId: {}", pageNum, pageSize, title, rating, level, free, categoryName, topicId);
-        List<Course> courses = title != null ? courseRepository.findByMultiQueryWithKeyword(title, rating, level, free, categoryName, topicId) :
-            courseRepository.findByMultiQuery(rating, level, free, categoryName, topicId);
-        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> {
-            course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND));
-            List<Review> reviews = course.getReviews();
-            int ratingCount = reviews.size();
-            Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
-            double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
-            AtomicInteger totalCurriculumCourse = new AtomicInteger();
-            AtomicInteger totalDurationCourse = new AtomicInteger();
-            List<Section> sections = sectionService.findByCourseId(course.getId());
-            sections.forEach(section -> {
-                List<Lecture> lectures = section.getLectures();
-                List<Quiz> quizzes = section.getQuizzes();
-                totalCurriculumCourse.addAndGet(lectures.size());
-                totalCurriculumCourse.addAndGet(quizzes.size());
-                int totalSeconds = lectures.stream()
-                        .mapToInt(lecture -> lecture.getDuration())
-                        .sum();
-                totalDurationCourse.addAndGet(totalSeconds);
-
-            });
-            Set<Promotion> promotions = course.getPromotions();
-            Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
-        String formattedHours = convertSeconds(totalDurationCourse.get());
-        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount, discountedPrice);
-        }).toList();
-        return courseListGetVMS;
-    }
-
-    @Override
-    public List<CourseListGetVM> getCoursesByCategoryId(Integer categoryId) {
-        log.info("received categoryId: {}", categoryId);
-        List<Course> courses = courseRepository.findByCategoryIdWithStatus(categoryId);
-        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
-        return courseListGetVMS;
     }
 
     @Override
@@ -483,6 +415,15 @@ public class CourseServiceImpl implements CourseService{
             return CourseAssignPromotion.fromModel(course, !isNotInPromotions);
         }).toList();
         return courseAssignPromotions;
+    }
+
+    @Override
+    public List<CourseListGetVM> getCoursesByCategory(String categoryName, int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Page<Course> coursePage = courseRepository.findByMultiQueryWithKeyword(pageable, null, null, null, null, categoryName, null) ;
+        List<Course> courses = coursePage.getContent();
+        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
+        return courseListGetVMS;
     }
 
     private String convertSeconds(int seconds) {
