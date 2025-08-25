@@ -271,7 +271,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               AND (:freeFlags IS NULL OR c.free IN :freeFlags)
               AND (:categoryName IS NULL OR cat.name = :categoryName OR p.name = :categoryName)
               AND (:topicId IS NULL OR t.id = :topicId)
-              AND c.status = 'PUBLISHED'
               AND (
                 :ratingStar IS NULL OR
                 (SELECT COALESCE(AVG(r.ratingStar), 0)
@@ -292,7 +291,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
               AND (:freeFlags IS NULL OR c.free IN :freeFlags)
               AND (:categoryName IS NULL OR cat.name = :categoryName OR p.name = :categoryName)
               AND (:topicId IS NULL OR t.id = :topicId)
-              AND c.status = 'PUBLISHED'
               AND (
                 :ratingStar IS NULL OR
                 (SELECT COALESCE(AVG(r.ratingStar), 0)
