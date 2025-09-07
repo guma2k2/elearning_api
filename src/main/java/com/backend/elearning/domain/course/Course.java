@@ -23,7 +23,9 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@Table(name = "course")
+@Table(name = "course", indexes = {
+        @Index(name = "idx_course_title", columnList = "title")
+})
 public class Course extends AbstractAuditEntity {
 
     @Id

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +27,7 @@ import java.util.List;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-
     private final StudentRepository studentRepository;
-
     private final CourseRepository courseRepository;
 
     private static final int fiveStar = 5;
@@ -36,15 +35,14 @@ public class ReviewServiceImpl implements ReviewService {
     private static final int threeStar = 3;
     private static final int twoStar = 2;
     private static final int oneStar = 1;
-
-
     private static final String sortField = "createdAt";
+
+
     public ReviewServiceImpl(ReviewRepository reviewRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.reviewRepository = reviewRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
     }
-
 
 
     @Override
@@ -64,6 +62,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview = reviewRepository.save(review);
         return ReviewVM.fromModel(savedReview);
     }
+
 
     @Override
     public PageableDataReview<ReviewVM> getByMultiQuery(Long courseId, Integer pageNum, int pageSize, Integer ratingStar, String sortDir) {
@@ -113,6 +112,7 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
+
     @Override
     public ReviewVM updateReview(ReviewPostVM reviewPostVM, Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
@@ -128,24 +128,21 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findByCourseId(courseId);
     }
 
+
     @Override
     public PageableData<ReviewGetListVM> getPageableReviews(int pageNum, int pageSize, String keyword, ReviewStatus status) {
         List<ReviewGetListVM> reviewVMS = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Review> reviewPage = null;
-        if (keyword != null && status != null) {
-            reviewPage = reviewRepository.findAllCustomWithStatusAndId(pageable, status, keyword);
-        } else {
-            if (keyword != null) {
-                reviewPage = reviewRepository.findAllCustomWithKeyword(pageable, keyword);
-            } else if (status !=null) {
-                reviewPage = reviewRepository.findAllCustomWithStatus(pageable, status);
-            } else {
-                reviewPage = reviewRepository.findAllCustom(pageable);
-            }
+        Specification<Review> spec = Specification.where(null);
+
+        if (keyword != null && !keyword.isEmpty()) {
+            spec =  spec.and(ReviewSpecifications.contentContains(keyword));
         }
 
-
+        if (status != null) {
+            spec = spec.and(ReviewSpecifications.hasStatus(status));
+        }
+        Page<Review> reviewPage = reviewRepository.findAll(spec, pageable);
         List<Review> reviews = reviewPage.getContent();
         for (Review review : reviews) {
             reviewVMS.add(ReviewGetListVM.fromModel(review));
@@ -159,6 +156,7 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
+
     @Override
     public void updateStatusReview(ReviewStatusPostVM statusPostVM, Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
@@ -168,5 +166,4 @@ public class ReviewServiceImpl implements ReviewService {
         review.setStatus(statusPostVM.status());
         reviewRepository.saveAndFlush(review);
     }
-
 }

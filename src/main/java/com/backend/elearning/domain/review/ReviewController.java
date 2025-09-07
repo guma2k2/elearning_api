@@ -54,9 +54,6 @@ public class ReviewController {
     }
 
 
-
-
-
     @GetMapping("/reviews/search/{courseId}")
     public ResponseEntity<PageableData<ReviewVM>> getByBaseProductId(
             @PathVariable("courseId") Long courseId,

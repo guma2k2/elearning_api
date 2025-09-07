@@ -4,6 +4,7 @@ import com.backend.elearning.utils.MessageUtil;
 
 public class NotFoundException extends RuntimeException{
     private String message;
+
     public NotFoundException(String errorCode, Object... var2) {
         this.message = MessageUtil.getMessage(errorCode, var2);
     }

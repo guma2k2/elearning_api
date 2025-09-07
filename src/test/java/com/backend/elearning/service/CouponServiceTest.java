@@ -6,14 +6,19 @@ import com.backend.elearning.domain.order.Order;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.utils.DateTimeUtils;
+import com.backend.elearning.utils.MessageUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.context.support.StaticMessageSource;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +36,13 @@ public class CouponServiceTest {
     @BeforeEach
     void beforeEach() {
         couponService = new CouponServiceImpl(couponRepository);
+
+        StaticMessageSource sms = new StaticMessageSource();
+        sms.addMessage("COUPON_CODE_DUPLICATED", Locale.ENGLISH,
+                "Coupon code {0} already exists");
+
+        MessageUtil.setAccessor(new MessageSourceAccessor(sms, Locale.ENGLISH));
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
     }
 
 

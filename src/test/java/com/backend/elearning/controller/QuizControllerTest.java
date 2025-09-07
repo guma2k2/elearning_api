@@ -8,12 +8,15 @@ import com.backend.elearning.security.UserDetailsServiceImpl;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.MessageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,8 +47,19 @@ public class QuizControllerTest {
     @MockBean
     private QuizService quizService;
 
+
     @Autowired
     private ObjectMapper objectMapper;
+
+
+    @Autowired
+    MessageSource messageSource;
+
+    @BeforeEach
+    void initMessageUtil() {
+        // add a setter or init method in MessageUtil if you don’t have one
+        MessageUtil.setAccessor(new MessageSourceAccessor(messageSource));
+    }
 
     @Test
     void createCourse_ShouldReturnCreated_WhenQuizIsCreated() throws Exception {
@@ -105,13 +119,12 @@ public class QuizControllerTest {
     void deleteQuizById_ShouldReturnNotFound_WhenQuizNotFound() throws Exception {
         // Given
         Long quizId = 1L;
+        String msg = "Quiz with id " + quizId + " not found";
 
-        // Use doThrow for methods that return void
-        doThrow(new NotFoundException(MessageUtil.getMessage(Constants.ERROR_CODE.QUIZ_NOT_FOUND, quizId))).when(quizService).delete(quizId);
+        doThrow(new NotFoundException(msg)).when(quizService).delete(quizId);
 
-        // When & Then
         mockMvc.perform(delete("/api/v1/admin/quizzes/{id}", quizId))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.details").value(MessageUtil.getMessage(Constants.ERROR_CODE.QUIZ_NOT_FOUND, quizId)));
+                .andExpect(jsonPath("$.details").value(msg));
     }
 }

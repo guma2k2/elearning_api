@@ -23,17 +23,23 @@ import com.backend.elearning.domain.user.UserRepository;
 import com.backend.elearning.domain.user.UserService;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
+import com.backend.elearning.utils.MessageUtil;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.context.support.StaticMessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -81,16 +87,31 @@ import static org.mockito.Mockito.when;
    private SecurityContext securityContext;
 
     @Mock
+    private EntityManager entityManager;
+
+    @Mock
     private CourseRepositoryCustomImpl courseRepositoryCustom;
 
    @Mock
    private Authentication authentication;
     @BeforeEach
     void beforeEach() {
-        courseService = new CourseServiceImpl(courseRepository, categoryRepository, topicRepository, sectionService,
+        courseService = new CourseServiceImpl(entityManager, courseRepository, categoryRepository, topicRepository, sectionService,
                 quizRepository, lectureRepository, reviewService, learningLectureRepository, learningQuizRepository, learningCourseRepository, orderDetailRepository, courseRepositoryCustom, cartRepository
         ,userService, userRepository);
        SecurityContextHolder.setContext(securityContext);
+
+        StaticMessageSource sms = new StaticMessageSource();
+        sms.addMessage("CART_NOT_FOUND", Locale.ENGLISH, "Cart with id {0} not found");
+
+        sms.addMessage("STUDENT_NOT_FOUND", Locale.ENGLISH,
+                "Student with id {0} not found");
+        sms.addMessage("COURSE_TITLE_DUPLICATED", Locale.ENGLISH,
+                "Course {0} is duplicated");
+        sms.addMessage("COURSE_NOT_FOUND", Locale.ENGLISH,
+                "Course with id {0} not found");
+        MessageUtil.setAccessor(new MessageSourceAccessor(sms, Locale.ENGLISH));
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
 
     }
 

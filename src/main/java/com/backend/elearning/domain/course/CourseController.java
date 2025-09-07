@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +25,18 @@ public class CourseController {
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }
+
+    @GetMapping("/courses/spec")
+    public ResponseEntity<PageableData<CourseVM>> testSpecification (
+            Pageable pageable,
+            @RequestParam(value = "course", required = false) String[] course,
+            @RequestParam(value = "category", required = false) String [] category
+
+    ) {
+        PageableData<CourseVM> pageableCourses = courseService.advanceSearchWithSpecifications(pageable, course, category);
+        return ResponseEntity.ok().body(pageableCourses);
+    }
+
 
 
     @GetMapping("/admin/courses/paging")
@@ -52,7 +65,7 @@ public class CourseController {
     @GetMapping("/courses/search")
     public ResponseEntity<PageableData<CourseListGetVM>> getCoursesByMultiQueryWithPageable (
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_COURSE_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "ratingStar", required = false) Float rating,
             @RequestParam(value = "level", required = false) List<String> level,
@@ -125,11 +138,15 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/admin/courses/promotions/{promotionId}")
     public ResponseEntity<List<CourseAssignPromotion>> getByPromotionId(@PathVariable("promotionId") Long promotionId){
         List<CourseAssignPromotion> courses = courseService.getByPromotionId(promotionId);
         return ResponseEntity.ok().body(courses);
+    }
+
+    @GetMapping("/courses/suggestions")
+    public ResponseEntity<List<String>> getSuggestions(@RequestParam("keyword") String keyword){
+        return ResponseEntity.ok().body(courseService.getSuggestion(keyword));
     }
 
 

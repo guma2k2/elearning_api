@@ -3,10 +3,8 @@ package com.backend.elearning.domain.course;
 import com.backend.elearning.domain.section.Section;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, Long> {
+public interface CourseRepository extends JpaRepository<Course, Long> , JpaSpecificationExecutor<Course> {
+
+
+    @Override
+    Page<Course> findAll(Specification<Course> spec, Pageable pageable);
 
     @Query("""
         select count(1)
@@ -308,6 +310,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             @Param("categoryName") String categoryName,
             @Param("topicId") Integer topicId
     );
+
+
+    @Query("SELECT p FROM Course p " +
+            "WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Course> getSuggestionCourse(@Param("keyword") String keyword, Pageable pageable);
+
 
 
 

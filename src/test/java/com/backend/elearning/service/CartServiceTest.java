@@ -9,17 +9,22 @@ import com.backend.elearning.domain.learning.learningLecture.LearningLectureServ
 import com.backend.elearning.domain.student.Student;
 import com.backend.elearning.domain.student.StudentRepository;
 import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.MessageUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.context.support.StaticMessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -53,6 +58,17 @@ public class CartServiceTest {
     public void beforeEach() {
         cartService = new CartServiceImpl(cartRepository, studentRepository, courseRepository, courseService);
         SecurityContextHolder.setContext(securityContext);
+
+        StaticMessageSource sms = new StaticMessageSource();
+        sms.addMessage("CART_NOT_FOUND", Locale.ENGLISH, "Cart with id {0} not found");
+
+        sms.addMessage("STUDENT_NOT_FOUND", Locale.ENGLISH,
+                "Student with id {0} not found");
+
+        sms.addMessage("COURSE_NOT_FOUND", Locale.ENGLISH,
+                "Course with id {0} not found");
+        MessageUtil.setAccessor(new MessageSourceAccessor(sms, Locale.ENGLISH));
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
     }
 
     @Test
