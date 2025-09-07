@@ -8,13 +8,18 @@ import com.backend.elearning.domain.topic.*;
 import com.backend.elearning.exception.BadRequestException;
 import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
+import com.backend.elearning.utils.MessageUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.context.support.StaticMessageSource;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -39,6 +44,15 @@ public class TopicServiceTest {
     @BeforeEach
     void beforeEach() {
         topicService = new TopicServiceImpl(topicRepository, categoryRepository, courseRepository);
+
+        StaticMessageSource sms = new StaticMessageSource();
+        sms.addMessage("TOPIC_NAME_DUPLICATED", Locale.ENGLISH, "Topic with name {0} is duplicated");
+
+        sms.addMessage("TOPIC_NOT_FOUND", Locale.ENGLISH,
+                "Topic {0} is not found");
+
+        MessageUtil.setAccessor(new MessageSourceAccessor(sms, Locale.ENGLISH));
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
     }
 
 

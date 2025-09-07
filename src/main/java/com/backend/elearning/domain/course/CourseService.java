@@ -1,6 +1,7 @@
 package com.backend.elearning.domain.course;
 
 import com.backend.elearning.domain.common.PageableData;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -35,4 +36,8 @@ public interface CourseService {
     List<CourseAssignPromotion> getByPromotionId(Long promotionId);
 
     List<CourseListGetVM> getCoursesByCategory(String categoryName, int pageNum, int pageSize);
+
+    List<String> getSuggestion(String keyword);
+
+    PageableData<CourseVM> advanceSearchWithSpecifications(Pageable pageable, String[] course, String[] category);
 }

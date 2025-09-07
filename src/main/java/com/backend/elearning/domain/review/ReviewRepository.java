@@ -2,9 +2,8 @@ package com.backend.elearning.domain.review;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
 
 
     @Query("""
@@ -52,25 +51,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             """)
     Page<Review> findByCourseId(@Param("courseId") Long courseId, Pageable pageable);
 
-
-    @Query("""
-            select r
-            from Review r
-            left join fetch r.course c
-            left join fetch r.student u
-            """)
-    Page<Review> findAllCustom(Pageable pageable);
-
-
-    @Query("""
-            select r
-            from Review r
-            left join fetch r.course c
-            left join fetch r.student u
-            where LOWER(r.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            """)
-    Page<Review> findAllCustomWithKeyword(Pageable pageable, @Param("keyword") String keyword);
-
+    @Override
+    @EntityGraph(attributePaths = {"user", "course"})
+    Page<Review> findAll(Specification<Review> spec, Pageable pageable);
 
     @Query("""
             select r
@@ -93,24 +76,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findByStudentAndCourse(@Param("email") String email, @Param("courseId") Long courseId);
 
 
-    @Query("""
-            select r
-            from Review r
-            left join fetch r.course c
-            left join fetch r.student u
-            where LOWER(r.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            and r.status = :status
-            """)
-    Page<Review> findAllCustomWithStatusAndId(Pageable pageable, @Param("status") ReviewStatus status, @Param("keyword") String keyword);
 
-    @Query("""
-            select r
-            from Review r
-            left join fetch r.course c
-            left join fetch r.student u
-            where r.status = :status
-            """)
-    Page<Review> findAllCustomWithStatus(Pageable pageable, @Param("status") ReviewStatus status);
+
 
 //    @Modifying
 //    @Query("""

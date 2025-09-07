@@ -15,4 +15,8 @@ public class MessageUtil {
     public static String getMessage(String code, Object... args) {
         return accessor.getMessage(code, args, code);
     }
+
+    public static void setAccessor(MessageSourceAccessor accessor) {
+        MessageUtil.accessor = accessor;
+    }
 }

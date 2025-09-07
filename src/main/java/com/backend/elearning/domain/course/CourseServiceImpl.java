@@ -6,6 +6,8 @@ import com.backend.elearning.domain.category.Category;
 import com.backend.elearning.domain.category.CategoryRepository;
 import com.backend.elearning.domain.common.ECurriculumType;
 import com.backend.elearning.domain.common.PageableData;
+import com.backend.elearning.domain.course.specification.CourseSpecificationBuilder;
+import com.backend.elearning.domain.course.specification.SpecSearchCriteria;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourse;
 import com.backend.elearning.domain.learning.learningCourse.LearningCourseRepository;
 import com.backend.elearning.domain.learning.learningLecture.LearningLecture;
@@ -32,6 +34,8 @@ import com.backend.elearning.exception.DuplicateException;
 import com.backend.elearning.exception.NotFoundException;
 import com.backend.elearning.utils.Constants;
 import com.backend.elearning.utils.ConvertTitleToSlug;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,10 +44,16 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.backend.elearning.utils.Constants.Search.SEARCH_SPEC_OPERATOR;
 
 @Service
 @Slf4j
 public class CourseServiceImpl implements CourseService{
+
+    private final EntityManager entityManager;
 
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
@@ -65,7 +75,8 @@ public class CourseServiceImpl implements CourseService{
     private static final String QUIZ_TYPE = "quiz";
     private static final String sortBy = "updatedAt";
 
-    public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CourseRepositoryCustomImpl courseRepositoryCustom, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
+    public CourseServiceImpl(EntityManager entityManager, CourseRepository courseRepository, CategoryRepository categoryRepository, TopicRepository topicRepository, SectionService sectionService, QuizRepository quizRepository, LectureRepository lectureRepository, ReviewService reviewService, LearningLectureRepository learningLectureRepository, LearningQuizRepository learningQuizRepository, LearningCourseRepository learningCourseRepository, OrderDetailRepository orderDetailRepository, CourseRepositoryCustomImpl courseRepositoryCustom, CartRepository cartRepository, UserService userService, UserRepository userRepository) {
+        this.entityManager = entityManager;
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.topicRepository = topicRepository;
@@ -118,6 +129,8 @@ public class CourseServiceImpl implements CourseService{
                 courseVMS
         );
     }
+
+
 
     @Override
     public CourseVM create(CoursePostVM coursePostVM) {
@@ -250,40 +263,7 @@ public class CourseServiceImpl implements CourseService{
         return discountedPrice;
     }
 
-    @Override
-    public CourseListGetVM getCourseListGetVMById(Long id) {
-        log.info("received id: {}", id);
-        Course course = courseRepository.findByIdReturnSections(id).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
-        course = courseRepository.findByIdWithPromotions(course).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
-        Long courseId = course.getId();
-        List<Review> reviews = reviewService.findByCourseId(courseId);
-        int ratingCount = reviews.size();
-        Double averageRating = reviews.stream().map(review -> review.getRatingStar()).mapToDouble(Integer::doubleValue).average().orElse(0.0);
-        double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
 
-        // get totalCurriculum, total duration of course by section
-        AtomicInteger totalCurriculumCourse = new AtomicInteger();
-        AtomicInteger totalDurationCourse = new AtomicInteger();
-
-
-        course.getSections().forEach(section -> {
-            Long sectionId = section.getId();
-            List<Lecture> lectures = lectureRepository.findBySectionId(sectionId);
-            List<Quiz> quizzes = quizRepository.findBySectionId(sectionId   );
-            totalCurriculumCourse.addAndGet(lectures.size());
-            totalCurriculumCourse.addAndGet(quizzes.size());
-            int totalSeconds = lectures.stream()
-                    .mapToInt(lecture -> lecture.getDuration())
-                    .sum();
-            totalDurationCourse.addAndGet(totalSeconds);
-        });
-        String formattedHours = convertSeconds(totalDurationCourse.get());
-
-        Set<Promotion> promotions = course.getPromotions();
-        Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
-
-        return CourseListGetVM.fromModel(course, formattedHours, totalCurriculumCourse.get(), roundedAverageRating, ratingCount, discountedPrice);
-    }
 
     @Override
     public CourseLearningVm getCourseBySlug(String slug) {
@@ -350,13 +330,16 @@ public class CourseServiceImpl implements CourseService{
                                                          List<Boolean> free,
                                                          String categoryName, Integer topicId
     ) {
-
         log.info("received pageNum: {}, pageSize: {}, title: {}, rating: {}, level: {}, free: {}, categoryName: {}, " +
                         "topicId: {}", pageNum, pageSize, title, rating, level, free, categoryName, topicId);
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Course> coursePage = courseRepository.findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) ;
+        Page<Course> coursePage = courseRepository.
+                findByMultiQueryWithKeyword(pageable, title, rating, level, free, categoryName, topicId) ;
         List<Course> courses = coursePage.getContent();
-        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
+        List<CourseListGetVM> courseListGetVMS = courses
+                .stream()
+                .map(course -> getCourseListGetVMById(course.getId()))
+                .toList();
         return new PageableData(
                 pageNum,
                 pageSize,
@@ -420,10 +403,67 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public List<CourseListGetVM> getCoursesByCategory(String categoryName, int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Course> coursePage = courseRepository.findByMultiQueryWithKeyword(pageable, null, null, null, null, categoryName, null) ;
+        Page<Course> coursePage = courseRepository
+                .findByMultiQueryWithKeyword
+                        (pageable, null, null, null, null, categoryName, null);
         List<Course> courses = coursePage.getContent();
-        List<CourseListGetVM> courseListGetVMS = courses.stream().map(course -> getCourseListGetVMById(course.getId())).toList();
+        List<CourseListGetVM> courseListGetVMS = courses
+                .stream()
+                .map(course -> getCourseListGetVMById(course.getId()))
+                .toList();
         return courseListGetVMS;
+    }
+
+    @Override
+    public List<String> getSuggestion(String keyword) {
+        Pageable pageable = PageRequest.of(0, 6);
+        List<String> suggestions = courseRepository.getSuggestionCourse(keyword, pageable)
+                .stream()
+                .map(course -> course.getTitle())
+                .toList();
+        return suggestions;
+    }
+
+    @Override
+    public CourseListGetVM getCourseListGetVMById(Long id) {
+        log.info("received id: {}", id);
+        Course course = courseRepository.findByIdReturnSections(id)
+                .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
+        course = courseRepository.findByIdWithPromotions(course)
+                .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.COURSE_NOT_FOUND, id));
+        Long courseId = course.getId();
+        List<Review> reviews = reviewService.findByCourseId(courseId);
+        int ratingCount = reviews.size();
+        Double averageRating = reviews.stream()
+                .map(review -> review.getRatingStar())
+                .mapToDouble(Integer::doubleValue).average().orElse(0.0);
+        double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
+
+        // get totalCurriculum, total duration of course by section
+        AtomicInteger totalCurriculumCourse = new AtomicInteger();
+        AtomicInteger totalDurationCourse = new AtomicInteger();
+
+
+        course.getSections().forEach(section -> {
+            Long sectionId = section.getId();
+            List<Lecture> lectures = lectureRepository.findBySectionId(sectionId);
+            List<Quiz> quizzes = quizRepository.findBySectionId(sectionId   );
+            totalCurriculumCourse.addAndGet(lectures.size());
+            totalCurriculumCourse.addAndGet(quizzes.size());
+            int totalSeconds = lectures.stream()
+                    .mapToInt(lecture -> lecture.getDuration())
+                    .sum();
+            totalDurationCourse.addAndGet(totalSeconds);
+        });
+        String formattedHours = convertSeconds(totalDurationCourse.get());
+
+        Set<Promotion> promotions = course.getPromotions();
+        Long discountedPrice = getDiscountedPriceByCourse(promotions, course);
+
+        return CourseListGetVM
+                .fromModel
+                        (course, formattedHours, totalCurriculumCourse.get(),
+                                roundedAverageRating, ratingCount, discountedPrice);
     }
 
     private String convertSeconds(int seconds) {
@@ -436,6 +476,153 @@ public class CourseServiceImpl implements CourseService{
             int minutes = (seconds % 3600) / 60;
             return hours + " giờ " + minutes + " phút";
         }
+    }
+    @Override
+    public PageableData<CourseVM>  advanceSearchWithSpecifications(Pageable pageable, String[] course, String[] category) {
+        log.info(pageable.toString());
+        if (course != null && category != null) {
+            return searchByCourseWithJoin(pageable, course, category);
+        } else if (course != null) {
+            CourseSpecificationBuilder builder = new CourseSpecificationBuilder();
+
+            Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
+            for (String c : course) {
+                Matcher matcher = pattern.matcher(c);
+                if (matcher.find()) {
+                    log.info(matcher.group(3));
+                    builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                }
+            }
+
+            Page<Course> coursePage = courseRepository.findAll(builder.build(), pageable);
+            List<CourseVM> courseVMS = new ArrayList<>();
+            List<Course> courses = coursePage.getContent();
+            for (Course c : courses) {
+                courseVMS.add(CourseVM.fromModel(c ,new ArrayList<>(),0, 0.0,0,"" , null, false, 0L));
+            }
+            return new PageableData(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    (int) coursePage.getTotalElements(),
+                    coursePage.getTotalPages(),
+                    courseVMS
+            );
+        }
+
+        return null;
+    }
+
+     public PageableData<CourseVM> searchByCourseWithJoin(Pageable pageable, String[] course, String[] category) {
+         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+         CriteriaQuery<Course> query = builder.createQuery(Course.class);
+         Root<Course> courseRoot = query.from(Course.class);
+         Join<Category, Course> categoryRoot = courseRoot.join("category");
+
+         List<Predicate> coursePreList = new ArrayList<>();
+         Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
+         for (String c : course) {
+             Matcher matcher = pattern.matcher(c);
+             if (matcher.find()) {
+                 SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                 coursePreList.add(toCoursePredicate(courseRoot, builder, searchCriteria));
+             }
+         }
+
+         List<Predicate> categoryPreList = new ArrayList<>();
+         for (String c : category) {
+             Matcher matcher = pattern.matcher(c);
+             if (matcher.find()) {
+                 SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                 categoryPreList.add(toCategoryPredicate(categoryRoot, builder, searchCriteria));
+             }
+         }
+
+         Predicate coursePre = builder.or(coursePreList.toArray(new Predicate[0]));
+         Predicate categoryPre = builder.or(categoryPreList.toArray(new Predicate[0]));
+
+         Predicate finalPre = builder.and(coursePre, categoryPre);
+
+         query.where(finalPre);
+
+         List<Course> courses = entityManager.createQuery(query).setFirstResult(pageable.getPageNumber())
+                 .setMaxResults(pageable.getPageSize()).getResultList();
+         List<CourseVM> courseVMS = new ArrayList<>();
+         for (Course c : courses) {
+             courseVMS.add(CourseVM.fromModel(c ,new ArrayList<>(),0, 0.0,0,"" , null, false, 0L));
+
+         }
+         long count = countCourseJoinCategory(course, category);
+         int totalPages = 0;
+         if (count % pageable.getPageSize() == 0) {
+             totalPages = (int) (count / pageable.getPageSize());
+         } else {
+             totalPages = (int) (count / pageable.getPageSize()) + 1;
+         }
+         return new PageableData<>(
+                 pageable.getPageNumber(),
+                 pageable.getPageSize(),
+                 (int) count,
+                 totalPages,
+                 courseVMS
+         );
+     }
+
+    private long countCourseJoinCategory(String[] course, String[] category) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<Course> courseRoot = query.from(Course.class);
+        Join<Category, Course> categoryRoot = courseRoot.join("category");
+        List<Predicate> coursePreList = new ArrayList<>();
+        Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
+        for (String c : course) {
+            Matcher matcher = pattern.matcher(c);
+            if (matcher.find()) {
+                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                coursePreList.add(toCoursePredicate(courseRoot, builder, searchCriteria));
+            }
+        }
+
+        List<Predicate> categoryPreList = new ArrayList<>();
+        for (String c : category) {
+            Matcher matcher = pattern.matcher(c);
+            if (matcher.find()) {
+                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                categoryPreList.add(toCategoryPredicate(categoryRoot, builder, searchCriteria));
+            }
+        }
+
+        Predicate coursePre = builder.or(coursePreList.toArray(new Predicate[0]));
+        Predicate categoryPre = builder.or(categoryPreList.toArray(new Predicate[0]));
+        Predicate finalPre = builder.and(coursePre, categoryPre);
+        query.select(builder.count(courseRoot));
+        query.where(finalPre);
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    private Predicate toCoursePredicate(Root<Course> root, CriteriaBuilder builder, SpecSearchCriteria criteria) {
+        return switch (criteria.getOperation()) {
+            case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
+            case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
+            case GREATER_THAN -> builder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LESS_THAN -> builder.lessThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LIKE -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue().toString() + "%");
+            case STARTS_WITH -> builder.like(root.get(criteria.getKey()), criteria.getValue() + "%");
+            case ENDS_WITH -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue());
+            case CONTAINS -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+        };
+    }
+
+    private Predicate toCategoryPredicate(Join<Category, Course> root, CriteriaBuilder builder, SpecSearchCriteria criteria) {
+        return switch (criteria.getOperation()) {
+            case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
+            case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
+            case GREATER_THAN -> builder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LESS_THAN -> builder.lessThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LIKE -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue().toString() + "%");
+            case STARTS_WITH -> builder.like(root.get(criteria.getKey()), criteria.getValue() + "%");
+            case ENDS_WITH -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue());
+            case CONTAINS -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+        };
     }
 
 
